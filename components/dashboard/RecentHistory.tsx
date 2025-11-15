@@ -2,8 +2,9 @@
 'use client';
 
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// ✅ date-fns 최적화: 필요한 함수만 import
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+import { ko } from 'date-fns/locale/ko';
 import { FileText, ExternalLink, ArrowRight } from 'lucide-react';
 import { HistoryDocument } from '@/lib/firebase/types';
 

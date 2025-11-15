@@ -1,5 +1,5 @@
 // lib/paddle.ts
-import { initializePaddle, Paddle, CheckoutOpenOptions } from '@paddle/paddle-js';
+import type { Paddle, CheckoutOpenOptions, InitializePaddleOptions } from '@paddle/paddle-js';
 
 /**
  * Paddle 가격 설정
@@ -17,23 +17,34 @@ const PADDLE_ENVIRONMENT = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || 'sandb
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
 
 /**
- * Paddle 인스턴스 (싱글톤)
+ * ✅ Paddle 인스턴스 가져오기
+ * window.Paddle을 반환 (PaddleProvider에서 초기화됨)
+ * 
+ * @returns Paddle | undefined
  */
-let paddleInstance: Paddle | undefined = undefined;
+export function getPaddleInstance(): Paddle | undefined {
+  if (typeof window === 'undefined') {
+    console.warn('⚠️ getPaddleInstance called on server side');
+    return undefined;
+  }
+
+  if (!window.Paddle) {
+    console.warn('⚠️ Paddle not initialized. Make sure PaddleProvider is added to your app.');
+    return undefined;
+  }
+
+  return window.Paddle;
+}
 
 /**
- * Paddle.js 초기화
+ * ✅ Paddle 초기화 (클라이언트 사이드 전용)
+ * PaddleProvider에서 자동으로 호출되므로 직접 호출할 필요 없음
  * 
- * @returns Promise<Paddle> - Paddle 인스턴스
- * 
- * @example
- * const paddle = await initializePaddleClient();
- * paddle.Checkout.open({ ... });
+ * @deprecated Use PaddleProvider instead
  */
-export async function initializePaddleClient(): Promise<Paddle> {
-  // 이미 초기화된 인스턴스가 있으면 재사용
-  if (paddleInstance) {
-    return paddleInstance;
+export async function initializePaddleClient(): Promise<Paddle | undefined> {
+  if (typeof window === 'undefined') {
+    return undefined;
   }
 
   // 환경 변수 검증
@@ -46,41 +57,34 @@ export async function initializePaddleClient(): Promise<Paddle> {
   }
 
   try {
-    // Paddle.js 초기화
-    const paddle = await initializePaddle({
-      environment: PADDLE_ENVIRONMENT,
-      token: PADDLE_CLIENT_TOKEN,
-      // 옵션: 이벤트 콜백 설정 가능
-      eventCallback: (event) => {
-        console.log('Paddle Event:', event);
-      },
-    });
-
-    if (!paddle) {
-      throw new Error('Failed to initialize Paddle: paddle instance is undefined');
+    if (!window.Paddle) {
+      console.error('❌ Paddle.js not loaded yet');
+      return undefined;
     }
 
-    paddleInstance = paddle;
-    console.log(`✅ Paddle initialized successfully (${PADDLE_ENVIRONMENT} mode)`);
+    // ✅ Paddle.js v2 Setup
+    const options: InitializePaddleOptions = {
+      token: PADDLE_CLIENT_TOKEN,
+      eventCallback: (event) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Paddle Event:', event);
+        }
+      },
+    };
+
+    window.Paddle.Setup(options);
     
-    return paddle;
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ Paddle initialized successfully (${PADDLE_ENVIRONMENT} mode)`);
+    }
+    
+    return window.Paddle;
   } catch (error) {
     console.error('❌ Failed to initialize Paddle:', error);
     throw new Error(
       `Failed to initialize Paddle: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
-}
-
-/**
- * Paddle 인스턴스 가져오기
- * 초기화되지 않았으면 자동으로 초기화
- */
-export async function getPaddleInstance(): Promise<Paddle> {
-  if (!paddleInstance) {
-    return await initializePaddleClient();
-  }
-  return paddleInstance;
 }
 
 /**
@@ -95,15 +99,10 @@ export interface OpenCheckoutOptions {
 }
 
 /**
- * Paddle 체크아웃 열기
+ * ✅ Paddle 체크아웃 열기
  * Pro 플랜 구독을 시작하기 위한 결제 창을 엽니다
  * 
  * @param options - 체크아웃 옵션
- * @param options.priceId - Paddle Price ID (예: PADDLE_PRICES.pro_monthly)
- * @param options.userId - 사용자 ID (Firebase UID)
- * @param options.userEmail - 사용자 이메일 (선택)
- * @param options.successUrl - 결제 성공 후 리다이렉트 URL
- * @param options.customData - 추가 커스텀 데이터
  * 
  * @example
  * await openCheckout({
@@ -122,7 +121,11 @@ export async function openCheckout(options: OpenCheckoutOptions): Promise<void> 
   } = options;
 
   try {
-    const paddle = await getPaddleInstance();
+    const paddle = getPaddleInstance();
+
+    if (!paddle) {
+      throw new Error('Paddle not initialized. Please wait for PaddleProvider to load.');
+    }
 
     // 체크아웃 설정
     const checkoutOptions: CheckoutOpenOptions = {
@@ -156,7 +159,9 @@ export async function openCheckout(options: OpenCheckoutOptions): Promise<void> 
     // 체크아웃 열기
     paddle.Checkout.open(checkoutOptions);
 
-    console.log('✅ Paddle checkout opened');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Paddle checkout opened');
+    }
   } catch (error) {
     console.error('❌ Failed to open checkout:', error);
     throw new Error(
@@ -191,9 +196,6 @@ export async function startProSubscription(
  * 
  * @param subscriptionId - Paddle Subscription ID
  * @returns Promise<boolean> - 성공 여부
- * 
- * @example
- * const success = await cancelSubscription('sub_01234567890');
  */
 export async function cancelSubscription(subscriptionId: string): Promise<boolean> {
   try {
@@ -206,7 +208,7 @@ export async function cancelSubscription(subscriptionId: string): Promise<boolea
     }
 
     // 서버 API 호출
-    const response = await fetch('/api/subscription/paddle/cancel', {
+    const response = await fetch('/api/subscription/cancel', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -221,7 +223,10 @@ export async function cancelSubscription(subscriptionId: string): Promise<boolea
     }
 
     const data = await response.json();
-    console.log('✅ Subscription canceled:', data);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Subscription canceled:', data);
+    }
     
     return true;
   } catch (error) {
@@ -233,15 +238,9 @@ export async function cancelSubscription(subscriptionId: string): Promise<boolea
 /**
  * 결제 수단 변경
  * Paddle 고객 포털로 리다이렉트하여 결제 수단을 변경합니다
- * 
- * @param subscriptionId - Paddle Subscription ID
- * 
- * @example
- * await updatePaymentMethod('sub_01234567890');
  */
 export async function updatePaymentMethod(subscriptionId: string): Promise<void> {
   try {
-    // Firebase ID 토큰 가져오기
     const { getIdToken } = await import('./auth');
     const token = await getIdToken();
 
@@ -249,8 +248,7 @@ export async function updatePaymentMethod(subscriptionId: string): Promise<void>
       throw new Error('User is not authenticated');
     }
 
-    // 서버 API 호출 (Update URL 생성)
-    const response = await fetch('/api/subscription/paddle/update-payment', {
+    const response = await fetch('/api/subscription/update-payment', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -276,9 +274,6 @@ export async function updatePaymentMethod(subscriptionId: string): Promise<void>
 
 /**
  * 구독 재개 (취소된 구독을 다시 활성화)
- * 
- * @param subscriptionId - Paddle Subscription ID
- * @returns Promise<boolean> - 성공 여부
  */
 export async function resumeSubscription(subscriptionId: string): Promise<boolean> {
   try {
@@ -289,7 +284,7 @@ export async function resumeSubscription(subscriptionId: string): Promise<boolea
       throw new Error('User is not authenticated');
     }
 
-    const response = await fetch('/api/subscription/paddle/resume', {
+    const response = await fetch('/api/subscription/resume', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -303,19 +298,15 @@ export async function resumeSubscription(subscriptionId: string): Promise<boolea
       throw new Error(error.error || 'Failed to resume subscription');
     }
 
-    console.log('✅ Subscription resumed');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Subscription resumed');
+    }
+    
     return true;
   } catch (error) {
     console.error('❌ Failed to resume subscription:', error);
     throw error;
   }
-}
-
-/**
- * Paddle 인스턴스 정리 (필요시)
- */
-export function cleanupPaddle(): void {
-  paddleInstance = undefined;
 }
 
 /**
@@ -332,16 +323,24 @@ export function isSandboxMode(): boolean {
   return PADDLE_ENVIRONMENT === 'sandbox';
 }
 
+// ============================================
+// Window 타입 확장
+// ============================================
+declare global {
+  interface Window {
+    Paddle?: Paddle;
+  }
+}
+
 // 기본 export
 export default {
-  initialize: initializePaddleClient,
   getInstance: getPaddleInstance,
+  initialize: initializePaddleClient,
   openCheckout,
   startProSubscription,
   cancelSubscription,
   updatePaymentMethod,
   resumeSubscription,
-  cleanup: cleanupPaddle,
   prices: PADDLE_PRICES,
   environment: PADDLE_ENVIRONMENT,
 };

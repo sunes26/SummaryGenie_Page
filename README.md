@@ -99,7 +99,10 @@
 - ✅ **구독 갱신 시 자동 업데이트 (transaction.completed 이벤트)**
 
 ### ⚙️ 설정
-- ✅ 프로필 편집 (이름, 이메일, 프로필 사진)
+- ✅ 프로필 편집 (이름, 프로필 사진)
+- ✅ **프로필 사진 업로드 (Firebase Storage, 최대 2MB)**
+- ✅ **이미지 업로드 진행률 표시**
+- ✅ 이메일 변경 (재인증 필요)
 - ✅ 비밀번호 변경 (재인증 포함)
 - ✅ 알림 설정
 - ✅ 사용 통계 확인
@@ -215,7 +218,6 @@ summarygenie_page/
 │  │  ├─ HistoryTable.tsx                 # 기록 테이블
 │  │  ├─ MobileHeader.tsx                 # 모바일 헤더
 │  │  ├─ NotificationSettings.tsx         # 알림 설정
-│  │  ├─ page.tsx                         # (임시 파일)
 │  │  ├─ ProfileSettings.tsx              # 프로필 설정
 │  │  ├─ RecentHistory.tsx                # 최근 기록
 │  │  ├─ SearchBar.tsx                    # 검색 바
@@ -804,6 +806,60 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ 
     success: true, 
     message: '구독 정보가 동기화되었습니다.' 
+  });
+}
+```
+
+### 5. 프로필 설정
+
+#### 프로필 사진 업로드
+
+```typescript
+// components/dashboard/ProfileSettings.tsx
+const handleImageUpload = async () => {
+  if (!selectedFile) return;
+
+  setUploading(true);
+  setUploadProgress(0);
+
+  try {
+    // Firebase Storage에 업로드 + 프로필 업데이트
+    const downloadURL = await uploadAndUpdateProfilePhoto(
+      selectedFile,
+      (progress: number) => {
+        setUploadProgress(progress);
+      }
+    );
+
+    setPhotoURL(downloadURL);
+    showSuccess('프로필 사진이 업데이트되었습니다.');
+    onUpdate();
+  } catch (error: any) {
+    showError(error.message || '이미지 업로드에 실패했습니다.');
+  } finally {
+    setUploading(false);
+  }
+};
+```
+
+#### 프로필 정보 업데이트
+
+```typescript
+// lib/auth.ts
+export async function updateUserProfile(
+  displayName?: string,
+  photoURL?: string
+): Promise<void> {
+  const auth = getAuthInstance();
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error('No user is currently signed in');
+  }
+
+  await updateProfile(user, {
+    ...(displayName && { displayName }),
+    ...(photoURL && { photoURL }),
   });
 }
 ```
@@ -1598,6 +1654,106 @@ const sortedDocs = snapshot.docs.sort((a, b) =>
 const latestDoc = sortedDocs[0];
 ```
 
+### 10. ProfileSettings Props 타입 오류 ⭐ NEW
+
+**증상:**
+```typescript
+error TS2322: Type '{ key: number; user: User; onUpdate: () => void; }' is not assignable to type 'IntrinsicAttributes & StatsOverviewProps'.
+  Property 'user' does not exist on type 'IntrinsicAttributes & StatsOverviewProps'.
+```
+
+**원인:**
+- `ProfileSettings.tsx` 컴포넌트가 잘못된 Props 타입(`StatsOverviewProps`)을 사용
+- `user` prop이 타입 정의에 없음
+
+**해결 방법:**
+
+**1. ProfileSettings 컴포넌트 Props 타입 정의:**
+
+```typescript
+// components/dashboard/ProfileSettings.tsx
+interface ProfileSettingsProps {
+  user: User;
+  onUpdate: () => void;
+}
+
+export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps) {
+  // ...
+}
+```
+
+**2. 올바른 함수 사용:**
+
+```typescript
+// lib/auth.ts 함수 사용 시
+// ❌ 잘못된 방법
+await uploadProfileImage(selectedFile);  // 존재하지 않는 함수
+
+// ✅ 올바른 방법
+await uploadAndUpdateProfilePhoto(selectedFile, (progress) => {
+  setUploadProgress(progress);
+});
+
+// ❌ 잘못된 방법
+await updateUserProfile({ displayName: name });  // 객체 전달
+
+// ✅ 올바른 방법
+await updateUserProfile(name);  // 개별 매개변수 전달
+```
+
+### 11. Next.js 15 설정 경고 ⭐ NEW
+
+**증상:**
+```
+⚠ Invalid next.config.ts options detected: 
+⚠ Unrecognized key(s) in object: 'swcMinify'
+⚠ Webpack is configured while Turbopack is not
+```
+
+**원인:**
+- Next.js 15에서는 `swcMinify`가 기본 활성화되어 불필요
+- Turbopack 사용 시 Webpack 설정이 있으면 충돌 가능
+
+**해결 방법:**
+
+`next.config.ts` 파일 수정:
+
+```typescript
+// ❌ Before
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  swcMinify: true,  // 제거 필요
+  webpack: (config) => {
+    // Webpack 설정...
+    return config;
+  },
+};
+
+export default nextConfig;
+
+// ✅ After
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  // swcMinify 제거 (Next.js 15에서 기본 활성화)
+  
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
+  },
+  
+  // Turbopack 사용 시 Webpack 설정 제거 권장
+  // 또는 Turbopack 설정으로 마이그레이션
+};
+
+export default nextConfig;
+```
+
+**참고:**
+- 앱은 경고가 있어도 정상 작동
+- 성능 최적화를 위해 정리 권장
+- 급하지 않으면 나중에 수정 가능
+
 ---
 
 ## 📈 개발 로드맵
@@ -1645,6 +1801,9 @@ const latestDoc = sortedDocs[0];
 - [x] PWA 지원
 - [ ] 다크 모드 개선
 - [ ] 캐싱 전략 최적화
+- [x] **프로필 설정 페이지 완성** ⭐
+- [x] **프로필 사진 업로드** ⭐
+- [x] **보안 설정 (이메일/비밀번호 변경)** ⭐
 
 ### 📅 Phase 6: 고급 기능 (예정)
 - [ ] 팀 공유 기능
@@ -1711,11 +1870,11 @@ perf: 성능 개선
 
 예시:
 ```
-feat: Add infinite scroll to history page
+feat: Add profile photo upload to settings page
 fix: Fix subscription renewal date sync issue
-docs: Update README with subscription sync feature
+docs: Update README with ProfileSettings component
 refactor: Optimize Firestore queries with subcollections
-perf: Add Paddle API direct query for real-time sync
+perf: Add image upload progress tracking
 ```
 
 ---
@@ -1779,4 +1938,4 @@ SOFTWARE.
 
 **Made with ❤️ by SummaryGenie Team**
 
-*마지막 업데이트: 2025년 11월 15일*
+*마지막 업데이트: 2025년 11월 16일*

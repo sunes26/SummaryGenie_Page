@@ -1,8 +1,9 @@
 // lib/firebase/client.ts
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
+// ✅ Tree Shaking 최적화: 필요한 함수만 import
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 // Firebase 설정 타입
 interface FirebaseConfig {
@@ -48,10 +49,10 @@ const validateConfig = (config: FirebaseConfig): void => {
 };
 
 // Firebase 초기화 (싱글톤 패턴)
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-let storage: FirebaseStorage;
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let db: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
 /**
  * Firebase 앱 초기화
@@ -69,10 +70,14 @@ export const initializeFirebase = (): FirebaseApp => {
     
     if (apps.length === 0) {
       app = initializeApp(firebaseConfig);
-      console.log('✅ Firebase initialized successfully');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Firebase initialized successfully');
+      }
     } else {
       app = apps[0];
-      console.log('✅ Using existing Firebase instance');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Using existing Firebase instance');
+      }
     }
   }
 
@@ -81,44 +86,54 @@ export const initializeFirebase = (): FirebaseApp => {
 
 /**
  * Firebase Authentication 인스턴스 가져오기
+ * ✅ 지연 초기화: 필요할 때만 생성
  */
 export const getAuthInstance = (): Auth => {
   if (!auth) {
-    const app = initializeFirebase();
-    auth = getAuth(app);
+    const firebaseApp = initializeFirebase();
+    auth = getAuth(firebaseApp);
   }
   return auth;
 };
 
 /**
  * Firestore 인스턴스 가져오기
+ * ✅ 지연 초기화: 필요할 때만 생성
  */
 export const getFirestoreInstance = (): Firestore => {
   if (!db) {
-    const app = initializeFirebase();
-    db = getFirestore(app);
+    const firebaseApp = initializeFirebase();
+    db = getFirestore(firebaseApp);
   }
   return db;
 };
 
 /**
  * Firebase Storage 인스턴스 가져오기
+ * ✅ 지연 초기화: 필요할 때만 생성
  */
 export const getStorageInstance = (): FirebaseStorage => {
   if (!storage) {
-    const app = initializeFirebase();
-    storage = getStorage(app);
+    const firebaseApp = initializeFirebase();
+    storage = getStorage(firebaseApp);
   }
   return storage;
 };
 
-// Export instances (자동 초기화)
-export { app, auth, db, storage };
+/**
+ * ✅ 인스턴스 정리 함수 (테스트 용도)
+ */
+export const cleanupFirebaseInstances = (): void => {
+  app = undefined;
+  auth = undefined;
+  db = undefined;
+  storage = undefined;
+};
 
-// 기본 export
+// 기본 export (하위 호환성)
 export default {
-  app: initializeFirebase(),
-  auth: getAuthInstance(),
-  db: getFirestoreInstance(),
-  storage: getStorageInstance(),
+  get app() { return initializeFirebase(); },
+  get auth() { return getAuthInstance(); },
+  get db() { return getFirestoreInstance(); },
+  get storage() { return getStorageInstance(); },
 };

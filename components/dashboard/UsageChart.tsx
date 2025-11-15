@@ -1,21 +1,38 @@
 // components/dashboard/UsageChart.tsx
 'use client';
 
-import { useState } from 'react';
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+import { useState, lazy, Suspense } from 'react';
 import { DailyDocument } from '@/lib/firebase/types';
-import { BarChart3, TrendingUp } from 'lucide-react';
+import { BarChart3, TrendingUp, Loader2 } from 'lucide-react';
+
+// ✅ Recharts Dynamic Import (300KB 절약)
+const BarChart = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.BarChart }))
+);
+const Bar = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.Bar }))
+);
+const LineChart = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.LineChart }))
+);
+const Line = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.Line }))
+);
+const XAxis = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.XAxis }))
+);
+const YAxis = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.YAxis }))
+);
+const CartesianGrid = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.CartesianGrid }))
+);
+const Tooltip = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.Tooltip }))
+);
+const ResponsiveContainer = lazy(() => 
+  import('recharts').then(mod => ({ default: mod.ResponsiveContainer }))
+);
 
 interface UsageChartProps {
   data: DailyDocument[];
@@ -25,6 +42,96 @@ interface UsageChartProps {
 
 type ChartType = 'weekly' | 'monthly';
 
+// ✅ 로딩 스켈레톤
+function ChartSkeleton() {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="h-6 bg-gray-200 rounded w-40 mb-6 animate-pulse"></div>
+      <div className="h-80 bg-gray-100 rounded animate-pulse"></div>
+    </div>
+  );
+}
+
+// ✅ 차트 렌더링 컴포넌트 (Suspense 내부)
+function ChartContent({ 
+  weeklyData, 
+  monthlyData, 
+  activeChart 
+}: { 
+  weeklyData: any[]; 
+  monthlyData: any[]; 
+  activeChart: ChartType;
+}) {
+  // 커스텀 툴팁
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+          <p className="text-sm font-semibold text-gray-900 mb-1">{label}</p>
+          <p className="text-sm text-gray-600">
+            요약 횟수: <span className="font-bold text-[#69D2E7]">{payload[0].value}회</span>
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <ResponsiveContainer width="100%" height={320}>
+      {activeChart === 'weekly' ? (
+        <BarChart data={weeklyData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+          <XAxis
+            dataKey="label"
+            tick={{ fill: '#6b7280', fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: '#e5e7eb' }}
+          />
+          <YAxis
+            tick={{ fill: '#6b7280', fontSize: 12 }}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
+          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(105, 210, 231, 0.1)' }} />
+          <Bar
+            dataKey="count"
+            fill="#69D2E7"
+            radius={[8, 8, 0, 0]}
+            maxBarSize={60}
+          />
+        </BarChart>
+      ) : (
+        <LineChart data={monthlyData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis
+            dataKey="label"
+            tick={{ fill: '#6b7280', fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: '#e5e7eb' }}
+          />
+          <YAxis
+            tick={{ fill: '#6b7280', fontSize: 12 }}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone"
+            dataKey="count"
+            stroke="#69D2E7"
+            strokeWidth={3}
+            dot={{ fill: '#69D2E7', r: 4 }}
+            activeDot={{ r: 6, fill: '#69D2E7' }}
+          />
+        </LineChart>
+      )}
+    </ResponsiveContainer>
+  );
+}
+
 export default function UsageChart({ 
   data, 
   loading = false,
@@ -33,12 +140,7 @@ export default function UsageChart({
   const [activeChart, setActiveChart] = useState<ChartType>('weekly');
 
   if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="h-6 bg-gray-200 rounded w-40 mb-6 animate-pulse"></div>
-        <div className="h-80 bg-gray-100 rounded animate-pulse"></div>
-      </div>
-    );
+    return <ChartSkeleton />;
   }
 
   if (!data || data.length === 0) {
@@ -81,7 +183,7 @@ export default function UsageChart({
   data.forEach((stat) => {
     const date = new Date(stat.date);
     const weekStart = new Date(date);
-    weekStart.setDate(date.getDate() - date.getDay()); // 주의 시작 (일요일)
+    weekStart.setDate(date.getDate() - date.getDay());
     const weekKey = weekStart.toISOString().split('T')[0];
     
     if (!groupedByWeek[weekKey]) {
@@ -103,21 +205,6 @@ export default function UsageChart({
       count: groupedByWeek[weekKey],
     });
   });
-
-  // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="text-sm font-semibold text-gray-900 mb-1">{label}</p>
-          <p className="text-sm text-gray-600">
-            요약 횟수: <span className="font-bold text-[#69D2E7]">{payload[0].value}회</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -164,58 +251,18 @@ export default function UsageChart({
         )}
       </div>
 
-      {/* 차트 영역 */}
-      <ResponsiveContainer width="100%" height={320}>
-        {activeChart === 'weekly' || type === 'bar' ? (
-          <BarChart data={weeklyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-            <XAxis
-              dataKey="label"
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              tickLine={false}
-              axisLine={{ stroke: '#e5e7eb' }}
-            />
-            <YAxis
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              tickLine={false}
-              axisLine={false}
-              allowDecimals={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(105, 210, 231, 0.1)' }} />
-            <Bar
-              dataKey="count"
-              fill="#69D2E7"
-              radius={[8, 8, 0, 0]}
-              maxBarSize={60}
-            />
-          </BarChart>
-        ) : (
-          <LineChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis
-              dataKey="label"
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              tickLine={false}
-              axisLine={{ stroke: '#e5e7eb' }}
-            />
-            <YAxis
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              tickLine={false}
-              axisLine={false}
-              allowDecimals={false}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="#69D2E7"
-              strokeWidth={3}
-              dot={{ fill: '#69D2E7', r: 4 }}
-              activeDot={{ r: 6, fill: '#69D2E7' }}
-            />
-          </LineChart>
-        )}
-      </ResponsiveContainer>
+      {/* ✅ Suspense로 차트 감싸기 */}
+      <Suspense fallback={
+        <div className="h-80 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      }>
+        <ChartContent 
+          weeklyData={weeklyData} 
+          monthlyData={monthlyData} 
+          activeChart={activeChart}
+        />
+      </Suspense>
 
       {/* 통계 요약 */}
       <div className="mt-6 pt-4 border-t border-gray-100">

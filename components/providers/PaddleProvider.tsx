@@ -2,84 +2,107 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { initializePaddleClient } from '@/lib/paddle';
+import Script from 'next/script';
+import type { Paddle, InitializePaddleOptions } from '@paddle/paddle-js';
 
 /**
- * Paddle.js를 로드하고 초기화하는 Provider
- * app/layout.tsx에 추가하세요
- * 
- * @example
- * <PaddleProvider>
- *   {children}
- * </PaddleProvider>
+ * ✅ 최적화된 Paddle Provider (TypeScript 에러 수정)
+ * - Script 태그로 지연 로딩
+ * - afterInteractive 전략으로 성능 개선
+ * - 올바른 Paddle.js v2 API 사용
  */
 export function PaddleProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
+  // Paddle 환경 설정
+  const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+  const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
+
   useEffect(() => {
-    // Paddle 초기화
-    initializePaddleClient()
-      .then(() => {
+    // Paddle 스크립트 로드 완료 후 초기화
+    const initializePaddle = async () => {
+      if (typeof window === 'undefined' || !window.Paddle) {
+        return;
+      }
+
+      if (!paddleToken) {
+        console.warn('⚠️ Paddle client token not found');
+        return;
+      }
+
+      try {
+        // ✅ Paddle.js v2 올바른 초기화 방법
+        const options: InitializePaddleOptions = {
+          token: paddleToken,
+          // environment는 token에 이미 포함되어 있으므로 별도로 지정하지 않음
+          eventCallback: (event) => {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Paddle Event:', event.name);
+            }
+          },
+        };
+
+        // Setup 호출
+        window.Paddle?.Setup(options);
+        
         setIsReady(true);
-        console.log('✅ Paddle initialized in provider');
-      })
-      .catch((error) => {
-        console.error('❌ Failed to initialize Paddle:', error);
-      });
-  }, []);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ Paddle initialized (${paddleEnv} mode)`);
+        }
+      } catch (error) {
+        console.error('❌ Paddle initialization failed:', error);
+      }
+    };
 
-  // Paddle이 준비되지 않아도 children을 렌더링
-  // PaddleCheckout 컴포넌트에서 자체적으로 초기화를 처리함
-  return <>{children}</>;
-}
+    // Paddle 스크립트 로드 확인
+    const checkPaddle = setInterval(() => {
+      if (window.Paddle) {
+        clearInterval(checkPaddle);
+        initializePaddle();
+      }
+    }, 100);
 
-// ============================================
-// app/layout.tsx에 추가하는 방법
-// ============================================
+    // 10초 후 타임아웃
+    const timeout = setTimeout(() => {
+      clearInterval(checkPaddle);
+      if (!window.Paddle) {
+        console.error('❌ Paddle script failed to load');
+      }
+    }, 10000);
 
-/*
-// app/layout.tsx
-import { AuthProvider } from '@/contexts/AuthContext';
-import { ToastProvider } from '@/components/ui/toast';
-import { PaddleProvider } from '@/components/providers/PaddleProvider';
+    return () => {
+      clearInterval(checkPaddle);
+      clearTimeout(timeout);
+    };
+  }, [paddleEnv, paddleToken]);
 
-export default function RootLayout({ children }) {
   return (
-    <html lang="ko">
-      <body>
-        <AuthProvider>
-          <PaddleProvider>
-            {children}
-          </PaddleProvider>
-        </AuthProvider>
-        <ToastProvider />
-      </body>
-    </html>
+    <>
+      {/* ✅ Next.js Script로 Paddle.js 로드 (afterInteractive) */}
+      <Script
+        src="https://cdn.paddle.com/paddle/v2/paddle.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Paddle.js script loaded');
+          }
+        }}
+        onError={(e) => {
+          console.error('❌ Failed to load Paddle.js:', e);
+        }}
+      />
+      
+      {children}
+    </>
   );
 }
-*/
 
 // ============================================
-// 대안: Script 태그로 직접 로드
+// Window 타입 확장 (TypeScript)
 // ============================================
-
-/*
-// app/layout.tsx
-import Script from 'next/script';
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="ko">
-      <head>
-        <Script 
-          src="https://cdn.paddle.com/paddle/v2/paddle.js"
-          strategy="afterInteractive"
-        />
-      </head>
-      <body>
-        {children}
-      </body>
-    </html>
-  );
+declare global {
+  interface Window {
+    Paddle?: Paddle;
+  }
 }
-*/

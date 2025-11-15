@@ -1,270 +1,349 @@
-// components/dashboard/StatsOverview.tsx
+// components/dashboard/ProfileSettings.tsx
 'use client';
 
-import { useMemo } from 'react';
-import { FileText, TrendingUp, Calendar, Award, Globe, BarChart3 } from 'lucide-react';
-import { useHistory, useHistoryCount } from '@/hooks/useHistory';
-import { useUsageStats } from '@/hooks/useUsageStats';
-import StatsCard from './StatsCard';
-import UsageChart from './UsageChart';
+import { useState, useRef } from 'react';
+import { User } from 'firebase/auth';
+import { User as UserIcon, Upload, Loader2, Camera, X } from 'lucide-react';
+import { updateUserProfile, uploadAndUpdateProfilePhoto } from '@/lib/auth';
+import { showSuccess, showError } from '@/lib/toast-helpers';
+import Image from 'next/image';
 
-interface StatsOverviewProps {
-  userId: string;
+interface ProfileSettingsProps {
+  user: User;
+  onUpdate: () => void;
 }
 
-export default function StatsOverview({ userId }: StatsOverviewProps) {
-  // 데이터 조회
-  const { count: totalCount, loading: countLoading } = useHistoryCount(userId);
-  const { dailyStats, monthlyTotal, loading: statsLoading } = useUsageStats(userId);
-  const { history, loading: historyLoading } = useHistory(userId, { pageSize: 1000 });
+export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps) {
+  // 프로필 정보 상태
+  const [displayName, setDisplayName] = useState(user.displayName || '');
+  const [photoURL, setPhotoURL] = useState(user.photoURL || '');
+  
+  // 이미지 업로드 상태
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewURL, setPreviewURL] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
+  // 프로필 업데이트 로딩
+  const [profileLoading, setProfileLoading] = useState(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 가장 많이 요약한 도메인 Top 5
-  const topDomains = useMemo(() => {
-    if (!history || history.length === 0) return [];
+  // 파일 선택 핸들러
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const domainCounts: { [key: string]: number } = {};
+    // 파일 크기 검증 (2MB)
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      showError('파일 크기는 2MB 이하여야 합니다.');
+      return;
+    }
 
-    history.forEach((item) => {
-      const domain = item.metadata?.domain;
-      if (domain) {
-        domainCounts[domain] = (domainCounts[domain] || 0) + 1;
-      }
-    });
+    // 파일 형식 검증
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      showError('JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드 가능합니다.');
+      return;
+    }
 
-    return Object.entries(domainCounts)
-      .map(([domain, count]) => ({ domain, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-  }, [history]);
+    setSelectedFile(file);
 
-  // 가장 활발한 요일 계산
-  const mostActiveDay = useMemo(() => {
-    if (!dailyStats || dailyStats.length === 0) return null;
-
-    const dayOfWeekCounts: { [key: string]: number } = {
-      일: 0,
-      월: 0,
-      화: 0,
-      수: 0,
-      목: 0,
-      금: 0,
-      토: 0,
+    // 미리보기 생성
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewURL(reader.result as string);
     };
+    reader.readAsDataURL(file);
+  };
 
-    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  // 이미지 업로드 및 프로필 업데이트
+  const handleImageUpload = async () => {
+    if (!selectedFile) return;
 
-    dailyStats.forEach((stat) => {
-      const date = new Date(stat.date);
-      const dayOfWeek = dayNames[date.getDay()];
-      dayOfWeekCounts[dayOfWeek] += stat.count || 0;
-    });
+    setUploading(true);
+    setUploadProgress(0);
 
-    const maxDay = Object.entries(dayOfWeekCounts).reduce(
-      (max, [day, count]) => (count > max.count ? { day, count } : max),
-      { day: '', count: 0 }
-    );
+    try {
+      // ✅ uploadAndUpdateProfilePhoto 함수 사용 (이미 프로필 업데이트 포함)
+      const downloadURL = await uploadAndUpdateProfilePhoto(
+        selectedFile,
+        (progress: number) => {
+          setUploadProgress(progress);
+        }
+      );
 
-    return maxDay.count > 0 ? maxDay.day : null;
-  }, [dailyStats]);
+      setPhotoURL(downloadURL);
+      setSelectedFile(null);
+      setPreviewURL(null);
+      
+      showSuccess('프로필 사진이 업데이트되었습니다.');
+      onUpdate();
+    } catch (error: any) {
+      console.error('Image upload error:', error);
+      showError(error.message || '이미지 업로드에 실패했습니다.');
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
 
-  // 평균 일일 사용량
-  const averageDaily = useMemo(() => {
-    if (dailyStats.length === 0) return 0;
-    return Math.round((monthlyTotal / dailyStats.length) * 10) / 10;
-  }, [dailyStats, monthlyTotal]);
+  // 이미지 선택 취소
+  const handleCancelImage = () => {
+    setSelectedFile(null);
+    setPreviewURL(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
-  // 로딩 상태
-  const isLoading = countLoading || statsLoading || historyLoading;
+  // 프로필 정보 업데이트
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!displayName.trim()) {
+      showError('이름을 입력해주세요.');
+      return;
+    }
+
+    if (displayName.trim() === user.displayName) {
+      showError('변경된 내용이 없습니다.');
+      return;
+    }
+
+    setProfileLoading(true);
+
+    try {
+      // ✅ 개별 매개변수로 전달 (객체 X)
+      await updateUserProfile(displayName.trim());
+      showSuccess('프로필이 업데이트되었습니다.');
+      onUpdate();
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      showError(error.message || '프로필 업데이트에 실패했습니다.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
-          사용 통계
-        </h3>
-        <p className="text-sm text-gray-500 mb-6">
-          최근 30일간의 요약 활동을 확인하세요.
-        </p>
-      </div>
+    <div className="space-y-8">
+      {/* 프로필 사진 */}
+      <div className="pb-8 border-b border-gray-200">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Camera className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">프로필 사진</h3>
+            <p className="text-sm text-gray-500">프로필 사진을 변경하세요 (최대 2MB)</p>
+          </div>
+        </div>
 
-      {/* 통계 카드 그리드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* 총 요약 수 */}
-        <StatsCard
-          title="총 요약"
-          value={totalCount.toLocaleString()}
-          icon={FileText}
-          description="전체 기간"
-          color="blue"
-          loading={isLoading}
-        />
-
-        {/* 이번 달 요약 */}
-        <StatsCard
-          title="최근 30일"
-          value={monthlyTotal.toLocaleString()}
-          icon={TrendingUp}
-          description="최근 한 달"
-          color="green"
-          loading={isLoading}
-        />
-
-        {/* 평균 사용량 */}
-        <StatsCard
-          title="일평균"
-          value={`${averageDaily}회`}
-          icon={Calendar}
-          description="하루 평균"
-          color="purple"
-          loading={isLoading}
-        />
-
-        {/* 가장 활발한 요일 */}
-        <StatsCard
-          title="활발한 요일"
-          value={mostActiveDay ? `${mostActiveDay}요일` : '-'}
-          icon={Award}
-          description="가장 많이 사용"
-          color="orange"
-          loading={isLoading}
-        />
-      </div>
-
-      {/* 사용량 차트 */}
-      {!isLoading && dailyStats.length > 0 && (
-        <UsageChart data={dailyStats} loading={statsLoading} />
-      )}
-
-      {/* 도메인 통계 */}
-      {!isLoading && topDomains.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Globe className="w-5 h-5 mr-2 text-blue-600" />
-            가장 많이 요약한 도메인 Top 5
-          </h4>
-          <div className="space-y-3">
-            {topDomains.map((item, index) => {
-              const percentage = totalCount > 0 ? (item.count / totalCount) * 100 : 0;
-              const colors = [
-                'bg-blue-500',
-                'bg-green-500',
-                'bg-purple-500',
-                'bg-orange-500',
-                'bg-pink-500',
-              ];
-              const bgColors = [
-                'bg-blue-50',
-                'bg-green-50',
-                'bg-purple-50',
-                'bg-orange-50',
-                'bg-pink-50',
-              ];
-              const textColors = [
-                'text-blue-700',
-                'text-green-700',
-                'text-purple-700',
-                'text-orange-700',
-                'text-pink-700',
-              ];
-
-              return (
-                <div
-                  key={item.domain}
-                  className={`flex items-center justify-between p-4 ${bgColors[index]} rounded-lg border border-gray-200 hover:shadow-md transition`}
+        <div className="mt-6 flex items-start space-x-6">
+          {/* 현재 프로필 사진 */}
+          <div className="flex-shrink-0">
+            {previewURL ? (
+              <div className="relative">
+                <Image
+                  src={previewURL}
+                  alt="미리보기"
+                  width={128}
+                  height={128}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                />
+                <button
+                  type="button"
+                  onClick={handleCancelImage}
+                  className="absolute top-0 right-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition shadow-lg"
                 >
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${bgColors[index]} border-2 ${colors[index].replace('bg-', 'border-')}`}
-                    >
-                      <span className={`text-sm font-bold ${textColors[index]}`}>
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {item.domain}
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : photoURL ? (
+              <Image
+                src={photoURL}
+                alt={displayName || 'Profile'}
+                width={128}
+                height={128}
+                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+              />
+            ) : (
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center border-4 border-gray-200">
+                <UserIcon className="w-16 h-16 text-white" />
+              </div>
+            )}
+          </div>
+
+          {/* 업로드 버튼 */}
+          <div className="flex-1">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            {selectedFile ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-3">
+                    <Upload className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[200px]">
-                          <div
-                            className={`h-2 rounded-full ${colors[index]} transition-all duration-500`}
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                          {percentage.toFixed(1)}%
-                        </span>
-                      </div>
                     </div>
                   </div>
-                  <div className="text-right ml-4">
-                    <p className="text-xl font-bold text-gray-900">{item.count}</p>
-                    <p className="text-xs text-gray-500">요약</p>
-                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
-      {/* 빈 상태 */}
-      {!isLoading && history.length === 0 && (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-10 h-10 text-gray-300" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            아직 통계가 없습니다
-          </h3>
-          <p className="text-gray-500 mb-6">
-            Chrome 확장 프로그램으로 페이지를 요약하면 통계가 표시됩니다.
-          </p>
-          <a
-            href="https://chrome.google.com/webstore"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-          >
-            확장 프로그램 설치하기
-          </a>
-        </div>
-      )}
+                {uploading && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">업로드 중...</span>
+                      <span className="font-semibold text-blue-600">{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
 
-      {/* 로딩 상태 */}
-      {isLoading && (
-        <div className="space-y-6">
-          {/* 차트 스켈레톤 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="h-6 bg-gray-200 rounded w-40 mb-6 animate-pulse"></div>
-            <div className="h-80 bg-gray-100 rounded animate-pulse"></div>
-          </div>
-
-          {/* 도메인 스켈레톤 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg animate-pulse"
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={handleImageUpload}
+                    disabled={uploading}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        업로드 중...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        업로드
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelImage}
+                    disabled={uploading}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
                 >
-                  <div className="flex items-center space-x-3 flex-1">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                </div>
-              ))}
+                  <Upload className="w-4 h-4 mr-2" />
+                  사진 선택
+                </button>
+                <p className="text-xs text-gray-500 mt-2">
+                  JPEG, PNG, GIF, WEBP 형식 (최대 2MB)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 프로필 정보 */}
+      <div>
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <UserIcon className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">프로필 정보</h3>
+            <p className="text-sm text-gray-500">이름과 이메일을 관리하세요</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleProfileUpdate} className="space-y-4 mt-6">
+          {/* 이름 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              이름
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="이름을 입력하세요"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={profileLoading}
+            />
+          </div>
+
+          {/* 이메일 (읽기 전용) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              이메일
+            </label>
+            <input
+              type="email"
+              value={user.email || ''}
+              readOnly
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              이메일 변경은 <span className="font-semibold">보안</span> 탭에서 가능합니다.
+            </p>
+          </div>
+
+          {/* 이메일 인증 상태 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              이메일 인증 상태
+            </label>
+            <div className="flex items-center space-x-2">
+              {user.emailVerified ? (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  ✓ 인증됨
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  ⚠ 미인증
+                </span>
+              )}
             </div>
           </div>
-        </div>
-      )}
+
+          <button
+            type="submit"
+            disabled={profileLoading || displayName.trim() === user.displayName}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            {profileLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                저장 중...
+              </>
+            ) : (
+              <>
+                <UserIcon className="w-4 h-4 mr-2" />
+                프로필 저장
+              </>
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

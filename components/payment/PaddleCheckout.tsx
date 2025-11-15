@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getPaddleInstance, PADDLE_PRICES } from '@/lib/paddle';
-import { CheckoutOpenOptions } from '@paddle/paddle-js';
+import type { CheckoutOpenOptions } from '@paddle/paddle-js';
 import { showSuccess, showError, showLoading, dismissToast } from '@/lib/toast-helpers';
 
 /**
@@ -24,8 +24,6 @@ interface PaddleCheckoutProps {
   priceId?: string;
   /** 성공 URL */
   successUrl?: string;
-  /** 닫기 URL */
-  closeUrl?: string;
   /** 버튼 크기 */
   size?: 'sm' | 'md' | 'lg';
   /** 버튼 variant */
@@ -33,13 +31,7 @@ interface PaddleCheckoutProps {
 }
 
 /**
- * Paddle Checkout을 띄우는 버튼 컴포넌트
- * 
- * @example
- * <PaddleCheckout 
- *   buttonText="Pro로 업그레이드"
- *   onSuccess={() => console.log('구독 완료!')}
- * />
+ * ✅ Paddle Checkout 버튼 (TypeScript 에러 수정)
  */
 export function PaddleCheckout({
   buttonText = 'Pro로 업그레이드',
@@ -48,7 +40,6 @@ export function PaddleCheckout({
   onError,
   priceId = PADDLE_PRICES.pro_monthly,
   successUrl,
-  closeUrl,
   size = 'md',
   variant = 'primary',
 }: PaddleCheckoutProps) {
@@ -74,7 +65,7 @@ export function PaddleCheckout({
   const isAlreadyPro = isPro && isActive;
 
   /**
-   * Paddle Checkout 열기
+   * ✅ Paddle Checkout 열기 (수정됨)
    */
   const handleOpenCheckout = async () => {
     // 사용자 인증 확인
@@ -93,8 +84,12 @@ export function PaddleCheckout({
     const toastId = showLoading('결제 페이지를 준비 중...');
 
     try {
-      // Paddle 인스턴스 가져오기
-      const paddle = await getPaddleInstance();
+      // ✅ Paddle 인스턴스 가져오기
+      const paddle = getPaddleInstance();
+
+      if (!paddle) {
+        throw new Error('Paddle이 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      }
 
       // 체크아웃 옵션 설정
       const checkoutOptions: CheckoutOpenOptions = {
@@ -111,11 +106,11 @@ export function PaddleCheckout({
           source: 'web_dashboard',
         },
         settings: {
-          displayMode: 'overlay', // 오버레이 모드
-          theme: 'dark', // 다크 테마
-          locale: 'ko', // 한국어
-          showAddDiscounts: true, // 할인 코드 입력 허용
-          allowLogout: false, // 로그아웃 버튼 숨김
+          displayMode: 'overlay',
+          theme: 'dark',
+          locale: 'ko',
+          showAddDiscounts: true,
+          allowLogout: false,
           successUrl: successUrl || `${window.location.origin}/subscription?success=true`,
         },
       };
@@ -127,14 +122,14 @@ export function PaddleCheckout({
         };
       }
 
-      // 닫기 URL 설정 (선택사항) - 현재는 사용하지 않음
-      // Paddle.js v2에서는 closeUrl이 없음
-
       // 체크아웃 열기
       paddle.Checkout.open(checkoutOptions);
 
       dismissToast(toastId);
-      console.log('✅ Paddle checkout opened');
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Paddle checkout opened');
+      }
 
       // 성공 콜백
       if (onSuccess) {
@@ -217,9 +212,6 @@ export function PaddleCheckout({
 
 /**
  * Pro 플랜 프라이싱 카드 컴포넌트
- * 
- * @example
- * <ProPricingCard />
  */
 export function ProPricingCard() {
   const { isPro, isActive } = useSubscription();
@@ -282,10 +274,6 @@ export function ProPricingCard() {
 
 /**
  * 업그레이드 프롬프트 컴포넌트
- * Free 사용자에게 표시
- * 
- * @example
- * <UpgradePrompt />
  */
 export function UpgradePrompt() {
   return (
@@ -321,10 +309,6 @@ export function UpgradePrompt() {
 
 /**
  * 인라인 업그레이드 버튼
- * 작은 CTA용
- * 
- * @example
- * <InlineUpgradeButton />
  */
 export function InlineUpgradeButton() {
   return (
