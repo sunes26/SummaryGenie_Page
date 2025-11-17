@@ -1,25 +1,30 @@
 // components/marketing/Features.tsx
+'use client';
+
 import { Sparkles, MessageSquare, Languages, Zap, Shield, Smartphone } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Features() {
+  const { t } = useTranslation();
+
   const mainFeatures = [
     {
       icon: Sparkles,
-      title: 'AI 자동 요약',
-      description: '최신 GPT 기술로 웹페이지의 핵심 내용을 즉시 요약합니다.',
+      title: t('marketing.features.aiSummary.title'),
+      description: t('marketing.features.aiSummary.description'),
       color: 'from-blue-500 to-cyan-500',
     },
     {
       icon: MessageSquare,
-      title: '스마트 Q&A',
-      description: '궁금한 점을 물어보세요. AI가 문서 내용을 기반으로 답변합니다.',
+      title: t('marketing.features.smartQA.title'),
+      description: t('marketing.features.smartQA.description'),
       color: 'from-purple-500 to-pink-500',
     },
     {
       icon: Languages,
-      title: '완벽한 한국어 지원',
-      description: '한국어 웹페이지도 정확하게 요약하고 이해합니다.',
+      title: t('marketing.features.koreanSupport.title'),
+      description: t('marketing.features.koreanSupport.description'),
       color: 'from-orange-500 to-red-500',
     },
   ];
@@ -27,18 +32,18 @@ export default function Features() {
   const additionalFeatures = [
     {
       icon: Zap,
-      title: '빠른 처리',
-      description: '클릭 한 번으로 3초 내 요약 완료',
+      title: t('marketing.features.fastProcessing.title'),
+      description: t('marketing.features.fastProcessing.description'),
     },
     {
       icon: Shield,
-      title: '프라이버시 보호',
-      description: '모든 데이터는 안전하게 암호화',
+      title: t('marketing.features.privacy.title'),
+      description: t('marketing.features.privacy.description'),
     },
     {
       icon: Smartphone,
-      title: '어디서나 접근',
-      description: '웹 대시보드로 언제든지 확인',
+      title: t('marketing.features.access.title'),
+      description: t('marketing.features.access.description'),
     },
   ];
 
@@ -48,14 +53,10 @@ export default function Features() {
         <ScrollReveal>
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl md:text-5xl font-bold">
-              강력한 기능으로
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                생산성을 극대화
-              </span>
+              {t('marketing.features.title')}
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              복잡한 설정 없이, 설치하자마자 바로 사용할 수 있습니다.
+              {t('marketing.features.subtitle')}
             </p>
           </div>
         </ScrollReveal>

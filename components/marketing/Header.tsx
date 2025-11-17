@@ -7,10 +7,13 @@ import { Menu, X, Sparkles, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/lib/auth';
+import { useTranslation } from '@/hooks/useTranslation'; // ✅ 번역 훅 추가
+import LanguageSwitcher from '@/components/LanguageSwitcher'; // ✅ 언어 전환 버튼 추가
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, loading } = useAuth();
+  const { t } = useTranslation(); // ✅ 번역 훅 사용
 
   const handleLogout = async () => {
     try {
@@ -33,29 +36,31 @@ export default function Header() {
             </span>
           </Link>
 
+          {/* ✅ 데스크톱 네비게이션 - 번역 적용 */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium hover:text-blue-600 transition">
-              기능
+              {t('marketing.header.features')}
             </a>
             <a href="#how-it-works" className="text-sm font-medium hover:text-blue-600 transition">
-              사용방법
+              {t('marketing.header.howItWorks')}
             </a>
             <a href="#pricing" className="text-sm font-medium hover:text-blue-600 transition">
-              요금제
+              {t('marketing.header.pricing')}
             </a>
             <a href="#faq" className="text-sm font-medium hover:text-blue-600 transition">
-              FAQ
+              {t('marketing.header.faq')}
             </a>
           </nav>
 
+          {/* ✅ 데스크톱 액션 버튼 - 번역 적용 */}
           <div className="hidden md:flex items-center gap-4">
             {loading ? (
               <div className="w-32 h-9 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md"></div>
             ) : user ? (
-              // 로그인한 상태: 대시보드 버튼 + 프로필 정보 + 로그아웃 버튼
+              // 로그인한 상태
               <div className="flex items-center gap-3">
                 <Link href="/dashboard">
-                  <Button>대시보드</Button>
+                  <Button>{t('marketing.header.dashboard')}</Button>
                 </Link>
                 
                 {/* 프로필 정보 */}
@@ -64,7 +69,7 @@ export default function Header() {
                     {user.photoURL ? (
                       <img
                         src={user.photoURL}
-                        alt={user.displayName || '사용자'}
+                        alt={user.displayName || t('common.name')}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -75,7 +80,7 @@ export default function Header() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {user.displayName || '사용자'}
+                      {user.displayName || t('common.name')}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       {user.email}
@@ -87,25 +92,29 @@ export default function Header() {
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-                  title="로그아웃"
+                  title={t('marketing.header.logout')}
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>로그아웃</span>
+                  <span>{t('marketing.header.logout')}</span>
                 </button>
               </div>
             ) : (
-              // 로그인하지 않은 상태: 로그인 + 무료 시작하기 버튼
+              // 로그인하지 않은 상태
               <>
                 <Link href="/login">
-                  <Button variant="ghost">로그인</Button>
+                  <Button variant="ghost">{t('marketing.header.login')}</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button>무료 시작하기</Button>
+                  <Button>{t('marketing.header.signup')}</Button>
                 </Link>
               </>
             )}
+
+            {/* ✅ 언어 전환 버튼 추가 */}
+            <LanguageSwitcher showLabel={false} />
           </div>
 
+          {/* 모바일 메뉴 버튼 */}
           <button
             className="md:hidden p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -119,6 +128,7 @@ export default function Header() {
           </button>
         </div>
 
+        {/* ✅ 모바일 메뉴 - 번역 적용 */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-200 dark:border-slate-800">
             <nav className="flex flex-col gap-4">
@@ -127,29 +137,35 @@ export default function Header() {
                 className="text-sm font-medium hover:text-blue-600 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                기능
+                {t('marketing.header.features')}
               </a>
               <a
                 href="#how-it-works"
                 className="text-sm font-medium hover:text-blue-600 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                사용방법
+                {t('marketing.header.howItWorks')}
               </a>
               <a
                 href="#pricing"
                 className="text-sm font-medium hover:text-blue-600 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                요금제
+                {t('marketing.header.pricing')}
               </a>
               <a
                 href="#faq"
                 className="text-sm font-medium hover:text-blue-600 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                FAQ
+                {t('marketing.header.faq')}
               </a>
+
+              {/* ✅ 모바일 언어 전환 버튼 */}
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                <LanguageSwitcher className="w-full justify-center" />
+              </div>
+
               <div className="flex flex-col gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
                 {loading ? (
                   <div className="w-full h-9 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md"></div>
@@ -162,7 +178,7 @@ export default function Header() {
                         {user.photoURL ? (
                           <img
                             src={user.photoURL}
-                            alt={user.displayName || '사용자'}
+                            alt={user.displayName || t('common.name')}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -173,7 +189,7 @@ export default function Header() {
                       </div>
                       <div className="flex flex-col flex-1 min-w-0">
                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                          {user.displayName || '사용자'}
+                          {user.displayName || t('common.name')}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {user.email}
@@ -182,7 +198,7 @@ export default function Header() {
                     </div>
                     
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full">대시보드</Button>
+                      <Button className="w-full">{t('marketing.header.dashboard')}</Button>
                     </Link>
 
                     {/* 모바일 로그아웃 버튼 */}
@@ -191,7 +207,7 @@ export default function Header() {
                       className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span>로그아웃</span>
+                      <span>{t('marketing.header.logout')}</span>
                     </button>
                   </>
                 ) : (
@@ -199,11 +215,11 @@ export default function Header() {
                   <>
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full">
-                        로그인
+                        {t('marketing.header.login')}
                       </Button>
                     </Link>
                     <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full">무료 시작하기</Button>
+                      <Button className="w-full">{t('marketing.header.signup')}</Button>
                     </Link>
                   </>
                 )}

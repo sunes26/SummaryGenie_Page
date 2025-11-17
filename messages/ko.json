@@ -1,0 +1,408 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "성공했습니다",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "close": "닫기",
+    "search": "검색",
+    "filter": "필터",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "submit": "제출",
+    "email": "이메일",
+    "password": "비밀번호",
+    "name": "이름",
+    "or": "또는",
+    "and": "및",
+    "required": "필수",
+    "optional": "선택사항"
+  },
+  "auth": {
+    "login": {
+      "title": "SummaryGenie 로그인",
+      "subtitle": "AI 웹페이지 요약 서비스에 로그인하세요",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "비밀번호",
+      "passwordPlaceholder": "••••••••",
+      "loginButton": "로그인",
+      "loggingIn": "로그인 중...",
+      "googleLogin": "Google로 로그인",
+      "googleLoggingIn": "Google 로그인 중...",
+      "noAccount": "계정이 없으신가요?",
+      "signup": "회원가입",
+      "forgotPassword": "비밀번호를 잊으셨나요?"
+    },
+    "signup": {
+      "title": "회원가입",
+      "displayNameLabel": "이름 (선택사항)",
+      "displayNamePlaceholder": "홍길동",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "비밀번호",
+      "passwordPlaceholder": "8자 이상 입력해주세요",
+      "passwordHint": "최소 8자 이상의 비밀번호를 입력해주세요.",
+      "passwordConfirmLabel": "비밀번호 확인",
+      "passwordConfirmPlaceholder": "비밀번호를 다시 입력해주세요",
+      "agreeTerms": "이용약관 및 개인정보처리방침에 동의합니다.",
+      "terms": "이용약관",
+      "privacy": "개인정보처리방침",
+      "signupButton": "회원가입",
+      "signingUp": "회원가입 중...",
+      "googleSignup": "Google로 계속하기",
+      "googleSigningUp": "Google 회원가입 중...",
+      "haveAccount": "이미 계정이 있으신가요?",
+      "login": "로그인"
+    },
+    "forgotPassword": {
+      "title": "비밀번호를 잊으셨나요?",
+      "subtitle": "가입하신 이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다.",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "your@email.com",
+      "sendButton": "비밀번호 재설정 이메일 발송",
+      "sending": "발송 중...",
+      "successTitle": "✓ 이메일이 발송되었습니다!",
+      "successMessage": "이메일을 확인하여 비밀번호를 재설정해주세요. 메일이 오지 않았다면 스팸함을 확인해보세요.",
+      "backToLogin": "← 로그인 페이지로 돌아가기",
+      "noAccount": "계정이 없으신가요?",
+      "signup": "회원가입"
+    },
+    "errors": {
+      "invalidEmail": "올바른 이메일 형식을 입력해주세요.",
+      "passwordTooShort": "비밀번호는 최소 8자 이상이어야 합니다.",
+      "passwordMismatch": "비밀번호가 일치하지 않습니다.",
+      "agreeTermsRequired": "이용약관에 동의해주세요.",
+      "loginFailed": "로그인에 실패했습니다.",
+      "signupFailed": "회원가입에 실패했습니다.",
+      "resetFailed": "비밀번호 재설정 이메일 발송에 실패했습니다."
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "logo": "SummaryGenie",
+      "dashboard": "대시보드",
+      "history": "요약 기록",
+      "subscription": "구독 관리",
+      "settings": "설정",
+      "logout": "로그아웃"
+    },
+    "home": {
+      "title": "대시보드",
+      "greeting": "안녕하세요, {name}님! 👋",
+      "stats": {
+        "monthlyUsage": "이번 달 사용량",
+        "monthlyUsageDesc": "이번 달 요약 횟수",
+        "totalSummaries": "총 요약 횟수",
+        "totalSummariesDesc": "전체 요약 기록",
+        "recentWeek": "최근 7일",
+        "recentWeekDesc": "일주일간 사용량",
+        "count": "{count}회"
+      },
+      "upgrade": {
+        "title": "Pro로 업그레이드",
+        "description": "무제한 요약, 고성능 AI, 우선 지원을 경험해보세요",
+        "viewPro": "Pro 플랜 보기",
+        "installExtension": "확장 프로그램 설치"
+      },
+      "extension": {
+        "title": "Chrome 확장 프로그램",
+        "description": "웹 서핑 중 언제든지 페이지를 요약하세요",
+        "install": "확장 프로그램 설치"
+      },
+      "gettingStarted": {
+        "title": "💡 시작하기",
+        "step1Title": "1. 확장 프로그램 설치",
+        "step1Desc": "Chrome 웹스토어에서 SummaryGenie를 설치하세요",
+        "step2Title": "2. 페이지 요약",
+        "step2Desc": "읽고 싶은 페이지에서 확장 프로그램 아이콘을 클릭하세요",
+        "step3Title": "3. 기록 관리",
+        "step3Desc": "요약 기록은 자동으로 저장되어 언제든 확인할 수 있습니다"
+      }
+    },
+    "history": {
+      "title": "요약 기록",
+      "totalCount": "총 {count}개의 요약",
+      "searchPlaceholder": "제목 또는 내용으로 검색...",
+      "filterAll": "전체",
+      "sortNewest": "최신순",
+      "sortOldest": "오래된 순",
+      "perPage": "페이지당 20개 표시",
+      "filtering": "{domain} 필터링 중 •",
+      "loadMore": "더 보기",
+      "loadingMore": "추가 로딩 중...",
+      "allLoaded": "모든 기록을 불러왔습니다",
+      "empty": "아직 요약이 없습니다",
+      "emptyDesc": "Chrome 확장 프로그램으로 웹페이지를 요약해보세요",
+      "table": {
+        "title": "제목",
+        "domain": "도메인",
+        "date": "생성일",
+        "actions": "액션",
+        "view": "상세보기"
+      }
+    },
+    "modal": {
+      "title": "요약 상세",
+      "originalUrl": "원본 URL",
+      "domain": "도메인",
+      "createdAt": "생성일",
+      "summary": "요약 내용",
+      "copy": "복사",
+      "copied": "복사됨!",
+      "close": "닫기"
+    }
+  },
+  "subscription": {
+    "title": "구독 관리",
+    "sync": "구독 정보 동기화",
+    "syncing": "동기화 중...",
+    "free": {
+      "title": "Free 플랜",
+      "badge": "무료",
+      "description": "현재 무료 플랜을 사용 중입니다.",
+      "usageTitle": "이번 달 사용량",
+      "usageLimit": "{current} / {limit}회",
+      "usageFull": "이번 달 무료 사용량을 모두 소진했습니다.",
+      "limitationsTitle": "현재 제한사항:",
+      "limitation1": "월 30회 무료 요약 제한",
+      "limitation2": "기본 AI 모델만 사용 가능",
+      "limitation3": "광고 표시",
+      "benefitsTitle": "Pro로 업그레이드하면:",
+      "benefit1": "무제한 요약",
+      "benefit2": "고성능 AI 모델 사용",
+      "benefit3": "광고 제거",
+      "benefit4": "우선 지원",
+      "upgradeButton": "Pro로 업그레이드 - ₩9,900/월",
+      "footer": "언제든지 취소 가능 • 부가세 포함"
+    },
+    "pro": {
+      "title": "Pro 플랜",
+      "active": "활성",
+      "pastDue": "결제 실패",
+      "description": "Pro 플랜의 모든 기능을 사용하고 계십니다.",
+      "startDate": "구독 시작일",
+      "nextBilling": "다음 결제일",
+      "amount": "결제 금액",
+      "renewal": "갱신까지",
+      "cancellation": "종료까지",
+      "daysLeft": "{days}일 남음",
+      "benefitsTitle": "Pro 혜택 사용 중:",
+      "benefit1": "무제한 요약",
+      "benefit2": "고성능 AI 모델 사용",
+      "benefit3": "광고 제거",
+      "benefit4": "우선 지원",
+      "updatePayment": "결제 수단 변경",
+      "cancel": "구독 해지",
+      "resume": "구독 재개하기",
+      "footer": "구독을 해지해도 현재 결제 기간이 끝날 때까지 Pro 기능을 사용할 수 있습니다."
+    },
+    "alerts": {
+      "successTitle": "구독이 완료되었습니다!",
+      "successMessage": "이제 Pro 플랜의 모든 기능을 무제한으로 사용할 수 있습니다.",
+      "cancelScheduledTitle": "구독 종료 예정",
+      "cancelScheduledMessage": "구독이 {days}일 후 종료됩니다. ({date})",
+      "pastDueTitle": "결제에 실패했습니다",
+      "pastDueMessage": "결제 수단을 확인하고 업데이트해주세요.",
+      "updatePaymentButton": "결제 수단 업데이트"
+    },
+    "cancelModal": {
+      "title": "구독을 해지하시겠습니까?",
+      "message": "구독을 해지하면 현재 결제 기간({date})이 끝날 때까지 Pro 기능을 계속 사용할 수 있습니다.",
+      "confirmButton": "구독 해지하기",
+      "processing": "처리 중...",
+      "cancelButton": "취소"
+    }
+  },
+  "settings": {
+    "title": "설정",
+    "subtitle": "프로필, 보안, 알림 및 통계를 관리하세요",
+    "tabs": {
+      "profile": "프로필",
+      "security": "보안",
+      "notifications": "알림",
+      "stats": "통계"
+    },
+    "profile": {
+      "title": "프로필 설정",
+      "photo": "프로필 사진",
+      "uploadPhoto": "사진 업로드",
+      "uploading": "업로드 중...",
+      "uploadProgress": "업로드 진행: {progress}%",
+      "nameLabel": "이름",
+      "namePlaceholder": "이름을 입력하세요",
+      "emailLabel": "이메일",
+      "emailNote": "이메일 변경 시 재인증이 필요합니다.",
+      "saveButton": "변경사항 저장",
+      "saving": "저장 중...",
+      "success": "프로필이 업데이트되었습니다.",
+      "photoSuccess": "프로필 사진이 업데이트되었습니다."
+    },
+    "security": {
+      "title": "보안 설정",
+      "changePassword": "비밀번호 변경",
+      "currentPassword": "현재 비밀번호",
+      "newPassword": "새 비밀번호",
+      "confirmPassword": "새 비밀번호 확인",
+      "updateButton": "비밀번호 업데이트",
+      "updating": "업데이트 중...",
+      "success": "비밀번호가 변경되었습니다.",
+      "note": "비밀번호 변경 시 재인증이 필요합니다."
+    },
+    "notifications": {
+      "title": "알림 설정",
+      "emailNotifications": "이메일 알림",
+      "summaryComplete": "요약 완료 알림",
+      "summaryCompleteDesc": "요약이 완료되면 이메일로 알림",
+      "weeklyReport": "주간 리포트",
+      "weeklyReportDesc": "매주 사용 통계 요약 발송",
+      "marketing": "마케팅 알림",
+      "marketingDesc": "새로운 기능 및 업데이트 소식",
+      "saveButton": "설정 저장",
+      "saving": "저장 중...",
+      "success": "알림 설정이 저장되었습니다."
+    },
+    "stats": {
+      "title": "사용 통계",
+      "totalSummaries": "총 요약 횟수",
+      "thisMonth": "이번 달 요약 수",
+      "mostActiveDay": "가장 활발한 요일",
+      "topDomains": "가장 많이 요약한 도메인 Top 5",
+      "monthlyTrend": "월별 트렌드"
+    },
+    "help": {
+      "title": "도움이 필요하신가요?",
+      "message": "설정에 대해 궁금한 점이 있으시면 문의해주세요.",
+      "email": "support@summarygenie.com"
+    }
+  },
+  "marketing": {
+    "header": {
+      "features": "기능",
+      "howItWorks": "사용방법",
+      "pricing": "요금제",
+      "faq": "FAQ",
+      "login": "로그인",
+      "signup": "무료 시작하기",
+      "dashboard": "대시보드",
+      "logout": "로그아웃"
+    },
+    "hero": {
+      "badge": "AI 기반 웹페이지 요약 서비스",
+      "title1": "웹 서핑 시간은",
+      "title2": "절반으로",
+      "title3": "정보의 깊이는",
+      "title4": "두 배로",
+      "subtitle": "긴 글을 읽는 시간을 아끼고, 핵심만 빠르게 파악하세요. AI가 여러분의 시간을 더 가치있게 만듭니다.",
+      "ctaPrimary": "Chrome에 추가하기",
+      "ctaSecondary": "사용방법 보기",
+      "stats": {
+        "users": "활성 사용자",
+        "summaries": "요약 생성",
+        "timeSaved": "시간 절약"
+      }
+    },
+    "features": {
+      "title": "강력한 기능으로 생산성을 극대화",
+      "subtitle": "복잡한 설정 없이, 설치하자마자 바로 사용할 수 있습니다.",
+      "aiSummary": {
+        "title": "AI 자동 요약",
+        "description": "최신 GPT 기술로 웹페이지의 핵심 내용을 즉시 요약합니다."
+      },
+      "smartQA": {
+        "title": "스마트 Q&A",
+        "description": "궁금한 점을 물어보세요. AI가 문서 내용을 기반으로 답변합니다."
+      },
+      "koreanSupport": {
+        "title": "완벽한 한국어 지원",
+        "description": "한국어 웹페이지도 정확하게 요약하고 이해합니다."
+      },
+      "fastProcessing": {
+        "title": "빠른 처리",
+        "description": "클릭 한 번으로 3초 내 요약 완료"
+      },
+      "privacy": {
+        "title": "프라이버시 보호",
+        "description": "모든 데이터는 안전하게 암호화"
+      },
+      "access": {
+        "title": "어디서나 접근",
+        "description": "웹 대시보드로 언제든지 확인"
+      }
+    },
+    "pricing": {
+      "title": "간단하고 투명한 요금제",
+      "subtitle": "언제든 업그레이드하거나 취소할 수 있습니다",
+      "free": {
+        "name": "Free",
+        "price": "₩0",
+        "period": "영구 무료",
+        "description": "기본 기능을 체험해보세요",
+        "features": {
+          "dailyLimit": "하루 10회 요약",
+          "basicAI": "기본 AI 모델",
+          "korean": "한국어 지원",
+          "history7": "요약 히스토리 7일",
+          "dashboard": "웹 대시보드 접근"
+        },
+        "cta": "무료로 시작하기"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "₩9,900",
+        "period": "월",
+        "description": "무제한으로 사용하세요",
+        "popular": "가장 인기",
+        "features": {
+          "unlimited": "무제한 요약",
+          "gpt4": "고성능 AI 모델 (GPT-4)",
+          "priority": "우선 처리",
+          "unlimitedHistory": "요약 히스토리 무제한",
+          "advancedQA": "고급 Q&A 기능",
+          "templates": "맞춤형 요약 템플릿",
+          "pdf": "PDF 요약 지원",
+          "support": "이메일 지원"
+        },
+        "cta": "Pro 시작하기"
+      },
+      "footer": {
+        "trial": "모든 플랜은 7일 무료 체험이 가능합니다 • 신용카드 등록 불필요",
+        "cancel": "언제든 취소 가능",
+        "refund": "환불 보장",
+        "secure": "안전한 결제"
+      }
+    },
+    "faq": {
+      "title": "자주 묻는 질문",
+      "subtitle": "궁금하신 점이 있으신가요?",
+      "q1": {
+        "question": "SummaryGenie는 어떻게 작동하나요?",
+        "answer": "SummaryGenie는 최신 GPT 기술을 활용하여 웹페이지의 텍스트를 분석하고, 핵심 내용만 추출하여 간결하게 요약합니다. Chrome 확장 프로그램으로 설치하면 원하는 페이지에서 바로 사용할 수 있습니다."
+      },
+      "q2": {
+        "question": "어떤 웹사이트에서 사용할 수 있나요?",
+        "answer": "대부분의 웹사이트에서 사용 가능합니다. 뉴스 기사, 블로그, 학술 논문, 기술 문서 등 텍스트 기반 콘텐츠가 있는 모든 페이지에서 작동합니다. 단, 로그인이 필요한 페이지나 동영상 콘텐츠는 제한될 수 있습니다."
+      },
+      "q3": {
+        "question": "무료 플랜과 Pro 플랜의 차이는 무엇인가요?",
+        "answer": "무료 플랜은 하루 10회까지 요약을 생성할 수 있으며, 기본 AI 모델을 사용합니다. Pro 플랜은 무제한 요약, 고성능 GPT-4 모델, 우선 처리, PDF 요약 지원 등 고급 기능을 제공합니다."
+      },
+      "needHelp": "더 궁금하신 점이 있으신가요?",
+      "contactEmail": "support@summarygenie.app"
+    },
+    "footer": {
+      "description": "AI 기반 웹페이지 요약으로 당신의 시간을 더 가치있게",
+      "product": "제품",
+      "company": "회사",
+      "legal": "법적 고지",
+      "copyright": "© 2025 SummaryGenie. All rights reserved.",
+      "language": "🇰🇷 한국어",
+      "madeIn": "Made with in Seoul"
+    }
+  }
+}

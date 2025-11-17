@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { logout } from '@/lib/auth';
+import { useTranslation } from '@/hooks/useTranslation';
 import Image from 'next/image';
 
 interface SidebarProps {
@@ -26,41 +27,39 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const navItems: NavItem[] = [
-  {
-    name: '대시보드',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: '요약 기록',
-    href: '/history',
-    icon: History,
-  },
-  {
-    name: '구독 관리',
-    href: '/subscription',
-    icon: CreditCard,
-  },
-  {
-    name: '설정',
-    href: '/settings',
-    icon: Settings,
-  },
-];
-
 export default function Sidebar({ user, onClose }: SidebarProps) {
+  const { t } = useTranslation();
   const pathname = usePathname();
+
+  const navItems: NavItem[] = [
+    {
+      name: t('dashboard.sidebar.dashboard'),
+      href: '/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      name: t('dashboard.sidebar.history'),
+      href: '/history',
+      icon: History,
+    },
+    {
+      name: t('dashboard.sidebar.subscription'),
+      href: '/subscription',
+      icon: CreditCard,
+    },
+    {
+      name: t('dashboard.sidebar.settings'),
+      href: '/settings',
+      icon: Settings,
+    },
+  ];
 
   const handleLogout = async () => {
     try {
       await logout();
-      // ✅ window.location.href로 강제 전체 페이지 리로드
-      // router.push() 대신 사용하여 모든 상태를 깨끗하게 초기화
       window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
-      // 에러가 발생해도 메인 화면으로 이동
       window.location.href = '/';
     }
   };
@@ -72,13 +71,13 @@ export default function Sidebar({ user, onClose }: SidebarProps) {
         <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/images/logo.png"
-            alt="SummaryGenie"
+            alt={t('dashboard.sidebar.logo')}
             width={32}
             height={32}
             className="w-8 h-8"
           />
           <span className="text-xl font-bold text-gray-900">
-            SummaryGenie
+            {t('dashboard.sidebar.logo')}
           </span>
         </Link>
 
@@ -128,7 +127,7 @@ export default function Sidebar({ user, onClose }: SidebarProps) {
             {user.photoURL ? (
               <Image
                 src={user.photoURL}
-                alt={user.displayName || '사용자'}
+                alt={user.displayName || t('common.name')}
                 width={40}
                 height={40}
                 className="w-10 h-10 rounded-full"
@@ -141,7 +140,7 @@ export default function Sidebar({ user, onClose }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {user.displayName || '사용자'}
+              {user.displayName || t('common.name')}
             </p>
             <p className="text-xs text-gray-500 truncate">{user.email}</p>
           </div>
@@ -153,7 +152,7 @@ export default function Sidebar({ user, onClose }: SidebarProps) {
           className="w-full flex items-center space-x-3 px-3 py-2.5 text-gray-700 hover:bg-gray-50 rounded-lg transition"
         >
           <LogOut className="w-5 h-5" />
-          <span>로그아웃</span>
+          <span>{t('dashboard.sidebar.logout')}</span>
         </button>
       </div>
     </aside>

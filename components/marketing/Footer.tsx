@@ -1,25 +1,30 @@
 // components/marketing/Footer.tsx
+'use client';
+
 import Link from 'next/link';
 import { Sparkles, Twitter, Github, Mail } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   const footerLinks = {
     product: [
-      { name: '기능', href: '#features' },
-      { name: '사용방법', href: '#how-it-works' },
-      { name: '요금제', href: '#pricing' },
-      { name: 'FAQ', href: '#faq' },
+      { name: t('marketing.header.features'), href: '#features' },
+      { name: t('marketing.header.howItWorks'), href: '#how-it-works' },
+      { name: t('marketing.header.pricing'), href: '#pricing' },
+      { name: t('marketing.header.faq'), href: '#faq' },
     ],
     company: [
-      { name: '소개', href: '/about' },
-      { name: '블로그', href: '/blog' },
-      { name: '채용', href: '/careers' },
-      { name: '문의', href: '/contact' },
+      { name: 'About', href: '/about' },
+      { name: 'Blog', href: '/blog' },
+      { name: 'Careers', href: '/careers' },
+      { name: 'Contact', href: '/contact' },
     ],
     legal: [
-      { name: '이용약관', href: '/terms' },
-      { name: '개인정보처리방침', href: '/privacy' },
-      { name: '환불정책', href: '/refund' },
+      { name: 'Terms', href: '/terms' },
+      { name: 'Privacy', href: '/privacy' },
+      { name: 'Refund', href: '/refund' },
     ],
   };
 
@@ -42,9 +47,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-sm">
-              AI 기반 웹페이지 요약으로
-              <br />
-              당신의 시간을 더 가치있게
+              {t('marketing.footer.description')}
             </p>
             <div className="flex items-center gap-4">
               {socialLinks.map((social) => (
@@ -64,7 +67,7 @@ export default function Footer() {
 
           {/* Product Links */}
           <div>
-            <h3 className="font-semibold mb-4">제품</h3>
+            <h3 className="font-semibold mb-4">{t('marketing.footer.product')}</h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
@@ -81,7 +84,7 @@ export default function Footer() {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-semibold mb-4">회사</h3>
+            <h3 className="font-semibold mb-4">{t('marketing.footer.company')}</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -98,7 +101,7 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold mb-4">법적 고지</h3>
+            <h3 className="font-semibold mb-4">{t('marketing.footer.legal')}</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -118,12 +121,12 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              © 2025 SummaryGenie. All rights reserved.
+              {t('marketing.footer.copyright')}
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400">
-              <span>🇰🇷 한국어</span>
+              <span>{t('marketing.footer.language')}</span>
               <span>•</span>
-              <span>Made with ❤️ in Seoul</span>
+              <span>{t('marketing.footer.madeIn')}</span>
             </div>
           </div>
         </div>

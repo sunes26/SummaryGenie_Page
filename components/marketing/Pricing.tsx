@@ -1,43 +1,48 @@
 // components/marketing/Pricing.tsx
+'use client';
+
 import Link from 'next/link';
 import { Check, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Pricing() {
+  const { t } = useTranslation();
+
   const plans = [
     {
-      name: 'Free',
-      price: '₩0',
-      period: '영구 무료',
-      description: '기본 기능을 체험해보세요',
+      name: t('marketing.pricing.free.name'),
+      price: t('marketing.pricing.free.price'),
+      period: t('marketing.pricing.free.period'),
+      description: t('marketing.pricing.free.description'),
       features: [
-        '하루 10회 요약',
-        '기본 AI 모델',
-        '한국어 지원',
-        '요약 히스토리 7일',
-        '웹 대시보드 접근',
+        t('marketing.pricing.free.features.dailyLimit'),
+        t('marketing.pricing.free.features.basicAI'),
+        t('marketing.pricing.free.features.korean'),
+        t('marketing.pricing.free.features.history7'),
+        t('marketing.pricing.free.features.dashboard'),
       ],
-      cta: '무료로 시작하기',
+      cta: t('marketing.pricing.free.cta'),
       href: '/signup',
       popular: false,
     },
     {
-      name: 'Pro',
-      price: '₩9,900',
-      period: '월',
-      description: '무제한으로 사용하세요',
+      name: t('marketing.pricing.pro.name'),
+      price: t('marketing.pricing.pro.price'),
+      period: t('marketing.pricing.pro.period'),
+      description: t('marketing.pricing.pro.description'),
       features: [
-        '무제한 요약',
-        '고성능 AI 모델 (GPT-4)',
-        '우선 처리',
-        '요약 히스토리 무제한',
-        '고급 Q&A 기능',
-        '맞춤형 요약 템플릿',
-        'PDF 요약 지원',
-        '이메일 지원',
+        t('marketing.pricing.pro.features.unlimited'),
+        t('marketing.pricing.pro.features.gpt4'),
+        t('marketing.pricing.pro.features.priority'),
+        t('marketing.pricing.pro.features.unlimitedHistory'),
+        t('marketing.pricing.pro.features.advancedQA'),
+        t('marketing.pricing.pro.features.templates'),
+        t('marketing.pricing.pro.features.pdf'),
+        t('marketing.pricing.pro.features.support'),
       ],
-      cta: 'Pro 시작하기',
+      cta: t('marketing.pricing.pro.cta'),
       href: '/signup?plan=pro',
       popular: true,
     },
@@ -49,10 +54,10 @@ export default function Pricing() {
         <ScrollReveal>
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl md:text-5xl font-bold">
-              간단하고 투명한 요금제
+              {t('marketing.pricing.title')}
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              언제든 업그레이드하거나 취소할 수 있습니다
+              {t('marketing.pricing.subtitle')}
             </p>
           </div>
         </ScrollReveal>
@@ -70,7 +75,7 @@ export default function Pricing() {
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold rounded-full shadow-lg">
                       <Crown className="w-4 h-4" />
-                      <span>가장 인기</span>
+                      <span>{t('marketing.pricing.pro.popular')}</span>
                     </div>
                   </div>
                 )}
@@ -80,7 +85,7 @@ export default function Pricing() {
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <div className="flex items-baseline justify-center gap-1 mb-2">
                     <span className="text-5xl font-bold">{plan.price}</span>
-                    {plan.period !== '영구 무료' && (
+                    {plan.period !== t('marketing.pricing.free.period') && (
                       <span className="text-slate-600 dark:text-slate-400">/ {plan.period}</span>
                     )}
                   </div>
@@ -119,20 +124,20 @@ export default function Pricing() {
         <ScrollReveal delay={200}>
           <div className="mt-16 text-center">
             <p className="text-slate-600 dark:text-slate-400 mb-4">
-              모든 플랜은 7일 무료 체험이 가능합니다 • 신용카드 등록 불필요
+              {t('marketing.pricing.footer.trial')}
             </p>
             <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-600" />
-                <span>언제든 취소 가능</span>
+                <span>{t('marketing.pricing.footer.cancel')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-600" />
-                <span>환불 보장</span>
+                <span>{t('marketing.pricing.footer.refund')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-600" />
-                <span>안전한 결제</span>
+                <span>{t('marketing.pricing.footer.secure')}</span>
               </div>
             </div>
           </div>

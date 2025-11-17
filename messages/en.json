@@ -1,0 +1,408 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "or": "or",
+    "and": "and",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to SummaryGenie",
+      "subtitle": "Sign in to access AI-powered web summarization",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "loginButton": "Sign In",
+      "loggingIn": "Signing in...",
+      "googleLogin": "Sign in with Google",
+      "googleLoggingIn": "Signing in with Google...",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign up",
+      "forgotPassword": "Forgot your password?"
+    },
+    "signup": {
+      "title": "Sign Up",
+      "displayNameLabel": "Name (Optional)",
+      "displayNamePlaceholder": "John Doe",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "passwordHint": "Please enter at least 8 characters.",
+      "passwordConfirmLabel": "Confirm Password",
+      "passwordConfirmPlaceholder": "Re-enter your password",
+      "agreeTerms": "I agree to the Terms of Service and Privacy Policy.",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "signupButton": "Sign Up",
+      "signingUp": "Signing up...",
+      "googleSignup": "Continue with Google",
+      "googleSigningUp": "Signing up with Google...",
+      "haveAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot Your Password?",
+      "subtitle": "Enter your email address and we'll send you a password reset link.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "sendButton": "Send Password Reset Email",
+      "sending": "Sending...",
+      "successTitle": "✓ Email Sent!",
+      "successMessage": "Check your email to reset your password. If you don't see it, check your spam folder.",
+      "backToLogin": "← Back to Sign In",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign up"
+    },
+    "errors": {
+      "invalidEmail": "Please enter a valid email address.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "agreeTermsRequired": "Please agree to the Terms of Service.",
+      "loginFailed": "Login failed.",
+      "signupFailed": "Sign up failed.",
+      "resetFailed": "Failed to send password reset email."
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "logo": "SummaryGenie",
+      "dashboard": "Dashboard",
+      "history": "Summary History",
+      "subscription": "Subscription",
+      "settings": "Settings",
+      "logout": "Log Out"
+    },
+    "home": {
+      "title": "Dashboard",
+      "greeting": "Hello, {name}! 👋",
+      "stats": {
+        "monthlyUsage": "This Month",
+        "monthlyUsageDesc": "Summaries this month",
+        "totalSummaries": "Total Summaries",
+        "totalSummariesDesc": "All-time summaries",
+        "recentWeek": "Last 7 Days",
+        "recentWeekDesc": "Weekly usage",
+        "count": "{count} summaries"
+      },
+      "upgrade": {
+        "title": "Upgrade to Pro",
+        "description": "Experience unlimited summaries, high-performance AI, and priority support",
+        "viewPro": "View Pro Plan",
+        "installExtension": "Install Extension"
+      },
+      "extension": {
+        "title": "Chrome Extension",
+        "description": "Summarize any page while browsing",
+        "install": "Install Extension"
+      },
+      "gettingStarted": {
+        "title": "💡 Getting Started",
+        "step1Title": "1. Install Extension",
+        "step1Desc": "Download SummaryGenie from Chrome Web Store",
+        "step2Title": "2. Summarize Pages",
+        "step2Desc": "Click the extension icon on any page you want to summarize",
+        "step3Title": "3. Manage History",
+        "step3Desc": "All summaries are automatically saved and accessible anytime"
+      }
+    },
+    "history": {
+      "title": "Summary History",
+      "totalCount": "{count} summaries total",
+      "searchPlaceholder": "Search by title or content...",
+      "filterAll": "All",
+      "sortNewest": "Newest",
+      "sortOldest": "Oldest",
+      "perPage": "20 per page",
+      "filtering": "Filtering by {domain} •",
+      "loadMore": "Load More",
+      "loadingMore": "Loading more...",
+      "allLoaded": "All summaries loaded",
+      "empty": "No summaries yet",
+      "emptyDesc": "Use the Chrome extension to summarize web pages",
+      "table": {
+        "title": "Title",
+        "domain": "Domain",
+        "date": "Created",
+        "actions": "Actions",
+        "view": "View Details"
+      }
+    },
+    "modal": {
+      "title": "Summary Details",
+      "originalUrl": "Original URL",
+      "domain": "Domain",
+      "createdAt": "Created",
+      "summary": "Summary",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "close": "Close"
+    }
+  },
+  "subscription": {
+    "title": "Manage Subscription",
+    "sync": "Sync Subscription",
+    "syncing": "Syncing...",
+    "free": {
+      "title": "Free Plan",
+      "badge": "Free",
+      "description": "You are currently on the Free plan.",
+      "usageTitle": "This Month's Usage",
+      "usageLimit": "{current} / {limit} summaries",
+      "usageFull": "You've used all your free summaries for this month.",
+      "limitationsTitle": "Current Limitations:",
+      "limitation1": "30 summaries per month",
+      "limitation2": "Basic AI model only",
+      "limitation3": "Ads displayed",
+      "benefitsTitle": "Upgrade to Pro for:",
+      "benefit1": "Unlimited summaries",
+      "benefit2": "High-performance AI model",
+      "benefit3": "Ad-free experience",
+      "benefit4": "Priority support",
+      "upgradeButton": "Upgrade to Pro - $9.99/mo",
+      "footer": "Cancel anytime • Tax included"
+    },
+    "pro": {
+      "title": "Pro Plan",
+      "active": "Active",
+      "pastDue": "Payment Failed",
+      "description": "You have access to all Pro features.",
+      "startDate": "Started",
+      "nextBilling": "Next Billing",
+      "amount": "Amount",
+      "renewal": "Until Renewal",
+      "cancellation": "Until Cancellation",
+      "daysLeft": "{days} days left",
+      "benefitsTitle": "Active Pro Benefits:",
+      "benefit1": "Unlimited summaries",
+      "benefit2": "High-performance AI model",
+      "benefit3": "Ad-free experience",
+      "benefit4": "Priority support",
+      "updatePayment": "Update Payment Method",
+      "cancel": "Cancel Subscription",
+      "resume": "Resume Subscription",
+      "footer": "If you cancel, you'll keep Pro access until the end of your current billing period."
+    },
+    "alerts": {
+      "successTitle": "Subscription Activated!",
+      "successMessage": "You now have unlimited access to all Pro features.",
+      "cancelScheduledTitle": "Subscription Ending Soon",
+      "cancelScheduledMessage": "Your subscription will end in {days} days ({date}).",
+      "pastDueTitle": "Payment Failed",
+      "pastDueMessage": "Please update your payment method.",
+      "updatePaymentButton": "Update Payment Method"
+    },
+    "cancelModal": {
+      "title": "Cancel Subscription?",
+      "message": "You'll keep Pro access until the end of your current billing period ({date}).",
+      "confirmButton": "Cancel Subscription",
+      "processing": "Processing...",
+      "cancelButton": "Keep Subscription"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile, security, notifications and stats",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "notifications": "Notifications",
+      "stats": "Statistics"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "photo": "Profile Photo",
+      "uploadPhoto": "Upload Photo",
+      "uploading": "Uploading...",
+      "uploadProgress": "Upload progress: {progress}%",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter your name",
+      "emailLabel": "Email",
+      "emailNote": "Changing your email requires re-authentication.",
+      "saveButton": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully.",
+      "photoSuccess": "Profile photo updated successfully."
+    },
+    "security": {
+      "title": "Security Settings",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "updateButton": "Update Password",
+      "updating": "Updating...",
+      "success": "Password changed successfully.",
+      "note": "Re-authentication required when changing password."
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "emailNotifications": "Email Notifications",
+      "summaryComplete": "Summary Complete",
+      "summaryCompleteDesc": "Notify when summaries are ready",
+      "weeklyReport": "Weekly Report",
+      "weeklyReportDesc": "Weekly usage statistics",
+      "marketing": "Marketing Emails",
+      "marketingDesc": "New features and updates",
+      "saveButton": "Save Settings",
+      "saving": "Saving...",
+      "success": "Notification settings saved."
+    },
+    "stats": {
+      "title": "Usage Statistics",
+      "totalSummaries": "Total Summaries",
+      "thisMonth": "This Month",
+      "mostActiveDay": "Most Active Day",
+      "topDomains": "Top 5 Domains",
+      "monthlyTrend": "Monthly Trend"
+    },
+    "help": {
+      "title": "Need Help?",
+      "message": "Contact us if you have any questions.",
+      "email": "support@summarygenie.com"
+    }
+  },
+  "marketing": {
+    "header": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Sign In",
+      "signup": "Get Started Free",
+      "dashboard": "Dashboard",
+      "logout": "Log Out"
+    },
+    "hero": {
+      "badge": "AI-Powered Web Summarization",
+      "title1": "Cut Your Reading Time",
+      "title2": "In Half",
+      "title3": "Double Your",
+      "title4": "Information Depth",
+      "subtitle": "Save time on long reads and quickly grasp the essentials. AI makes your time more valuable.",
+      "ctaPrimary": "Add to Chrome",
+      "ctaSecondary": "See How It Works",
+      "stats": {
+        "users": "Active Users",
+        "summaries": "Summaries Generated",
+        "timeSaved": "Time Saved"
+      }
+    },
+    "features": {
+      "title": "Powerful Features to Maximize Productivity",
+      "subtitle": "No complex setup - start using immediately after installation.",
+      "aiSummary": {
+        "title": "AI Auto-Summary",
+        "description": "Instantly summarize web pages using the latest GPT technology."
+      },
+      "smartQA": {
+        "title": "Smart Q&A",
+        "description": "Ask questions and get AI-powered answers based on the content."
+      },
+      "koreanSupport": {
+        "title": "Perfect Korean Support",
+        "description": "Accurately summarizes and understands Korean web pages."
+      },
+      "fastProcessing": {
+        "title": "Fast Processing",
+        "description": "Complete summaries in 3 seconds with one click"
+      },
+      "privacy": {
+        "title": "Privacy Protection",
+        "description": "All data is securely encrypted"
+      },
+      "access": {
+        "title": "Access Anywhere",
+        "description": "Check your summaries anytime via web dashboard"
+      }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Upgrade or cancel anytime",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "period": "Forever Free",
+        "description": "Try the basic features",
+        "features": {
+          "dailyLimit": "10 summaries per day",
+          "basicAI": "Basic AI model",
+          "korean": "Korean support",
+          "history7": "7-day history",
+          "dashboard": "Web dashboard access"
+        },
+        "cta": "Get Started Free"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$9.99",
+        "period": "month",
+        "description": "Unlimited usage",
+        "popular": "Most Popular",
+        "features": {
+          "unlimited": "Unlimited summaries",
+          "gpt4": "High-performance AI (GPT-4)",
+          "priority": "Priority processing",
+          "unlimitedHistory": "Unlimited history",
+          "advancedQA": "Advanced Q&A",
+          "templates": "Custom summary templates",
+          "pdf": "PDF summary support",
+          "support": "Email support"
+        },
+        "cta": "Start Pro"
+      },
+      "footer": {
+        "trial": "7-day free trial for all plans • No credit card required",
+        "cancel": "Cancel anytime",
+        "refund": "Refund guarantee",
+        "secure": "Secure payment"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Have questions?",
+      "q1": {
+        "question": "How does SummaryGenie work?",
+        "answer": "SummaryGenie uses the latest GPT technology to analyze web page text and extract only the key points for concise summaries. Install the Chrome extension and use it instantly on any page."
+      },
+      "q2": {
+        "question": "Which websites can I use it on?",
+        "answer": "It works on most websites including news articles, blogs, academic papers, and technical documentation - any page with text-based content. Some pages requiring login or video content may have limitations."
+      },
+      "q3": {
+        "question": "What's the difference between Free and Pro?",
+        "answer": "The Free plan allows up to 10 summaries per day using the basic AI model. Pro offers unlimited summaries, high-performance GPT-4 model, priority processing, PDF support, and advanced features."
+      },
+      "needHelp": "Still have questions?",
+      "contactEmail": "support@summarygenie.app"
+    },
+    "footer": {
+      "description": "Make your time more valuable with AI-powered web summarization",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "copyright": "© 2025 SummaryGenie. All rights reserved.",
+      "language": "🇺🇸 English",
+      "madeIn": "Made with ❤️ in Seoul"
+    }
+  }
+}

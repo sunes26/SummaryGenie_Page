@@ -7,8 +7,10 @@ import Link from 'next/link';
 import { signUp, signInWithGoogle, getFirebaseErrorMessage } from '@/lib/auth';
 import { getFirestoreInstance } from '@/lib/firebase/client';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SignupPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -22,25 +24,25 @@ export default function SignupPage() {
   const validateForm = (): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return '올바른 이메일 형식을 입력해주세요.';
+      return t('auth.errors.invalidEmail');
     }
 
     if (password.length < 8) {
-      return '비밀번호는 최소 8자 이상이어야 합니다.';
+      return t('auth.errors.passwordTooShort');
     }
 
     if (password !== passwordConfirm) {
-      return '비밀번호가 일치하지 않습니다.';
+      return t('auth.errors.passwordMismatch');
     }
 
     if (!agreeTerms) {
-      return '이용약관에 동의해주세요.';
+      return t('auth.errors.agreeTermsRequired');
     }
 
     return null;
   };
 
-  // ✅ users 컬렉션에 문서 생성
+  // users 컬렉션에 문서 생성
   const createUserProfile = async (userId: string, userEmail: string, userName?: string) => {
     try {
       const db = getFirestoreInstance();
@@ -59,7 +61,6 @@ export default function SignupPage() {
       console.log('✅ User profile created:', userId);
     } catch (error) {
       console.error('Failed to create user profile:', error);
-      // 에러가 나도 계속 진행 (나중에 자동 생성됨)
     }
   };
 
@@ -76,20 +77,17 @@ export default function SignupPage() {
     }
 
     try {
-      // 1. Authentication 계정 생성
       const userCredential = await signUp(email, password, displayName || undefined);
       const userId = userCredential.user.uid;
 
-      // 2. ✅ users 컬렉션에 문서 생성
       await createUserProfile(userId, email, displayName);
 
-      // 3. 이메일 인증 안내 페이지로 리다이렉트
       router.push('/verify-email?email=' + encodeURIComponent(email));
     } catch (error: any) {
       console.error('Signup error:', error);
       const errorMessage = error.code
         ? getFirebaseErrorMessage(error.code)
-        : error.message || '회원가입에 실패했습니다.';
+        : error.message || t('auth.errors.signupFailed');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -101,25 +99,21 @@ export default function SignupPage() {
     setError('');
 
     if (!agreeTerms) {
-      setError('이용약관에 동의해주세요.');
+      setError(t('auth.errors.agreeTermsRequired'));
       setLoading(false);
       return;
     }
 
     try {
-      // 1. Google 로그인
       const userCredential = await signInWithGoogle();
       const userId = userCredential.user.uid;
       const userEmail = userCredential.user.email || '';
       const userName = userCredential.user.displayName || undefined;
 
-      // 2. ✅ users 컬렉션에 문서 생성
       await createUserProfile(userId, userEmail, userName);
 
-      // 3. ID 토큰 가져오기
       const idToken = await userCredential.user.getIdToken();
 
-      // 4. 세션 쿠키 생성
       const response = await fetch('/api/auth/session', {
         method: 'POST',
         headers: {
@@ -129,17 +123,16 @@ export default function SignupPage() {
       });
 
       if (!response.ok) {
-        throw new Error('세션 생성에 실패했습니다.');
+        throw new Error(t('auth.errors.signupFailed'));
       }
 
-      // 5. 대시보드로 이동
       router.push('/dashboard');
       router.refresh();
     } catch (error: any) {
       console.error('Google signup error:', error);
       const errorMessage = error.code
         ? getFirebaseErrorMessage(error.code)
-        : 'Google 회원가입에 실패했습니다.';
+        : t('auth.errors.signupFailed');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -149,7 +142,9 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-6">회원가입</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">
+          {t('auth.signup.title')}
+        </h1>
 
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
@@ -161,7 +156,7 @@ export default function SignupPage() {
           {/* 이름 (선택사항) */}
           <div>
             <label htmlFor="displayName" className="block text-sm font-medium mb-1">
-              이름 (선택사항)
+              {t('auth.signup.displayNameLabel')}
             </label>
             <input
               id="displayName"
@@ -169,14 +164,14 @@ export default function SignupPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="홍길동"
+              placeholder={t('auth.signup.displayNamePlaceholder')}
             />
           </div>
 
           {/* 이메일 */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-1">
-              이메일 <span className="text-red-500">*</span>
+              {t('auth.signup.emailLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               id="email"
@@ -185,14 +180,14 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="your@email.com"
+              placeholder={t('auth.signup.emailPlaceholder')}
             />
           </div>
 
           {/* 비밀번호 */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-1">
-              비밀번호 <span className="text-red-500">*</span>
+              {t('auth.signup.passwordLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               id="password"
@@ -202,17 +197,17 @@ export default function SignupPage() {
               required
               minLength={8}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="8자 이상 입력해주세요"
+              placeholder={t('auth.signup.passwordPlaceholder')}
             />
             <p className="mt-1 text-xs text-gray-500">
-              최소 8자 이상의 비밀번호를 입력해주세요.
+              {t('auth.signup.passwordHint')}
             </p>
           </div>
 
           {/* 비밀번호 확인 */}
           <div>
             <label htmlFor="passwordConfirm" className="block text-sm font-medium mb-1">
-              비밀번호 확인 <span className="text-red-500">*</span>
+              {t('auth.signup.passwordConfirmLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               id="passwordConfirm"
@@ -221,7 +216,7 @@ export default function SignupPage() {
               onChange={(e) => setPasswordConfirm(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="비밀번호를 다시 입력해주세요"
+              placeholder={t('auth.signup.passwordConfirmPlaceholder')}
             />
           </div>
 
@@ -236,13 +231,14 @@ export default function SignupPage() {
             />
             <label htmlFor="agreeTerms" className="ml-2 text-sm text-gray-700">
               <Link href="#" className="text-blue-600 hover:underline">
-                이용약관
+                {t('auth.signup.terms')}
               </Link>
-              {' '}및{' '}
+              {' '}{t('common.and')}{' '}
               <Link href="#" className="text-blue-600 hover:underline">
-                개인정보처리방침
+                {t('auth.signup.privacy')}
               </Link>
-              에 동의합니다. <span className="text-red-500">*</span>
+              {t('auth.signup.agreeTerms').replace(t('auth.signup.terms'), '').replace(t('auth.signup.privacy'), '').replace(t('common.and'), '')}
+              {' '}<span className="text-red-500">*</span>
             </label>
           </div>
 
@@ -252,7 +248,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {loading ? '회원가입 중...' : '회원가입'}
+            {loading ? t('auth.signup.signingUp') : t('auth.signup.signupButton')}
           </button>
         </form>
 
@@ -262,7 +258,7 @@ export default function SignupPage() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">또는</span>
+            <span className="px-2 bg-white text-gray-500">{t('common.or')}</span>
           </div>
         </div>
 
@@ -290,14 +286,14 @@ export default function SignupPage() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          {loading ? 'Google 회원가입 중...' : 'Google로 계속하기'}
+          {loading ? t('auth.signup.googleSigningUp') : t('auth.signup.googleSignup')}
         </button>
 
         {/* 로그인 링크 */}
         <p className="mt-6 text-center text-sm text-gray-600">
-          이미 계정이 있으신가요?{' '}
+          {t('auth.signup.haveAccount')}{' '}
           <Link href="/login" className="text-blue-600 hover:underline font-medium">
-            로그인
+            {t('auth.signup.login')}
           </Link>
         </p>
       </div>

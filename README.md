@@ -1,4 +1,4 @@
-# SummaryGenie Page
+# SummaryGenie Page 🌟
 
 > AI 기반 웹페이지 요약 Chrome 확장 프로그램을 위한 웹 대시보드 및 구독 관리 플랫폼
 
@@ -20,12 +20,14 @@
 - [프로젝트 구조](#-프로젝트-구조)
 - [빠른 시작](#-빠른-시작)
 - [환경 변수 설정](#-환경-변수-설정)
-- [주요 기능 상세](#-주요-기능-상세)
-- [API 엔드포인트](#-api-엔드포인트)
+- [Firebase 설정 가이드](#-firebase-설정-가이드)
+- [Paddle 설정 가이드](#-paddle-설정-가이드)
+- [개발 가이드](#-개발-가이드)
 - [Firebase 데이터 구조](#-firebase-데이터-구조)
+- [API 엔드포인트](#-api-엔드포인트)
 - [배포](#-배포)
 - [트러블슈팅](#-트러블슈팅)
-- [개발 로드맵](#-개발-로드맵)
+- [개발 체크리스트](#-개발-체크리스트)
 - [기여하기](#-기여하기)
 - [라이센스](#-라이센스)
 
@@ -47,14 +49,14 @@
 
 ### 프로젝트 현황
 
-| Phase | 상태 | 설명 |
-|-------|------|------|
-| Phase 1 | ✅ 완료 | 프로젝트 기반 구축, Firebase 연동 |
-| Phase 2 | ✅ 완료 | 요약 기록 관리, 검색/필터링 |
-| Phase 3 | ✅ 완료 | Paddle 결제 시스템 연동 |
-| Phase 4 | ✅ 완료 | 실시간 구독 동기화, 웹훅 처리, Paddle API 직접 조회 |
-| Phase 5 | ✅ 완료 | **SEO 최적화, 성능 개선, 프로필 설정** |
-| Phase 6 | 📅 예정 | 고급 기능 (팀 공유, 태그 관리) |
+| Phase | 상태 | 기간 | 설명 |
+|-------|------|------|------|
+| Phase 1 | ✅ 완료 | 3주 | 프로젝트 기반 구축, Firebase 연동 |
+| Phase 2 | ✅ 완료 | 2주 | 요약 기록 관리, 검색/필터링 |
+| Phase 3 | ✅ 완료 | 2주 | Paddle 결제 시스템 연동 |
+| Phase 4 | ✅ 완료 | 1주 | 실시간 구독 동기화, 웹훅 처리 |
+| Phase 5 | ✅ 완료 | 1주 | SEO 최적화, 프로필 설정, 성능 개선 |
+| Phase 6 | 📅 예정 | - | 고급 기능 (팀 공유, 태그 관리) |
 
 ---
 
@@ -65,8 +67,8 @@
 - ✅ Google 소셜 로그인
 - ✅ 이메일 인증
 - ✅ 비밀번호 재설정
-- ✅ 세션 쿠키 기반 인증
-- ✅ 보호된 라우트 (Middleware)
+- ✅ 세션 쿠키 기반 인증 (5일 유효)
+- ✅ 보호된 라우트 (Next.js Middleware)
 
 ### 📊 대시보드
 - ✅ 실시간 사용량 통계
@@ -88,7 +90,7 @@
 - ✅ 중복 제거 및 최적화된 데이터 로딩
 
 ### 💳 구독 관리 (Paddle Billing)
-- ✅ Free/Pro 플랜 제공
+- ✅ Free/Pro 플랜 제공 (₩9,900/월)
 - ✅ Paddle Checkout 오버레이 결제
 - ✅ 구독 취소 및 재개
 - ✅ 결제 수단 변경
@@ -97,11 +99,11 @@
 - ✅ **Paddle API 직접 조회를 통한 수동 동기화**
 - ✅ 구독 만료일 계산 및 알림
 - ✅ 결제 내역 관리
-- ✅ **구독 갱신 시 자동 업데이트 (transaction.completed 이벤트)**
+- ✅ **구독 갱신 시 자동 업데이트**
 
 ### ⚙️ 설정
 - ✅ 프로필 편집 (이름, 프로필 사진)
-- ✅ **프로필 사진 업로드 (Firebase Storage, 최대 2MB)**
+- ✅ **프로필 사진 업로드** (Firebase Storage, 최대 2MB)
 - ✅ **이미지 업로드 진행률 표시**
 - ✅ 이메일 변경 (재인증 필요)
 - ✅ 비밀번호 변경 (재인증 포함)
@@ -123,7 +125,6 @@
   - Open Graph (Facebook, LinkedIn)
   - Twitter Cards
   - Canonical URLs
-- ✅ **클라이언트 컴포넌트용 동적 메타데이터**
 - ✅ **완전한 요금제 페이지** (Pricing)
 - ✅ **시맨틱 HTML** (접근성 개선)
 
@@ -141,11 +142,12 @@
 - **React Hot Toast** - 알림 시스템
 - **SWR** - 데이터 페칭 및 캐싱
 - **React Hook Form** - 폼 관리
+- **Lucide React** - 아이콘 라이브러리
 
 ### Backend & Database
 - **Firebase Authentication** - 사용자 인증
 - **Firebase Firestore** - NoSQL 데이터베이스 (서브컬렉션 구조)
-- **Firebase Storage** - 파일 저장
+- **Firebase Storage** - 파일 저장소
 - **Next.js API Routes** - 서버리스 API
 - **Firebase Admin SDK** - 서버 사이드 Firebase 작업
 
@@ -155,7 +157,7 @@
 - **Paddle.js v2** - 클라이언트 SDK
 - **Paddle REST API** - 서버 사이드 구독 조회 및 관리
 
-### SEO & 성능 ⭐ NEW
+### SEO & 성능
 - **Next.js Metadata API** - 서버 사이드 메타데이터
 - **JSON-LD** - 구조화된 데이터
 - **PWA Support** - 앱 설치 가능
@@ -166,11 +168,6 @@
 - **Vercel** - 자동 배포 및 호스팅
 - **GitHub Actions** - CI/CD (선택사항)
 
-### 개발 도구
-- **ESLint** - 코드 품질 관리
-- **Prettier** - 코드 포맷팅 (권장)
-- **TypeScript** - 정적 타입 검사
-
 ---
 
 ## 📁 프로젝트 구조
@@ -178,7 +175,7 @@
 ```
 summarygenie_page/
 │
-├─ app/                                     # Next.js 14 App Router
+├─ app/                                     # Next.js 15 App Router
 │  ├─ (auth)/                              # 인증 관련 페이지 그룹
 │  │  ├─ forgot-password/
 │  │  │  └─ page.tsx                       # 비밀번호 재설정
@@ -188,7 +185,7 @@ summarygenie_page/
 │  │  │  └─ page.tsx                       # 회원가입
 │  │  ├─ verify-email/
 │  │  │  └─ page.tsx                       # 이메일 인증
-│  │  └─ layout.tsx                        # 인증 그룹 레이아웃 ⭐ NEW
+│  │  └─ layout.tsx                        # 인증 그룹 레이아웃 ⭐
 │  │
 │  ├─ (dashboard)/                         # 대시보드 (인증 필요)
 │  │  ├─ dashboard/
@@ -204,7 +201,7 @@ summarygenie_page/
 │  ├─ (marketing)/                         # 마케팅 페이지 그룹
 │  │  ├─ about/                            # 소개 페이지 (예정)
 │  │  ├─ pricing/
-│  │  │  └─ page.tsx                       # 요금제 페이지 ⭐ NEW
+│  │  │  └─ page.tsx                       # 요금제 페이지 ⭐
 │  │  ├─ layout.tsx                        # 마케팅 레이아웃
 │  │  └─ page.tsx                          # 랜딩 페이지 (SEO 최적화)
 │  │
@@ -213,149 +210,129 @@ summarygenie_page/
 │  │  │  └─ session/
 │  │  │     └─ route.ts                    # 세션 쿠키 관리
 │  │  ├─ subscription/
-│  │  │  ├─ cancel/
-│  │  │  │  └─ route.ts                    # 구독 취소
-│  │  │  ├─ create/
-│  │  │  │  └─ route.ts                    # 구독 생성
-│  │  │  ├─ resume/
-│  │  │  │  └─ route.ts                    # 구독 재개
-│  │  │  ├─ status/
-│  │  │  │  └─ route.ts                    # 구독 상태 조회
-│  │  │  ├─ sync/
-│  │  │  │  └─ route.ts                    # 구독 수동 동기화 (NEW)
-│  │  │  └─ update-payment/
-│  │  │     └─ route.ts                    # 결제 수단 변경
-│  │  ├─ test-admin/
-│  │  │  └─ route.ts                       # Admin SDK 테스트
-│  │  ├─ test-queries/
-│  │  │  └─ route.ts                       # Firestore 쿼리 테스트
+│  │  │  ├─ cancel/route.ts                # 구독 취소
+│  │  │  ├─ create/route.ts                # 구독 생성
+│  │  │  ├─ resume/route.ts                # 구독 재개
+│  │  │  ├─ status/route.ts                # 구독 상태 조회
+│  │  │  ├─ sync/route.ts                  # 구독 수동 동기화 ⭐
+│  │  │  └─ update-payment/route.ts        # 결제 수단 변경
 │  │  └─ webhooks/
-│  │     └─ paddle/
-│  │        └─ route.ts                    # Paddle 웹훅
+│  │     └─ paddle/route.ts                # Paddle 웹훅
 │  │
-│  ├─ test-firebase/
-│  │  └─ page.tsx                          # Firebase 연결 테스트
-│  ├─ sitemap.ts                           # 동적 사이트맵 ⭐ NEW
-│  ├─ robots.ts                            # robots.txt ⭐ NEW
-│  ├─ manifest.ts                          # PWA 매니페스트 ⭐ NEW
-│  ├─ favicon.ico                          # 파비콘
-│  ├─ globals.css                          # 전역 스타일
+│  ├─ sitemap.ts                           # 동적 사이트맵 ⭐
+│  ├─ robots.ts                            # robots.txt ⭐
+│  ├─ manifest.ts                          # PWA 매니페스트 ⭐
+│  ├─ favicon.ico
+│  ├─ globals.css
 │  └─ layout.tsx                           # 루트 레이아웃 (SEO 최적화)
 │
 ├─ components/                              # React 컴포넌트
 │  ├─ dashboard/                           # 대시보드 컴포넌트
-│  │  ├─ DomainFilter.tsx                 # 도메인 필터
-│  │  ├─ HistoryModal.tsx                 # 상세 모달
-│  │  ├─ HistoryTable.tsx                 # 기록 테이블
-│  │  ├─ MobileHeader.tsx                 # 모바일 헤더
-│  │  ├─ NotificationSettings.tsx         # 알림 설정
-│  │  ├─ ProfileSettings.tsx              # 프로필 설정
-│  │  ├─ RecentHistory.tsx                # 최근 기록
-│  │  ├─ SearchBar.tsx                    # 검색 바
-│  │  ├─ SecuritySettings.tsx             # 보안 설정
-│  │  ├─ Sidebar.tsx                      # 사이드바
-│  │  ├─ StatsCard.tsx                    # 통계 카드
-│  │  ├─ StatsOverview.tsx                # 통계 개요
-│  │  └─ UsageChart.tsx                   # 사용량 차트
+│  │  ├─ DomainFilter.tsx
+│  │  ├─ HistoryModal.tsx
+│  │  ├─ HistoryTable.tsx
+│  │  ├─ MobileHeader.tsx
+│  │  ├─ NotificationSettings.tsx
+│  │  ├─ ProfileSettings.tsx               # 프로필 설정 ⭐
+│  │  ├─ RecentHistory.tsx
+│  │  ├─ SearchBar.tsx
+│  │  ├─ SecuritySettings.tsx              # 보안 설정 ⭐
+│  │  ├─ Sidebar.tsx
+│  │  ├─ StatsCard.tsx
+│  │  ├─ StatsOverview.tsx
+│  │  └─ UsageChart.tsx
 │  │
 │  ├─ marketing/                           # 마케팅 컴포넌트
-│  │  ├─ FAQ.tsx                          # FAQ 섹션
-│  │  ├─ Features.tsx                     # 기능 소개
-│  │  ├─ FinalCTA.tsx                     # 최종 CTA
-│  │  ├─ Footer.tsx                       # 푸터
-│  │  ├─ Header.tsx                       # 헤더
-│  │  ├─ Hero.tsx                         # 히어로 섹션
-│  │  ├─ HowItWorks.tsx                   # 작동 방식
-│  │  ├─ Pricing.tsx                      # 요금제
-│  │  ├─ ProblemStatement.tsx             # 문제 제기
-│  │  ├─ ScrollReveal.tsx                 # 스크롤 애니메이션
-│  │  └─ UseCases.tsx                     # 사용 사례
+│  │  ├─ FAQ.tsx
+│  │  ├─ Features.tsx
+│  │  ├─ FinalCTA.tsx
+│  │  ├─ Footer.tsx
+│  │  ├─ Header.tsx
+│  │  ├─ Hero.tsx
+│  │  ├─ HowItWorks.tsx
+│  │  ├─ Pricing.tsx
+│  │  ├─ ProblemStatement.tsx
+│  │  ├─ ScrollReveal.tsx
+│  │  └─ UseCases.tsx
 │  │
 │  ├─ payment/                             # 결제 컴포넌트
-│  │  ├─ PaddleCheckout.tsx               # Paddle 결제
-│  │  └─ SubscriptionInfo.tsx             # 구독 정보
+│  │  ├─ PaddleCheckout.tsx
+│  │  └─ SubscriptionInfo.tsx
 │  │
-│  ├─ providers/                           # Context Provider
-│  │  └─ PaddleProvider.tsx               # Paddle Provider
+│  ├─ providers/
+│  │  └─ PaddleProvider.tsx
 │  │
-│  ├─ seo/                                 # SEO 컴포넌트 ⭐ NEW
+│  ├─ seo/                                 # SEO 컴포넌트 ⭐
 │  │  ├─ JsonLd.tsx                       # JSON-LD 구조화된 데이터
-│  │  └─ DynamicMeta.tsx                  # 동적 메타 태그 (클라이언트용)
+│  │  └─ DynamicMeta.tsx                  # 동적 메타 태그
 │  │
-│  ├─ ui/                                  # 공통 UI 컴포넌트
-│  │  ├─ button.tsx                       # 버튼
-│  │  ├─ card.tsx                         # 카드
-│  │  ├─ dialog.tsx                       # 다이얼로그
-│  │  ├─ dropdown-menu.tsx                # 드롭다운 메뉴
-│  │  ├─ input.tsx                        # 입력
-│  │  ├─ label.tsx                        # 레이블
-│  │  ├─ select.tsx                       # 선택
-│  │  ├─ tabs.tsx                         # 탭
-│  │  ├─ textarea.tsx                     # 텍스트 영역
-│  │  └─ toast.tsx                        # 토스트 알림
+│  ├─ ui/                                  # Shadcn UI 컴포넌트
+│  │  ├─ button.tsx
+│  │  ├─ card.tsx
+│  │  ├─ dialog.tsx
+│  │  ├─ dropdown-menu.tsx
+│  │  ├─ input.tsx
+│  │  ├─ label.tsx
+│  │  ├─ select.tsx
+│  │  ├─ tabs.tsx
+│  │  ├─ textarea.tsx
+│  │  └─ toast.tsx
 │  │
-│  ├─ Header.tsx                           # 공통 헤더
-│  ├─ LogoutButton.tsx                     # 로그아웃 버튼
-│  └─ UserProfile.tsx                      # 사용자 프로필
+│  ├─ Header.tsx
+│  ├─ LogoutButton.tsx
+│  └─ UserProfile.tsx
 │
-├─ contexts/                                # React Context
+├─ contexts/
 │  └─ AuthContext.tsx                      # 인증 컨텍스트
 │
 ├─ hooks/                                   # Custom React Hooks
-│  ├─ useAuth.ts                           # 인증 훅
-│  ├─ useHistory.ts                        # 요약 기록 조회
-│  ├─ useSubscription.ts                   # 구독 상태
-│  └─ useUsageStats.ts                     # 사용량 통계
+│  ├─ useAuth.ts
+│  ├─ useHistory.ts
+│  ├─ useSubscription.ts
+│  └─ useUsageStats.ts
 │
 ├─ lib/                                     # 유틸리티 & 설정
-│  ├─ firebase/                            # Firebase 설정
-│  │  ├─ admin-utils.ts                   # Admin 유틸리티
-│  │  ├─ admin.ts                         # Admin SDK
-│  │  ├─ client-queries.ts                # 클라이언트 쿼리
-│  │  ├─ client.ts                        # 클라이언트 설정
-│  │  ├─ queries.ts                       # Firestore 쿼리
-│  │  ├─ storage.ts                       # Firebase Storage
-│  │  ├─ types.ts                         # TypeScript 타입
-│  │  └─ utils.ts                         # Firebase 유틸리티
+│  ├─ firebase/
+│  │  ├─ admin-utils.ts
+│  │  ├─ admin.ts
+│  │  ├─ client-queries.ts
+│  │  ├─ client.ts
+│  │  ├─ queries.ts
+│  │  ├─ storage.ts                        # Firebase Storage ⭐
+│  │  ├─ types.ts
+│  │  └─ utils.ts
 │  │
-│  ├─ api-client.ts                        # API 클라이언트
-│  ├─ auth.ts                              # 인증 헬퍼
-│  ├─ metadata.ts                          # 메타데이터 헬퍼 ⭐ NEW
-│  ├─ paddle-server.ts                     # Paddle 서버 API
-│  ├─ paddle-webhook.ts                    # Paddle 웹훅 유틸
-│  ├─ paddle.ts                            # Paddle 클라이언트
-│  ├─ toast-helpers.ts                     # 토스트 헬퍼
-│  └─ utils.ts                             # 공통 유틸리티
+│  ├─ api-client.ts
+│  ├─ auth.ts
+│  ├─ metadata.ts                          # 메타데이터 헬퍼 ⭐
+│  ├─ paddle-server.ts
+│  ├─ paddle-webhook.ts
+│  ├─ paddle.ts
+│  ├─ toast-helpers.ts
+│  └─ utils.ts
 │
-├─ public/                                  # 정적 파일
+├─ public/
 │  ├─ images/
-│  │  └─ logo.png                          # 로고
-│  ├─ file.svg                             # 파일 아이콘
-│  ├─ globe.svg                            # 글로브 아이콘
-│  ├─ manifest.json                        # PWA 매니페스트
-│  ├─ next.svg                             # Next.js 로고
-│  ├─ vercel.svg                           # Vercel 로고
-│  └─ window.svg                           # 윈도우 아이콘
+│  │  └─ logo.png
+│  ├─ favicon.ico
+│  └─ manifest.json                        # PWA 매니페스트
 │
-├─ types/                                   # TypeScript 타입 정의
-│  ├─ index.ts                             # 공통 타입
-│  └─ paddle.ts                            # Paddle 타입
+├─ types/
+│  ├─ index.ts
+│  └─ paddle.ts
 │
-├─ .env.example                             # 환경 변수 예시
-├─ .env.local                               # 환경 변수 (git 제외)
-├─ .gitignore                               # Git 제외 파일
-├─ components.json                          # shadcn/ui 설정
-├─ eslint.config.mjs                        # ESLint 설정
-├─ middleware.ts                            # Next.js 미들웨어
-├─ next-env.d.ts                            # Next.js TypeScript 정의
-├─ next.config.ts                           # Next.js 설정
-├─ package-lock.json                        # npm 잠금 파일
-├─ package.json                             # npm 패키지 설정
-├─ postcss.config.js                        # PostCSS 설정
-├─ README.md                                # 프로젝트 문서
-├─ tailwind.config.js                       # Tailwind CSS 설정
-├─ tsconfig.json                            # TypeScript 설정
-└─ tsconfig.tsbuildinfo                     # TypeScript 빌드 정보
+├─ .env.example                            # 환경 변수 예시
+├─ .env.local                              # 환경 변수 (git 제외)
+├─ .gitignore
+├─ components.json                         # shadcn/ui 설정
+├─ eslint.config.mjs
+├─ middleware.ts                           # Next.js 미들웨어
+├─ next.config.ts
+├─ package.json
+├─ postcss.config.js
+├─ README.md
+├─ tailwind.config.js
+└─ tsconfig.json
 ```
 
 ---
@@ -384,7 +361,32 @@ npm install
 yarn install
 ```
 
-### 3단계: 환경 변수 설정
+### 3단계: Shadcn/ui 초기화
+
+```bash
+npx shadcn-ui@latest init
+```
+
+설정 옵션:
+- **Style**: Default
+- **Base color**: Slate
+- **CSS variables**: Yes
+
+필요한 컴포넌트 설치:
+```bash
+npx shadcn-ui@latest add button
+npx shadcn-ui@latest add input
+npx shadcn-ui@latest add card
+npx shadcn-ui@latest add dialog
+npx shadcn-ui@latest add dropdown-menu
+npx shadcn-ui@latest add tabs
+npx shadcn-ui@latest add toast
+npx shadcn-ui@latest add select
+npx shadcn-ui@latest add label
+npx shadcn-ui@latest add textarea
+```
+
+### 4단계: 환경 변수 설정
 
 `.env.local` 파일을 생성하고 아래 환경 변수를 설정합니다.
 
@@ -415,7 +417,7 @@ NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY=pri_xxx
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 4단계: 개발 서버 실행
+### 5단계: 개발 서버 실행
 
 ```bash
 npm run dev
@@ -425,7 +427,7 @@ yarn dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인합니다.
 
-### 5단계: 빌드 (프로덕션)
+### 6단계: 빌드 (프로덕션)
 
 ```bash
 npm run build
@@ -439,26 +441,230 @@ yarn start
 
 ## 🔐 환경 변수 설정
 
-### Firebase 클라이언트 설정
+### `.env.example` 파일
 
-1. [Firebase Console](https://console.firebase.google.com/)에서 프로젝트 생성 또는 선택
-2. **프로젝트 설정** > **일반** 탭에서 웹 앱 추가
-3. 설정 정보를 `.env.local`에 복사
+프로젝트 루트에 `.env.example` 파일을 생성하세요:
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXX
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789012
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789012:web:xxxxx
+# ========================================
+# Firebase (클라이언트)
+# ========================================
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# ========================================
+# Firebase Admin (서버)
+# ========================================
+FIREBASE_ADMIN_PROJECT_ID=
+FIREBASE_ADMIN_CLIENT_EMAIL=
+FIREBASE_ADMIN_PRIVATE_KEY=
+
+# ========================================
+# Paddle (결제)
+# ========================================
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=
+NEXT_PUBLIC_PADDLE_ENVIRONMENT=sandbox
+# 프로덕션: production
+PADDLE_API_KEY=
+PADDLE_WEBHOOK_SECRET=
+
+# Paddle Price IDs
+NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY=
+
+# ========================================
+# 기타
+# ========================================
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Firebase Admin SDK 설정
+### 환경 변수 설명
 
-1. **프로젝트 설정** > **서비스 계정** 탭
+| 변수명 | 설명 | 필수 | 예시 |
+|--------|------|------|------|
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase API 키 | ✅ | `AIzaSyC...` |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase Auth 도메인 | ✅ | `my-project.firebaseapp.com` |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase 프로젝트 ID | ✅ | `my-project-12345` |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase Storage 버킷 | ✅ | `my-project.appspot.com` |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | FCM Sender ID | ✅ | `123456789` |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase App ID | ✅ | `1:123:web:abc` |
+| `FIREBASE_ADMIN_PROJECT_ID` | Admin용 프로젝트 ID | ✅ | `my-project-12345` |
+| `FIREBASE_ADMIN_CLIENT_EMAIL` | 서비스 계정 이메일 | ✅ | `firebase-adminsdk-xxx@...` |
+| `FIREBASE_ADMIN_PRIVATE_KEY` | 서비스 계정 Private Key | ✅ | `"-----BEGIN...` |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | Paddle 클라이언트 토큰 | ✅ | `test_xxx` |
+| `NEXT_PUBLIC_PADDLE_ENVIRONMENT` | Paddle 환경 | ✅ | `sandbox` 또는 `production` |
+| `PADDLE_API_KEY` | Paddle API 키 | ✅ | `xxx` |
+| `PADDLE_WEBHOOK_SECRET` | Paddle 웹훅 시크릿 | ✅ | `pdl_xxx` |
+| `NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY` | Pro 플랜 Price ID | ✅ | `pri_xxx` |
+| `NEXT_PUBLIC_APP_URL` | 앱 기본 URL | ✅ | `https://summarygenie.app` |
+
+---
+
+## 🔥 Firebase 설정 가이드
+
+### 1. Firebase 프로젝트 생성
+
+1. [Firebase Console](https://console.firebase.google.com/) 접속
+2. "프로젝트 추가" 클릭
+3. 프로젝트 이름 입력: `SummaryGenie`
+4. Google Analytics 활성화 (선택사항)
+5. 프로젝트 생성
+
+### 2. Firebase Authentication 설정
+
+#### 이메일/비밀번호 인증 활성화
+
+1. Firebase Console > **Authentication** > **Sign-in method**
+2. **이메일/비밀번호** 활성화
+3. 이메일 링크(비밀번호 없이 로그인) 비활성화
+
+#### Google 소셜 로그인 활성화
+
+1. **Google** 제공업체 활성화
+2. 프로젝트 지원 이메일 설정
+3. 저장
+
+### 3. Firebase Firestore 설정
+
+#### Firestore 데이터베이스 생성
+
+1. Firebase Console > **Firestore Database** > **데이터베이스 만들기**
+2. **테스트 모드에서 시작** 선택
+3. 리전 선택: `asia-northeast3 (Seoul)`
+4. 완료
+
+#### Firestore 보안 규칙 설정
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 사용자 문서
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // history 서브컬렉션
+      match /history/{historyId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // daily 서브컬렉션
+      match /daily/{dailyId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // subscription 컬렉션 (최상위)
+    match /subscription/{subId} {
+      allow read: if request.auth != null && 
+                     resource.data.userId == request.auth.uid;
+      allow write: if false; // 서버에서만 쓰기
+    }
+    
+    // webhook_events 컬렉션 (서버 전용)
+    match /webhook_events/{eventId} {
+      allow read, write: if false;
+    }
+    
+    // webhook_logs 컬렉션 (서버 전용)
+    match /webhook_logs/{logId} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+#### Firestore 인덱스 생성
+
+**필수 복합 인덱스:**
+
+1. `users/{userId}/history`:
+   ```
+   Collection ID: history
+   Fields indexed:
+     - deletedAt (Ascending)
+     - createdAt (Descending)
+   Query scope: Collection
+   ```
+
+2. `users/{userId}/daily`:
+   ```
+   Collection ID: daily
+   Fields indexed:
+     - date (Ascending)
+   Query scope: Collection
+   ```
+
+3. `subscription`:
+   ```
+   Collection ID: subscription
+   Fields indexed:
+     - userId (Ascending)
+   Query scope: Collection
+   ```
+
+Firebase Console > Firestore > **인덱스** 탭에서 생성하세요.
+
+### 4. Firebase Storage 설정
+
+#### Storage 버킷 생성
+
+1. Firebase Console > **Storage** > **시작하기**
+2. 보안 규칙 모드 선택
+3. 리전 선택: `asia-northeast3 (Seoul)`
+
+#### Storage 보안 규칙 설정
+
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // 프로필 사진
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true; // 공개 읽기
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId &&
+                      request.resource.size < 2 * 1024 * 1024 && // 최대 2MB
+                      request.resource.contentType.matches('image/.*');
+    }
+  }
+}
+```
+
+#### CORS 설정 (선택사항)
+
+`cors.json` 파일 생성:
+
+```json
+[
+  {
+    "origin": ["https://your-domain.com", "http://localhost:3000"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "maxAgeSeconds": 3600
+  }
+]
+```
+
+CORS 적용:
+```bash
+gsutil cors set cors.json gs://your-bucket-name.appspot.com
+```
+
+### 5. Firebase Admin SDK 설정
+
+#### 서비스 계정 키 생성
+
+1. Firebase Console > **프로젝트 설정** > **서비스 계정**
 2. **새 비공개 키 생성** 클릭
-3. 다운로드한 JSON 파일의 내용을 환경 변수에 설정
+3. JSON 파일 다운로드
+4. 파일 내용을 `.env.local`에 복사
 
 ```env
 FIREBASE_ADMIN_PROJECT_ID=your-project-id
@@ -466,512 +672,464 @@ FIREBASE_ADMIN_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceacc
 FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour-Private-Key-Here\n-----END PRIVATE KEY-----\n"
 ```
 
-⚠️ **주의**: `FIREBASE_ADMIN_PRIVATE_KEY`는 큰따옴표로 감싸고, `\n`을 그대로 유지해야 합니다.
+⚠️ **주의**: Private Key는 큰따옴표로 감싸고, `\n`을 그대로 유지해야 합니다.
 
-### Paddle 설정
+### 6. Firebase 웹 앱 설정
 
-#### 1. Paddle 계정 생성
+1. Firebase Console > **프로젝트 설정** > **일반**
+2. 앱 섹션에서 **웹** 선택 (</>)
+3. 앱 닉네임 입력: `SummaryGenie Web`
+4. **Firebase Hosting 설정** 건너뛰기
+5. 구성 정보 복사하여 `.env.local`에 붙여넣기
 
-- [Paddle Dashboard](https://vendors.paddle.com/)에서 계정 생성
-- Sandbox 환경에서 테스트 시작
+---
 
-#### 2. API Key 생성
+## 🎯 Paddle 설정 가이드
 
-1. **Developer Tools** > **Authentication** 에서 API Key 생성
-2. API Key를 안전한 곳에 보관
+### 1. Paddle 계정 생성
 
-```env
-PADDLE_API_KEY=your-paddle-api-key
-```
+1. [Paddle 웹사이트](https://www.paddle.com/) 방문
+2. **Start Free** 클릭하여 계정 생성
+3. 이메일 인증
 
-#### 3. Client Token 생성
+### 2. Sandbox 환경 활성화
 
-1. **Developer Tools** > **Client-side Tokens**에서 토큰 생성
-2. 도메인 제한 설정 권장
+1. Paddle Dashboard 로그인
+2. 우측 상단의 환경 전환 토글 확인
+3. **Sandbox** 모드로 전환
 
-```env
-NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=your-paddle-client-token
-```
+### 3. API 키 생성
 
-#### 4. Webhook 설정
+#### Client Token 생성
 
-1. **Developer Tools** > **Notifications** 에서 Webhook 설정
-2. Webhook URL: `https://your-domain.com/api/webhooks/paddle`
-3. 필요한 이벤트 선택:
-   - ✅ `subscription.created`
-   - ✅ `subscription.updated`
-   - ✅ `subscription.canceled`
-   - ✅ `subscription.past_due`
-   - ✅ `subscription.paused`
-   - ✅ `subscription.resumed`
-   - ✅ `transaction.completed`
-
-4. Webhook Secret 복사
+1. Paddle Dashboard > **Developer Tools** > **Authentication**
+2. **Client-side Tokens** 탭
+3. **New Client-side Token** 클릭
+4. 이름: `SummaryGenie Web Client`
+5. 도메인 제한 설정 (권장):
+   - `localhost:3000` (개발)
+   - `your-domain.com` (프로덕션)
+6. 토큰 복사
 
 ```env
-PADDLE_WEBHOOK_SECRET=your-webhook-secret
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=test_xxxxxxxxxxxxx
 ```
 
-#### 5. 상품(Product) 생성
+#### API Key 생성 (서버용)
 
-1. **Catalog** > **Products** 에서 새 상품 생성
-   - 상품명: SummaryGenie Pro
-   - 가격: ₩9,900/월 (또는 원하는 가격)
+1. **API Keys** 탭
+2. **New API Key** 클릭
+3. 이름: `SummaryGenie Server`
+4. 권한 선택:
+   - ✅ Read subscriptions
+   - ✅ Write subscriptions
+   - ✅ Read transactions
+5. API Key 복사
 
-2. Price ID를 환경 변수에 설정
+```env
+PADDLE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 4. 상품(Product) 생성
+
+#### Pro 플랜 상품 생성
+
+1. Paddle Dashboard > **Catalog** > **Products**
+2. **New Product** 클릭
+3. 상품 정보 입력:
+   - **Name**: SummaryGenie Pro
+   - **Description**: AI 기반 무제한 웹페이지 요약 서비스
+   - **Type**: Standard
+4. 저장
+
+#### Price 생성
+
+1. 생성한 Product > **Prices** 탭
+2. **New Price** 클릭
+3. 가격 설정:
+   - **Billing Cycle**: Monthly (월간)
+   - **Amount**: ₩9,900
+   - **Currency**: KRW (한국 원화)
+   - **Trial Period**: 없음 (또는 원하는 기간 설정)
+4. Price ID 복사
 
 ```env
 NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY=pri_01xxxxxxxxxxxxxxxxx
 ```
 
-#### 6. 환경 설정
+### 5. Webhook 설정
+
+#### Webhook URL 등록
+
+1. Paddle Dashboard > **Developer Tools** > **Notifications**
+2. **New Destination** 클릭
+3. Webhook 정보 입력:
+   - **URL**: `https://your-domain.com/api/webhooks/paddle`
+   - **Description**: SummaryGenie Production Webhook
+   - **Active**: 체크
+
+#### 이벤트 선택
+
+다음 이벤트를 **모두 선택**하세요:
+
+- ✅ `subscription.created` - 구독 생성
+- ✅ `subscription.updated` - 구독 업데이트
+- ✅ `subscription.canceled` - 구독 취소
+- ✅ `subscription.past_due` - 결제 실패
+- ✅ `subscription.paused` - 구독 일시정지
+- ✅ `subscription.resumed` - 구독 재개
+- ✅ `transaction.completed` - 결제 완료
+- ✅ `transaction.updated` - 결제 업데이트
+
+#### Webhook Secret 복사
+
+1. 생성된 Webhook > **Secret** 복사
+2. `.env.local`에 추가
 
 ```env
-# 개발 환경
-NEXT_PUBLIC_PADDLE_ENVIRONMENT=sandbox
-
-# 프로덕션 환경
-NEXT_PUBLIC_PADDLE_ENVIRONMENT=production
+PADDLE_WEBHOOK_SECRET=pdl_ntfset_01xxxxxxxxxxxxxxxxx
 ```
+
+### 6. 로컬 개발 Webhook 테스트
+
+#### ngrok 설치 및 사용
+
+로컬 개발 환경에서 Webhook을 테스트하려면 ngrok을 사용하세요:
+
+```bash
+# ngrok 설치 (macOS)
+brew install ngrok
+
+# ngrok 실행 (3000번 포트)
+ngrok http 3000
+```
+
+ngrok이 제공하는 HTTPS URL을 Paddle Webhook 설정에 추가:
+```
+https://xxxx-xxx-xxx-xxx.ngrok.io/api/webhooks/paddle
+```
+
+#### Webhook 테스트
+
+Paddle Dashboard에서 **Send Test Event** 버튼을 클릭하여 Webhook이 정상 작동하는지 확인하세요.
+
+### 7. 환경별 설정
+
+#### Sandbox (개발)
+
+```env
+NEXT_PUBLIC_PADDLE_ENVIRONMENT=sandbox
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=test_xxxxxxxxxxxxx
+PADDLE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+PADDLE_WEBHOOK_SECRET=pdl_ntfset_01xxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY=pri_01xxxxxxxxxxxxxxxxx
+```
+
+#### Production (프로덕션)
+
+1. Paddle Dashboard에서 **Production** 모드로 전환
+2. 위 단계를 반복하여 Production 전용 키 생성
+3. Vercel 환경 변수에 Production 값 설정
+
+```env
+NEXT_PUBLIC_PADDLE_ENVIRONMENT=production
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=live_xxxxxxxxxxxxx
+PADDLE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+PADDLE_WEBHOOK_SECRET=pdl_ntfset_01xxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY=pri_01xxxxxxxxxxxxxxxxx
+```
+
+### 8. Paddle Checkout 커스터마이징 (선택사항)
+
+#### 테마 설정
+
+Paddle Dashboard > **Checkout** > **Checkout Theme**에서:
+- 브랜드 색상 설정
+- 로고 업로드
+- 폰트 선택
+
+#### 결제 수단
+
+Paddle Dashboard > **Settings** > **Payment Methods**에서:
+- 신용카드/체크카드
+- PayPal
+- Apple Pay
+- Google Pay
 
 ---
 
-## 📚 주요 기능 상세
+## 📖 개발 가이드
 
-### 1. 인증 시스템
+### 코드 스타일
 
-#### Firebase Authentication 연동
+```bash
+# ESLint 실행
+npm run lint
+
+# 타입 체크
+npx tsc --noEmit
+
+# 포맷팅 (Prettier 사용 시)
+npm run format
+```
+
+### Git 커밋 컨벤션
+
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅, 세미콜론 누락 등
+refactor: 코드 리팩토링
+test: 테스트 코드 추가/수정
+chore: 빌드 프로세스 또는 도구 변경
+perf: 성능 개선
+```
+
+**예시:**
+```bash
+git commit -m "feat: Add profile photo upload to settings page"
+git commit -m "fix: Fix subscription renewal date sync issue"
+git commit -m "docs: Update README with Firebase setup guide"
+git commit -m "refactor: Optimize Firestore queries with subcollections"
+git commit -m "perf: Add image upload progress tracking"
+```
+
+### 브랜치 전략
+
+```
+main        - 프로덕션 환경 (항상 배포 가능한 상태)
+develop     - 개발 브랜치
+feature/*   - 새 기능 개발
+fix/*       - 버그 수정
+hotfix/*    - 긴급 수정
+release/*   - 릴리스 준비
+```
+
+**예시:**
+```bash
+git checkout -b feature/profile-photo-upload
+git checkout -b fix/subscription-sync-error
+git checkout -b hotfix/webhook-signature-validation
+```
+
+### 개발 워크플로우
+
+1. **이슈 생성**: GitHub Issues에서 작업 내용 정의
+2. **브랜치 생성**: `feature/`, `fix/` 등의 브랜치 생성
+3. **개발 및 테스트**: 로컬에서 개발 및 테스트
+4. **커밋**: 의미 있는 단위로 커밋
+5. **Pull Request**: `develop` 브랜치로 PR 생성
+6. **코드 리뷰**: 팀원의 리뷰 및 승인
+7. **병합**: PR 병합
+8. **배포**: `main` 브랜치로 병합 시 자동 배포
+
+---
+
+## 💾 Firebase 데이터 구조
+
+### 서브컬렉션 구조 개요
+
+```
+users (Collection)
+└── {userId} (Document)
+    ├── email: string
+    ├── name: string
+    ├── isPremium: boolean
+    ├── ...
+    ├── history (Subcollection)
+    │   └── {historyId} (Document)
+    │       ├── title: string
+    │       ├── summary: string
+    │       ├── createdAt: Timestamp
+    │       └── ...
+    └── daily (Subcollection)
+        └── {dailyId} (Document)
+            ├── date: string
+            ├── count: number
+            └── ...
+
+subscription (Collection, 최상위)
+└── {subscriptionId} (Document)
+    ├── userId: string
+    ├── paddleSubscriptionId: string
+    └── ...
+```
+
+### 1. `users/{userId}` 컬렉션
+
+사용자 프로필 정보
 
 ```typescript
-// lib/auth.ts
-import { 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider 
-} from 'firebase/auth';
-
-// 이메일 로그인
-export async function signInWithEmail(email: string, password: string) {
-  const auth = getAuthInstance();
-  return await signInWithEmailAndPassword(auth, email, password);
-}
-
-// Google 로그인
-export async function signInWithGoogle() {
-  const auth = getAuthInstance();
-  const provider = new GoogleAuthProvider();
-  return await signInWithPopup(auth, provider);
+interface UserProfile {
+  email: string;
+  name: string | null;
+  isPremium: boolean;
+  subscriptionPlan: 'free' | 'pro';
+  emailVerified: boolean;
+  photoURL?: string | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 ```
 
-#### 세션 쿠키 관리
-
-```typescript
-// app/api/auth/session/route.ts
-export async function POST(request: NextRequest) {
-  const { idToken } = await request.json();
-  
-  // ID 토큰 검증
-  const auth = getAdminAuth();
-  const decodedToken = await auth.verifyIdToken(idToken);
-  
-  // 세션 쿠키 생성 (5일 유효)
-  const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: 60 * 60 * 24 * 5 * 1000, // 5 days
-  });
-  
-  // 쿠키 설정 및 응답
-  const response = NextResponse.json({ success: true });
-  response.cookies.set('session', sessionCookie, {
-    maxAge: 60 * 60 * 24 * 5,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-  });
-  
-  return response;
+**예시 문서:**
+```json
+{
+  "email": "user@example.com",
+  "name": "홍길동",
+  "isPremium": true,
+  "subscriptionPlan": "pro",
+  "emailVerified": true,
+  "photoURL": "https://firebasestorage.googleapis.com/...",
+  "createdAt": "2024-01-15T09:00:00Z",
+  "updatedAt": "2024-11-15T14:30:00Z"
 }
 ```
 
-### 2. 대시보드
+### 2. `users/{userId}/history` 서브컬렉션
 
-#### 실시간 통계 조회
+사용자의 요약 기록 (Chrome 확장에서 생성)
 
 ```typescript
-// hooks/useUsageStats.ts
-export function useMonthlyUsage(userId: string | null) {
-  const { data, error } = useSWR(
-    userId ? ['monthly-usage', userId] : null,
-    async () => {
-      const now = new Date();
-      const stats = await getMonthlyUsage(
-        userId!, 
-        now.getFullYear(), 
-        now.getMonth() + 1
-      );
-      return stats;
-    },
-    {
-      refreshInterval: 60000, // 1분마다 갱신
-      revalidateOnFocus: true,
-    }
-  );
-  
-  return {
-    total: data?.total || 0,
-    loading: !error && !data,
-    error,
+interface HistoryDocument {
+  userId: string;
+  title: string;
+  url?: string;
+  summary?: string;  // Chrome 확장에서 summary로 저장
+  content?: string;  // 하위 호환성 지원
+  createdAt: Timestamp;
+  deletedAt?: Timestamp;  // 소프트 삭제
+  metadata?: {
+    domain?: string;
+    tags?: string[];
   };
 }
 ```
 
-#### 사용량 차트
+**필수 인덱스:**
+- 복합 인덱스: `deletedAt` (ASC), `createdAt` (DESC)
 
-```typescript
-// components/dashboard/UsageChart.tsx
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-export default function UsageChart({ data }: { data: DailyStats[] }) {
-  const chartData = data.map(stat => ({
-    date: new Date(stat.date).toLocaleDateString('ko-KR', { 
-      month: 'short', 
-      day: 'numeric' 
-    }),
-    count: stat.count,
-  }));
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData}>
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        <Line 
-          type="monotone" 
-          dataKey="count" 
-          stroke="#3b82f6" 
-          strokeWidth={2}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
+**예시 문서:**
+```json
+{
+  "userId": "user123",
+  "title": "Next.js 14 완벽 가이드",
+  "url": "https://example.com/nextjs-guide",
+  "summary": "Next.js 14의 주요 기능: App Router, Server Components, 서버 액션 등을 상세히 설명합니다...",
+  "createdAt": "2024-11-15T10:30:00Z",
+  "metadata": {
+    "domain": "example.com",
+    "tags": ["개발", "웹", "프론트엔드"]
+  }
 }
 ```
 
-### 3. 요약 기록 관리
+### 3. `users/{userId}/daily` 서브컬렉션
 
-#### 무한 스크롤 구현
+일일 사용량 통계 (Chrome 확장에서 생성)
 
 ```typescript
-// hooks/useHistory.ts
-export function useHistory(userId: string | null, options: HistoryOptions = {}) {
-  const { data, size, setSize, isValidating } = useSWRInfinite(
-    getKey,
-    fetcher,
-    {
-      revalidateFirstPage: false,
-      revalidateOnFocus: false,
-    }
-  );
-  
-  const loadMore = useCallback(() => {
-    if (!isLoadingMore && hasMore) {
-      setSize(size + 1);
-    }
-  }, [size, setSize, isLoadingMore, hasMore]);
-  
-  return { history, loadMore, hasMore };
+interface DailyDocument {
+  userId: string;
+  date: string; // YYYY-MM-DD
+  count: number;
+  isPremium: boolean;
+  createdAt: Timestamp;
 }
 ```
 
-#### 실시간 검색 (디바운스)
+**필수 인덱스:**
+- 단일 인덱스: `date` (ASC)
 
-```typescript
-// components/dashboard/SearchBar.tsx
-export default function SearchBar({ onSearch }: { onSearch: (term: string) => void }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  // 500ms 디바운스
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearch(searchTerm);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [searchTerm, onSearch]);
-  
-  return (
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      placeholder="제목 또는 내용으로 검색..."
-      className="w-full px-4 py-2 border rounded-lg"
-    />
-  );
+**예시 문서:**
+```json
+{
+  "userId": "user123",
+  "date": "2024-11-15",
+  "count": 25,
+  "isPremium": true,
+  "createdAt": "2024-11-15T23:59:59Z"
 }
 ```
 
-### 4. 구독 관리 (Paddle)
+### 4. `subscription` 컬렉션 (최상위)
 
-#### Paddle Checkout 연동
+Paddle 구독 정보
 
 ```typescript
-// components/payment/PaddleCheckout.tsx
-'use client';
+interface SubscriptionDocument {
+  userId: string;
+  paddleSubscriptionId: string;
+  paddleCustomerId: string;
+  plan: 'free' | 'pro';
+  status: 'active' | 'trialing' | 'past_due' | 'paused' | 'canceled';
+  currentPeriodEnd: Timestamp;
+  nextBillingDate: Timestamp | null;
+  cancelAtPeriodEnd: boolean;
+  price: number;
+  currency: string;
+  priceId: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
 
-import { usePaddle } from '@/lib/paddle';
-import { PADDLE_PRICES } from '@/lib/paddle';
+**필수 인덱스:**
+- 단일 인덱스: `userId` (ASC)
+- 단일 인덱스: `paddleSubscriptionId` (ASC)
 
-export function PaddleCheckout() {
-  const paddle = usePaddle();
-  const { user } = useAuth();
-  
-  const handleUpgrade = async () => {
-    if (!user) return;
-    
-    // Paddle Checkout 열기
-    paddle.Checkout.open({
-      items: [
-        {
-          priceId: PADDLE_PRICES.pro_monthly,
-          quantity: 1,
-        },
-      ],
-      customData: {
-        userId: user.uid,
-        email: user.email || '',
-      },
-      customer: user.email ? {
-        email: user.email,
-      } : undefined,
-      settings: {
-        displayMode: 'overlay',
-        theme: 'dark',
-        locale: 'ko',
-        successUrl: `${window.location.origin}/subscription?success=true`,
-      },
-    });
+**예시 문서:**
+```json
+{
+  "userId": "user123",
+  "paddleSubscriptionId": "sub_01xxxxxxxxx",
+  "paddleCustomerId": "ctm_01xxxxxxxxx",
+  "plan": "pro",
+  "status": "active",
+  "currentPeriodEnd": "2024-12-15T00:00:00Z",
+  "nextBillingDate": "2024-12-15T00:00:00Z",
+  "cancelAtPeriodEnd": false,
+  "price": 9900,
+  "currency": "KRW",
+  "priceId": "pri_01xxxxxxxxx",
+  "createdAt": "2024-11-15T10:00:00Z",
+  "updatedAt": "2024-11-15T14:30:00Z"
+}
+```
+
+### 5. `webhook_events` 컬렉션 (최상위)
+
+Paddle 웹훅 이벤트 기록 (중복 방지용)
+
+```typescript
+interface WebhookEventDocument {
+  eventId: string;              // Paddle event ID
+  eventType: string;            // 이벤트 타입
+  processedAt: Timestamp;       // 처리 시간
+  expiresAt: Timestamp;         // 만료 시간 (30일 후)
+  metadata?: Record<string, any>;
+}
+```
+
+**TTL 설정:**
+- `expiresAt` 필드에 TTL 인덱스 설정 (30일 후 자동 삭제)
+
+### 6. `webhook_logs` 컬렉션 (최상위)
+
+웹훅 처리 로그 (디버깅용)
+
+```typescript
+interface WebhookLogDocument {
+  eventId: string;
+  eventType: string;
+  status: 'success' | 'failed';
+  occurredAt: Timestamp;
+  processedAt: Timestamp;
+  error?: {
+    message: string;
+    stack?: string;
   };
-  
-  return (
-    <button onClick={handleUpgrade}>
-      Pro로 업그레이드
-    </button>
-  );
-}
-```
-
-#### Paddle 웹훅 처리 (개선됨)
-
-```typescript
-// app/api/webhooks/paddle/route.ts
-export async function POST(request: NextRequest) {
-  const rawBody = await request.text();
-  const signature = request.headers.get('paddle-signature');
-  
-  // 1. 시그니처 검증
-  const isValid = verifyPaddleWebhook(signature, rawBody);
-  
-  if (!isValid) {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-  }
-  
-  const payload = JSON.parse(rawBody);
-  const { event_type, data } = payload;
-  
-  // 2. 중복 이벤트 체크
-  const isDuplicate = await isDuplicateEvent(payload.event_id);
-  if (isDuplicate) {
-    return NextResponse.json({ success: true, message: 'Already processed' });
-  }
-  
-  // 3. 이벤트별 처리
-  switch (event_type) {
-    case 'subscription.created':
-      await handleSubscriptionCreated(data);
-      break;
-    case 'subscription.updated':
-      await handleSubscriptionUpdated(data);
-      break;
-    case 'subscription.canceled':
-      await handleSubscriptionCanceled(data);
-      break;
-    case 'transaction.completed':
-      // ✅ 구독 갱신 시 Paddle API에서 최신 정보 동기화
-      await handleTransactionCompleted(data);
-      if (data.subscription_id) {
-        await syncSubscriptionFromPaddle(data.subscription_id);
-      }
-      break;
-  }
-  
-  // 4. 이벤트 처리 완료 기록
-  await markEventAsProcessed(payload.event_id, event_type);
-  
-  return NextResponse.json({ success: true });
-}
-```
-
-#### 구독 수동 동기화
-
-```typescript
-// app/api/subscription/sync/route.ts
-export async function POST(request: NextRequest) {
-  // Firebase 인증
-  const token = await verifyIdToken(request);
-  const userId = token.uid;
-  
-  // Firestore에서 구독 찾기
-  const subscription = await getUserSubscription(userId);
-  
-  // Paddle API에서 최신 정보 가져오기
-  const paddleSubscription = await getPaddleSubscription(
-    subscription.paddleSubscriptionId
-  );
-  
-  // Firestore 업데이트
-  await updateSubscriptionInFirestore(subscription.id, {
-    currentPeriodEnd: new Date(paddleSubscription.current_billing_period.ends_at),
-    nextBillingDate: paddleSubscription.next_billed_at 
-      ? new Date(paddleSubscription.next_billed_at) 
-      : null,
-    status: paddleSubscription.status,
-  });
-  
-  return NextResponse.json({ 
-    success: true, 
-    message: '구독 정보가 동기화되었습니다.' 
-  });
-}
-```
-
-### 5. 프로필 설정
-
-#### 프로필 사진 업로드
-
-```typescript
-// components/dashboard/ProfileSettings.tsx
-const handleImageUpload = async () => {
-  if (!selectedFile) return;
-
-  setUploading(true);
-  setUploadProgress(0);
-
-  try {
-    // Firebase Storage에 업로드 + 프로필 업데이트
-    const downloadURL = await uploadAndUpdateProfilePhoto(
-      selectedFile,
-      (progress: number) => {
-        setUploadProgress(progress);
-      }
-    );
-
-    setPhotoURL(downloadURL);
-    showSuccess('프로필 사진이 업데이트되었습니다.');
-    onUpdate();
-  } catch (error: any) {
-    showError(error.message || '이미지 업로드에 실패했습니다.');
-  } finally {
-    setUploading(false);
-  }
-};
-```
-
-#### 프로필 정보 업데이트
-
-```typescript
-// lib/auth.ts
-export async function updateUserProfile(
-  displayName?: string,
-  photoURL?: string
-): Promise<void> {
-  const auth = getAuthInstance();
-  const user = auth.currentUser;
-
-  if (!user) {
-    throw new Error('No user is currently signed in');
-  }
-
-  await updateProfile(user, {
-    ...(displayName && { displayName }),
-    ...(photoURL && { photoURL }),
-  });
-}
-```
-
-### 6. SEO 최적화 ⭐ NEW
-
-#### 구조화된 데이터 (JSON-LD)
-
-```typescript
-// app/(marketing)/page.tsx
-import JsonLd from '@/components/seo/JsonLd';
-import { 
-  getOrganizationSchema, 
-  getWebApplicationSchema,
-  getFAQSchema,
-} from '@/lib/metadata';
-
-export default function LandingPage() {
-  const faqData = [
-    { question: '무료인가요?', answer: '네, 기본 플랜은...' },
-    // ...
-  ];
-
-  return (
-    <>
-      <JsonLd 
-        data={[
-          getOrganizationSchema(),
-          getWebApplicationSchema(),
-          getFAQSchema(faqData),
-        ]} 
-      />
-      {/* 페이지 콘텐츠 */}
-    </>
-  );
-}
-```
-
-#### 페이지별 메타데이터
-
-```typescript
-// app/(marketing)/pricing/page.tsx
-import type { Metadata } from 'next';
-import { generateProductMetadata } from '@/lib/metadata';
-
-export const metadata: Metadata = generateProductMetadata({
-  title: '요금제 - 무료로 시작하기',
-  description: 'Free 플랜(무료)과 Pro 플랜(월 9,900원)을 비교하세요.',
-  price: '9900',
-  currency: 'KRW',
-  canonical: '/pricing',
-});
-
-export default function PricingPage() {
-  // ...
-}
-```
-
-#### 클라이언트 컴포넌트용 동적 메타데이터
-
-```typescript
-// app/(auth)/login/page.tsx
-'use client';
-
-import DynamicMeta from '@/components/seo/DynamicMeta';
-
-export default function LoginPage() {
-  return (
-    <>
-      <DynamicMeta
-        title="로그인 | SummaryGenie"
-        description="SummaryGenie에 로그인하세요"
-      />
-      {/* 페이지 콘텐츠 */}
-    </>
-  );
 }
 ```
 
@@ -982,12 +1140,12 @@ export default function LoginPage() {
 ### 인증
 
 #### `POST /api/auth/session`
-세션 쿠키 생성
+Firebase ID 토큰으로 세션 쿠키 생성
 
 **Request:**
 ```json
 {
-  "idToken": "eyJhbGciOiJSUzI1..."
+  "idToken": "eyJhbGciOiJSUzI1NiIs..."
 }
 ```
 
@@ -1003,7 +1161,11 @@ export default function LoginPage() {
 ```
 
 **Headers:**
-- `Set-Cookie: session=...; HttpOnly; Secure; Max-Age=432000`
+```
+Set-Cookie: session=...; HttpOnly; Secure; Max-Age=432000
+```
+
+---
 
 #### `DELETE /api/auth/session`
 로그아웃 (세션 쿠키 삭제)
@@ -1016,7 +1178,9 @@ export default function LoginPage() {
 }
 ```
 
-### 구독
+---
+
+### 구독 관리
 
 #### `POST /api/subscription/create`
 Pro 플랜 구독 생성 (Paddle Checkout)
@@ -1052,6 +1216,8 @@ Content-Type: application/json
 }
 ```
 
+---
+
 #### `POST /api/subscription/cancel`
 구독 취소
 
@@ -1081,6 +1247,8 @@ Content-Type: application/json
 }
 ```
 
+---
+
 #### `POST /api/subscription/resume`
 취소 예정인 구독 재개
 
@@ -1100,6 +1268,8 @@ Authorization: Bearer {firebase-id-token}
   }
 }
 ```
+
+---
 
 #### `POST /api/subscription/sync` ⭐ NEW
 구독 정보 수동 동기화
@@ -1129,6 +1299,8 @@ Authorization: Bearer {firebase-id-token}
 - 구독 정보가 맞지 않을 때 ("0일 남음" 문제 등)
 - 사용자가 문제를 신고했을 때
 
+---
+
 #### `POST /api/subscription/update-payment`
 결제 수단 변경 URL 생성
 
@@ -1153,6 +1325,8 @@ Content-Type: application/json
 }
 ```
 
+---
+
 ### 웹훅
 
 #### `POST /api/webhooks/paddle`
@@ -1171,191 +1345,12 @@ Content-Type: application/json
 - `subscription.past_due` - 결제 실패
 - `subscription.paused` - 구독 일시정지
 - `subscription.resumed` - 구독 재개
-- `transaction.completed` - 결제 완료 (✅ Paddle API 직접 조회 추가)
+- `transaction.completed` - 결제 완료 (✅ Paddle API 직접 조회)
 
 **Response:**
 ```json
 {
   "success": true
-}
-```
-
----
-
-## 🗄️ Firebase 데이터 구조
-
-### 1. `users/{userId}` 컬렉션
-
-사용자 프로필 정보
-
-```typescript
-interface UserProfile {
-  email: string;
-  name: string | null;
-  isPremium: boolean;
-  subscriptionPlan: 'free' | 'pro';
-  emailVerified: boolean;
-  photoURL?: string | null;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-```
-
-**예시 문서:**
-```json
-{
-  "email": "user@example.com",
-  "name": "홍길동",
-  "isPremium": true,
-  "subscriptionPlan": "pro",
-  "emailVerified": true,
-  "photoURL": "https://...",
-  "createdAt": "2024-01-15T09:00:00Z",
-  "updatedAt": "2024-11-15T14:30:00Z"
-}
-```
-
-### 2. `users/{userId}/history` 서브컬렉션
-
-사용자의 요약 기록 (Chrome 확장에서 생성)
-
-```typescript
-interface HistoryDocument {
-  userId: string;
-  title: string;
-  url?: string;
-  summary?: string;  // Chrome 확장에서 summary로 저장
-  content?: string;  // 하위 호환성 지원
-  createdAt: Timestamp;
-  deletedAt?: Timestamp;
-  metadata?: {
-    domain?: string;
-    tags?: string[];
-  };
-}
-```
-
-**인덱스:**
-- 복합 인덱스: `deletedAt` (ASC), `createdAt` (DESC)
-
-**예시 문서:**
-```json
-{
-  "userId": "user123",
-  "title": "Next.js 14 완벽 가이드",
-  "url": "https://example.com/nextjs-guide",
-  "summary": "Next.js 14의 주요 기능: App Router, Server Components...",
-  "createdAt": "2024-11-15T10:30:00Z",
-  "metadata": {
-    "domain": "example.com",
-    "tags": ["개발", "웹"]
-  }
-}
-```
-
-### 3. `users/{userId}/daily` 서브컬렉션
-
-일일 사용량 통계 (Chrome 확장에서 생성)
-
-```typescript
-interface DailyDocument {
-  userId: string;
-  date: string; // YYYY-MM-DD
-  count: number;
-  isPremium: boolean;
-  createdAt: Timestamp;
-}
-```
-
-**인덱스:**
-- 복합 인덱스: `date` (ASC)
-
-**예시 문서:**
-```json
-{
-  "userId": "user123",
-  "date": "2024-11-15",
-  "count": 25,
-  "isPremium": true,
-  "createdAt": "2024-11-15T23:59:59Z"
-}
-```
-
-### 4. `subscription` 컬렉션 (최상위)
-
-Paddle 구독 정보
-
-```typescript
-interface SubscriptionDocument {
-  userId: string;
-  paddleSubscriptionId: string;
-  paddleCustomerId: string;
-  plan: 'free' | 'pro';
-  status: 'active' | 'trialing' | 'past_due' | 'paused' | 'canceled';
-  currentPeriodEnd: Timestamp;
-  nextBillingDate: Timestamp | null;
-  cancelAtPeriodEnd: boolean;
-  price: number;
-  currency: string;
-  priceId: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-```
-
-**인덱스:**
-- `userId` (ASC)
-- `paddleSubscriptionId` (ASC)
-- 복합 인덱스 (선택사항): `userId` (ASC), `createdAt` (DESC)
-
-**예시 문서:**
-```json
-{
-  "userId": "user123",
-  "paddleSubscriptionId": "sub_01xxxxxxxxx",
-  "paddleCustomerId": "ctm_01xxxxxxxxx",
-  "plan": "pro",
-  "status": "active",
-  "currentPeriodEnd": "2024-12-15T00:00:00Z",
-  "nextBillingDate": "2024-12-15T00:00:00Z",
-  "cancelAtPeriodEnd": false,
-  "price": 9900,
-  "currency": "KRW",
-  "priceId": "pri_01xxxxxxxxx",
-  "createdAt": "2024-11-15T10:00:00Z",
-  "updatedAt": "2024-11-15T14:30:00Z"
-}
-```
-
-### 5. `webhook_events` 컬렉션 (최상위)
-
-Paddle 웹훅 이벤트 기록 (중복 방지용)
-
-```typescript
-interface WebhookEventDocument {
-  eventId: string;
-  eventType: string;
-  processedAt: Timestamp;
-  expiresAt: Timestamp; // 30일 후 자동 삭제
-  metadata?: Record<string, any>;
-}
-```
-
-### 6. `webhook_logs` 컬렉션 (최상위)
-
-웹훅 처리 로그 (디버깅용)
-
-```typescript
-interface WebhookLogDocument {
-  eventId: string;
-  eventType: string;
-  status: 'success' | 'failed';
-  occurredAt: Timestamp;
-  processedAt: Timestamp;
-  error?: {
-    message: string;
-    stack?: string;
-  };
 }
 ```
 
@@ -1380,7 +1375,7 @@ vercel
 
 #### 2. 환경 변수 설정
 
-Vercel Dashboard에서 프로젝트 설정 > Environment Variables에 모든 환경 변수 추가
+Vercel Dashboard > 프로젝트 선택 > Settings > Environment Variables
 
 **필수 환경 변수:**
 - ✅ Firebase (클라이언트): `NEXT_PUBLIC_FIREBASE_*`
@@ -1398,72 +1393,40 @@ GitHub 저장소와 연결하면 `main` 브랜치에 push할 때마다 자동 �
 3. 환경 변수 설정
 4. Deploy 클릭
 
-### 도메인 설정
+#### 4. 도메인 설정
 
-#### 1. Vercel Dashboard에서 도메인 추가
-
+**Custom Domain 추가:**
 1. Vercel Dashboard > Domains
 2. Add Domain 클릭
 3. 원하는 도메인 입력
 
-#### 2. DNS 설정
+**DNS 설정:**
 
-**A 레코드:**
+A 레코드:
 ```
 Type: A
 Name: @
 Value: 76.76.21.21
 ```
 
-**CNAME 레코드:**
+CNAME 레코드:
 ```
 Type: CNAME
 Name: www
 Value: cname.vercel-dns.com
 ```
 
-#### 3. 환경 변수 업데이트
+#### 5. Paddle Webhook URL 업데이트
 
-프로덕션 도메인으로 환경 변수를 업데이트합니다.
+Paddle Dashboard > Developer Tools > Notifications에서 Webhook URL을 프로덕션 도메인으로 변경:
 
-```env
-NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
-
-### Paddle 웹훅 URL 업데이트
-
-#### 1. Paddle Dashboard 설정
-
-1. Paddle Dashboard > Developer Tools > Notifications
-2. Webhook URL을 프로덕션 도메인으로 변경:
-   ```
-   https://your-domain.com/api/webhooks/paddle
-   ```
-
-#### 2. Webhook 테스트
-
-Paddle Dashboard에서 "Send Test Event" 버튼으로 웹훅이 정상 작동하는지 확인합니다.
-
-#### 3. 웹훅 시그니처 검증
-
-프로덕션 환경에서는 반드시 웹훅 시그니처 검증을 활성화해야 합니다:
-
-```typescript
-// app/api/webhooks/paddle/route.ts
-const isValid = verifyWebhookSignature(
-  signature,
-  rawBody,
-  process.env.PADDLE_WEBHOOK_SECRET!
-);
-
-if (!isValid) {
-  return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-}
+https://your-domain.com/api/webhooks/paddle
 ```
 
 ---
 
-## 🔧 트러블슈팅
+## 🐛 트러블슈팅
 
 ### 1. Firebase 연결 오류
 
@@ -1475,7 +1438,12 @@ Error: Firebase: Error (auth/invalid-api-key)
 **해결 방법:**
 1. `.env.local` 파일의 `NEXT_PUBLIC_FIREBASE_API_KEY` 확인
 2. Firebase Console에서 API 키가 활성화되어 있는지 확인
-3. 개발 서버 재시작: `npm run dev`
+3. 개발 서버 재시작:
+   ```bash
+   npm run dev
+   ```
+
+---
 
 ### 2. Paddle Checkout이 열리지 않음
 
@@ -1488,13 +1456,15 @@ Error: Paddle is not initialized
 
 1. `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`이 올바르게 설정되었는지 확인
 2. Paddle.js 스크립트가 로드되었는지 확인
-3. 브라우저 콘솔에서 `window.Paddle` 객체 확인
+3. 브라우저 콘솔에서 확인:
 
-```typescript
+```javascript
 // 디버깅 코드
 console.log('Paddle loaded:', !!window.Paddle);
 console.log('Paddle environment:', process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT);
 ```
+
+---
 
 ### 3. 세션 쿠키가 설정되지 않음
 
@@ -1504,8 +1474,8 @@ console.log('Paddle environment:', process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT);
 **해결 방법:**
 
 1. 브라우저가 쿠키를 차단하지 않는지 확인
-2. `httpOnly`, `secure` 속성 확인
-3. 프로덕션에서는 `secure: true` 설정
+2. 개발 환경에서 `secure: false` 설정 확인
+3. Middleware 로그 확인:
 
 ```typescript
 // middleware.ts
@@ -1517,7 +1487,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
   
-  // 세션 검증
   try {
     await getAdminAuth().verifySessionCookie(session);
     console.log('✅ Valid session');
@@ -1527,6 +1496,8 @@ export async function middleware(request: NextRequest) {
   }
 }
 ```
+
+---
 
 ### 4. Paddle Webhook 시그니처 검증 실패
 
@@ -1538,9 +1509,9 @@ Error: Invalid webhook signature
 **해결 방법:**
 
 1. `PADDLE_WEBHOOK_SECRET`이 올바른지 확인
-2. Webhook URL이 올바른지 확인 (HTTPS 필수)
+2. Webhook URL이 HTTPS인지 확인
 3. Paddle Dashboard에서 Webhook 재생성
-4. 원본 요청 본문(raw body) 사용 확인
+4. 원본 요청 본문 확인:
 
 ```typescript
 // app/api/webhooks/paddle/route.ts
@@ -1564,6 +1535,8 @@ export async function POST(request: NextRequest) {
 }
 ```
 
+---
+
 ### 5. Firestore 쿼리 성능 문제
 
 **증상:**
@@ -1572,9 +1545,8 @@ export async function POST(request: NextRequest) {
 **해결 방법:**
 
 1. **인덱스 생성**: Firebase Console > Firestore > Indexes
-2. **페이지네이션 최적화**: `pageSize` 조정
-3. **SWR 캐싱 활용**: `revalidateOnFocus: false` 설정
 
+2. **페이지네이션 최적화**:
 ```typescript
 // hooks/useHistory.ts
 const { data, error } = useSWRInfinite(
@@ -1589,123 +1561,40 @@ const { data, error } = useSWRInfinite(
 );
 ```
 
-**필수 인덱스:**
+3. **필수 인덱스 생성**:
 
-1. `users/{userId}/history`:
-   - 복합 인덱스: `deletedAt` (ASC), `createdAt` (DESC)
-
-2. `users/{userId}/daily`:
-   - 복합 인덱스: `date` (ASC)
-
-3. `subscription`:
-   - 단일 인덱스: `userId` (ASC)
-   - 단일 인덱스: `paddleSubscriptionId` (ASC)
-
-### 6. CORS 오류
-
-**증상:**
+`users/{userId}/history`:
 ```
-Access to fetch at '...' from origin '...' has been blocked by CORS policy
+Fields indexed:
+  - deletedAt (Ascending)
+  - createdAt (Descending)
 ```
 
-**해결 방법:**
-
-Firebase Storage CORS 설정:
-
-1. `cors.json` 파일 생성:
-```json
-[
-  {
-    "origin": ["https://your-domain.com", "http://localhost:3000"],
-    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
-    "maxAgeSeconds": 3600
-  }
-]
+`users/{userId}/daily`:
+```
+Fields indexed:
+  - date (Ascending)
 ```
 
-2. CORS 적용:
-```bash
-gsutil cors set cors.json gs://your-bucket-name
-```
+---
 
-### 7. 서브컬렉션 쿼리 오류
-
-**증상:**
-```
-Error: Missing or insufficient permissions
-```
-
-**해결 방법:**
-
-Firestore 보안 규칙 업데이트:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // 사용자 문서
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // history 서브컬렉션
-      match /history/{historyId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow write: if request.auth != null && request.auth.uid == userId;
-      }
-      
-      // daily 서브컬렉션
-      match /daily/{dailyId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow write: if request.auth != null && request.auth.uid == userId;
-      }
-    }
-    
-    // subscription 컬렉션
-    match /subscription/{subId} {
-      allow read: if request.auth != null && 
-                     resource.data.userId == request.auth.uid;
-      allow write: if false; // 서버에서만 쓰기
-    }
-  }
-}
-```
-
-### 8. 구독 갱신 후 "0일 남음" 문제 ⭐ NEW
+### 6. 구독 갱신 후 "0일 남음" 문제 ⭐
 
 **증상:**
 - Pro 플랜 구독 중
-- Paddle에서 결제가 완료되었지만 대시보드에서 "다음 결제까지 0일 남음"으로 표시
-- 실제로는 30일 정도 남아있어야 함
+- Paddle에서 결제가 완료되었지만 "다음 결제까지 0일 남음"으로 표시
 
 **원인:**
 - Paddle 웹훅의 이벤트 순서 문제
 - `transaction.completed` 이벤트 처리 시 `currentPeriodEnd` 업데이트 누락
-- `subscription.updated` 이벤트가 늦게 오거나 오지 않는 경우
 
 **해결 방법:**
 
-**1. 수동 동기화 (즉시 해결)**
+**즉시 해결 (수동 동기화):**
 
-구독 관리 페이지에서 "구독 정보 동기화" 버튼 클릭:
+구독 관리 페이지에서 "구독 정보 동기화" 버튼 클릭
 
-```typescript
-// 구독 관리 페이지에서
-const handleSync = async () => {
-  const response = await fetch('/api/subscription/sync', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${firebaseIdToken}`,
-    },
-  });
-  
-  if (response.ok) {
-    // 페이지 새로고침하면 정확한 날짜 표시
-    window.location.reload();
-  }
-};
-```
-
-**2. 자동 동기화 (근본 해결)**
+**근본 해결 (자동 동기화):**
 
 이미 적용됨 - `transaction.completed` 이벤트에서 Paddle API 직접 조회:
 
@@ -1722,10 +1611,66 @@ async function handleTransactionCompleted(data: any) {
 }
 ```
 
-**예방:**
-- Firestore 인덱스 생성 (위 섹션 5 참조)
-- Paddle 웹훅 이벤트 로그 확인
-- 정기적인 구독 상태 점검
+---
+
+### 7. TypeScript 타입 오류
+
+**증상:**
+```typescript
+'type' 속성의 형식이 호환되지 않습니다.
+```
+
+**해결 방법:**
+
+Nullish Coalescing 및 Optional Chaining 사용:
+
+```tsx
+// ❌ 나쁜 예
+const value = obj?.prop  // string | undefined
+
+// ✅ 좋은 예 1: Nullish Coalescing
+const value = obj?.prop ?? ''  // string
+
+// ✅ 좋은 예 2: Optional Chaining + 기본값
+const value = obj?.prop || 'default'  // string
+
+// ✅ 좋은 예 3: Type Guard
+if (obj?.prop) {
+  const value = obj.prop  // string
+}
+```
+
+---
+
+### 8. 프로필 사진 업로드 실패
+
+**증상:**
+```
+Error: Firebase Storage: User does not have permission to access...
+```
+
+**해결 방법:**
+
+1. **Storage 보안 규칙 확인**:
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId &&
+                      request.resource.size < 2 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+  }
+}
+```
+
+2. **파일 크기 확인** (최대 2MB)
+3. **파일 형식 확인** (JPEG, PNG, GIF, WebP만 허용)
+
+---
 
 ### 9. Firestore 인덱스 필요 오류
 
@@ -1753,7 +1698,7 @@ const snapshot = await db
   .limit(1)
   .get();
 
-// After (인덱스 불필요 - 클라이언트 사이드 정렬)
+// After (인덱스 불필요 - 클라이언트 정렬)
 const snapshot = await db
   .collection('subscription')
   .where('userId', '==', userId)
@@ -1765,41 +1710,38 @@ const sortedDocs = snapshot.docs.sort((a, b) =>
 const latestDoc = sortedDocs[0];
 ```
 
-### 10. TypeScript 타입 오류 ⭐ NEW
+---
+
+### 10. CORS 오류
 
 **증상:**
-```typescript
-'type' 속성의 형식이 호환되지 않습니다.
-  '"article" | "website" | "product"' 형식은 '"article" | "website" | undefined' 형식에 할당할 수 없습니다.
 ```
-
-**원인:**
-- Next.js의 `Metadata` 타입에서 `openGraph.type`은 `'product'`를 지원하지 않음
+Access to fetch at '...' from origin '...' has been blocked by CORS policy
+```
 
 **해결 방법:**
 
-`lib/metadata.ts` 파일 수정 완료됨:
+Firebase Storage CORS 설정:
 
-```typescript
-// ✅ 수정됨
-interface MetadataOptions {
-  // ...
-  ogType?: 'website' | 'article'; // 'product' 제거
-}
-
-export function generateProductMetadata(options: {...}) {
-  return generateMetadata({
-    ...options,
-    ogType: 'website', // 'product' 대신 'website' 사용
-  });
-}
+1. `cors.json` 파일 생성:
+```json
+[
+  {
+    "origin": ["https://your-domain.com", "http://localhost:3000"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "maxAgeSeconds": 3600
+  }
+]
 ```
 
-상품 정보는 JSON-LD Schema로 제공됩니다 (더 표준적인 방법).
+2. CORS 적용:
+```bash
+gsutil cors set cors.json gs://your-bucket-name.appspot.com
+```
 
 ---
 
-## 📈 개발 로드맵
+## ✅ 개발 체크리스트
 
 ### ✅ Phase 1: 기반 구축 (완료)
 - [x] Next.js 15 프로젝트 셋업
@@ -1888,7 +1830,7 @@ SummaryGenie Page 프로젝트에 기여해주셔서 감사합니다!
 
 3. **Commit your Changes**
    ```bash
-   git commit -m 'Add some AmazingFeature'
+   git commit -m 'feat: Add some AmazingFeature'
    ```
 
 4. **Push to the Branch**
@@ -1919,18 +1861,9 @@ chore: 빌드 작업, 패키지 매니저 설정 등
 perf: 성능 개선
 ```
 
-예시:
-```
-feat: Add profile photo upload to settings page
-fix: Fix subscription renewal date sync issue
-docs: Update README with SEO optimization guide
-refactor: Optimize Firestore queries with subcollections
-perf: Add image upload progress tracking
-```
-
 ---
 
-## 📝 라이센스
+## 📄 라이센스
 
 이 프로젝트는 **MIT 라이센스** 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
 
@@ -1987,6 +1920,6 @@ SOFTWARE.
 
 ---
 
-**Made with ❤️ by SummaryGenie Team**
+**Made with by SummaryGenie Team**
 
-*마지막 업데이트: 2025년 1월 16일*  
+*마지막 업데이트: 2025년 11월 18일*
