@@ -1,23 +1,28 @@
 // components/marketing/ProblemStatement.tsx
+'use client';
+
 import { AlertCircle, Clock, BookOpen, Brain } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ProblemStatement() {
+  const { t } = useTranslation();
+
   const problems = [
     {
       icon: Clock,
-      title: '시간 부족',
-      description: '읽어야 할 자료는 많은데, 시간은 항상 부족합니다.',
+      title: t('marketing.problemStatement.problem1.title'),
+      description: t('marketing.problemStatement.problem1.description'),
     },
     {
       icon: BookOpen,
-      title: '정보 과부하',
-      description: '너무 많은 정보 속에서 정작 중요한 내용을 놓치기 쉽습니다.',
+      title: t('marketing.problemStatement.problem2.title'),
+      description: t('marketing.problemStatement.problem2.description'),
     },
     {
       icon: Brain,
-      title: '집중력 저하',
-      description: '긴 글을 읽다 보면 집중력이 떨어지고 핵심을 놓칩니다.',
+      title: t('marketing.problemStatement.problem3.title'),
+      description: t('marketing.problemStatement.problem3.description'),
     },
   ];
 
@@ -28,12 +33,14 @@ export default function ProblemStatement() {
           <div className="text-center space-y-4 mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 dark:bg-red-900/30 rounded-full text-sm font-medium text-red-700 dark:text-red-300">
               <AlertCircle className="w-4 h-4" />
-              <span>이런 고민 있으신가요?</span>
+              <span>{t('marketing.problemStatement.badge')}</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold">
-              정보의 홍수 속에서
+              {t('marketing.problemStatement.title')}
               <br />
-              <span className="text-slate-600 dark:text-slate-400">길을 잃고 계신가요?</span>
+              <span className="text-slate-600 dark:text-slate-400">
+                {t('marketing.problemStatement.subtitle')}
+              </span>
             </h2>
           </div>
         </ScrollReveal>
@@ -58,10 +65,10 @@ export default function ProblemStatement() {
           <div className="mt-16 text-center">
             <div className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 max-w-3xl">
               <p className="text-2xl font-semibold text-white">
-                "매일 쏟아지는 정보를 어떻게 소화하시나요?"
+                {t('marketing.problemStatement.quote.question')}
               </p>
               <p className="mt-4 text-blue-100">
-                SummaryGenie가 여러분의 시간을 지켜드립니다.
+                {t('marketing.problemStatement.quote.answer')}
               </p>
             </div>
           </div>

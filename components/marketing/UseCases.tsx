@@ -1,41 +1,46 @@
 // components/marketing/UseCases.tsx
+'use client';
+
 import { GraduationCap, Briefcase, Newspaper } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function UseCases() {
+  const { t } = useTranslation();
+
   const cases = [
     {
       icon: GraduationCap,
-      title: '학생 & 연구자',
-      description: '논문, 리포트, 학술 자료를 빠르게 파악하고 핵심만 정리하세요.',
+      title: t('marketing.useCases.case1.title'),
+      description: t('marketing.useCases.case1.description'),
       benefits: [
-        '시험 준비 시간 단축',
-        '논문 리뷰 효율화',
-        '참고 문헌 빠른 파악',
+        t('marketing.useCases.case1.benefit1'),
+        t('marketing.useCases.case1.benefit2'),
+        t('marketing.useCases.case1.benefit3'),
       ],
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
     },
     {
       icon: Briefcase,
-      title: '직장인 & 전문가',
-      description: '업무 관련 문서, 보고서, 기술 문서를 신속하게 이해하세요.',
+      title: t('marketing.useCases.case2.title'),
+      description: t('marketing.useCases.case2.description'),
       benefits: [
-        '회의 준비 시간 절약',
-        '산업 트렌드 빠른 파악',
-        '경쟁사 분석 효율화',
+        t('marketing.useCases.case2.benefit1'),
+        t('marketing.useCases.case2.benefit2'),
+        t('marketing.useCases.case2.benefit3'),
       ],
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     },
     {
       icon: Newspaper,
-      title: '일반 사용자',
-      description: '뉴스, 블로그, 기사 등을 빠르게 읽고 중요한 정보만 얻으세요.',
+      title: t('marketing.useCases.case3.title'),
+      description: t('marketing.useCases.case3.description'),
       benefits: [
-        '뉴스 큐레이션',
-        '트렌드 빠른 캐치업',
-        '관심사 효율적 탐색',
+        t('marketing.useCases.case3.benefit1'),
+        t('marketing.useCases.case3.benefit2'),
+        t('marketing.useCases.case3.benefit3'),
       ],
       color: 'from-orange-500 to-red-500',
       bgColor: 'bg-orange-50 dark:bg-orange-900/20',
@@ -48,10 +53,10 @@ export default function UseCases() {
         <ScrollReveal>
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl md:text-5xl font-bold">
-              누가 사용하나요?
+              {t('marketing.useCases.title')}
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              다양한 분야에서 시간을 절약하고 있습니다
+              {t('marketing.useCases.subtitle')}
             </p>
           </div>
         </ScrollReveal>
@@ -94,25 +99,35 @@ export default function UseCases() {
         <ScrollReveal delay={300}>
           <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center text-white">
             <h3 className="text-3xl font-bold mb-4">
-              당신의 시간을 더 가치있게
+              {t('marketing.useCases.cta.title')}
             </h3>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              매일 수십 개의 글을 읽어야 한다면,
-              <br />
-              SummaryGenie로 하루 2시간을 절약하세요.
+              {t('marketing.useCases.cta.subtitle')}
             </p>
             <div className="flex flex-wrap justify-center gap-8 text-left">
               <div>
-                <div className="text-4xl font-bold">2시간</div>
-                <div className="text-blue-100">평균 절약 시간</div>
+                <div className="text-4xl font-bold">
+                  {t('marketing.useCases.cta.stat1.number')}
+                </div>
+                <div className="text-blue-100">
+                  {t('marketing.useCases.cta.stat1.label')}
+                </div>
               </div>
               <div>
-                <div className="text-4xl font-bold">90%</div>
-                <div className="text-blue-100">사용자 만족도</div>
+                <div className="text-4xl font-bold">
+                  {t('marketing.useCases.cta.stat2.number')}
+                </div>
+                <div className="text-blue-100">
+                  {t('marketing.useCases.cta.stat2.label')}
+                </div>
               </div>
               <div>
-                <div className="text-4xl font-bold">5분</div>
-                <div className="text-blue-100">학습 시간</div>
+                <div className="text-4xl font-bold">
+                  {t('marketing.useCases.cta.stat3.number')}
+                </div>
+                <div className="text-blue-100">
+                  {t('marketing.useCases.cta.stat3.label')}
+                </div>
               </div>
             </div>
           </div>

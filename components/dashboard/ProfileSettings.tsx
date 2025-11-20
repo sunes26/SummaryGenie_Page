@@ -6,6 +6,7 @@ import { User } from 'firebase/auth';
 import { User as UserIcon, Upload, Loader2, Camera, X } from 'lucide-react';
 import { updateUserProfile, uploadAndUpdateProfilePhoto } from '@/lib/auth';
 import { showSuccess, showError } from '@/lib/toast-helpers';
+import { translateAuthError } from '@/lib/auth-errors';
 import { useTranslation } from '@/hooks/useTranslation';
 import Image from 'next/image';
 
@@ -86,7 +87,9 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
       onUpdate();
     } catch (error: any) {
       console.error('Image upload error:', error);
-      showError(error.message || t('common.error'));
+      // ✅ 에러 메시지 번역 적용
+      const errorMessage = translateAuthError(error, t);
+      showError(errorMessage || t('common.error'));
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -124,7 +127,9 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
       onUpdate();
     } catch (error: any) {
       console.error('Profile update error:', error);
-      showError(error.message || t('common.error'));
+      // ✅ 에러 메시지 번역 적용
+      const errorMessage = translateAuthError(error, t);
+      showError(errorMessage || t('common.error'));
     } finally {
       setProfileLoading(false);
     }

@@ -205,7 +205,7 @@ export async function reauthenticateUser(
     await reauthenticateWithCredential(user, credential);
   } catch (error: any) {
     if (error.code === 'auth/wrong-password') {
-      throw new Error('현재 비밀번호가 올바르지 않습니다.');
+      throw new Error('auth/wrong-password');
     }
     throw error;
   }
@@ -239,14 +239,15 @@ export async function updateUserEmail(
     // 3. 새 이메일로 인증 이메일 발송
     await sendEmailVerification(user);
   } catch (error: any) {
+    // 에러 코드만 throw (번역은 클라이언트에서)
     if (error.code === 'auth/email-already-in-use') {
-      throw new Error('이미 사용 중인 이메일입니다.');
+      throw new Error('auth/email-already-in-use');
     }
     if (error.code === 'auth/invalid-email') {
-      throw new Error('유효하지 않은 이메일 형식입니다.');
+      throw new Error('auth/invalid-email');
     }
     if (error.code === 'auth/requires-recent-login') {
-      throw new Error('보안을 위해 다시 로그인해주세요.');
+      throw new Error('auth/requires-recent-login');
     }
     throw error;
   }
@@ -277,11 +278,12 @@ export async function changePassword(
     // 2. 비밀번호 업데이트
     await updatePassword(user, newPassword);
   } catch (error: any) {
+    // 에러 코드만 throw (번역은 클라이언트에서)
     if (error.code === 'auth/weak-password') {
-      throw new Error('비밀번호는 최소 6자 이상이어야 합니다.');
+      throw new Error('auth/weak-password');
     }
     if (error.code === 'auth/requires-recent-login') {
-      throw new Error('보안을 위해 다시 로그인해주세요.');
+      throw new Error('auth/requires-recent-login');
     }
     throw error;
   }
@@ -321,20 +323,9 @@ export async function uploadAndUpdateProfilePhoto(
 }
 
 /**
- * Firebase Auth 에러 코드를 한국어 메시지로 변환
+ * Firebase Auth 에러 코드를 반환
+ * (실제 번역은 클라이언트 컴포넌트에서 useTranslation 훅으로 처리)
  */
-export function getFirebaseErrorMessage(errorCode: string): string {
-  const errorMessages: Record<string, string> = {
-    'auth/user-not-found': '존재하지 않는 사용자입니다.',
-    'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
-    'auth/invalid-email': '이메일 형식이 올바르지 않습니다.',
-    'auth/too-many-requests': '너무 많은 시도가 있었습니다. 나중에 다시 시도해주세요.',
-    'auth/email-already-in-use': '이미 사용 중인 이메일입니다.',
-    'auth/weak-password': '비밀번호는 최소 6자 이상이어야 합니다.',
-    'auth/network-request-failed': '네트워크 오류가 발생했습니다.',
-    'auth/popup-closed-by-user': '로그인 팝업이 닫혔습니다.',
-    'auth/cancelled-popup-request': '이전 팝업 요청이 취소되었습니다.',
-  };
-
-  return errorMessages[errorCode] || '알 수 없는 오류가 발생했습니다.';
+export function getFirebaseErrorCode(error: any): string {
+  return error?.code || 'auth/unknown-error';
 }

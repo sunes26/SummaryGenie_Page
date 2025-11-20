@@ -1,37 +1,52 @@
 // components/marketing/FinalCTA.tsx
+'use client';
+
 import Link from 'next/link';
 import { ArrowRight, Chrome } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function FinalCTA() {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
       <div className="container mx-auto max-w-4xl">
         <ScrollReveal>
           <div className="text-center space-y-8 text-white">
             <h2 className="text-4xl md:text-5xl font-bold">
-              지금 바로 시작하세요
+              {t('marketing.finalCTA.title')}
             </h2>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-              수천 명의 사용자가 이미 SummaryGenie로
-              <br />
-              매일 2시간을 절약하고 있습니다
+              {t('marketing.finalCTA.subtitle')}
             </p>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 py-8 max-w-2xl mx-auto">
               <div>
-                <div className="text-4xl font-bold mb-2">10K+</div>
-                <div className="text-blue-100 text-sm">활성 사용자</div>
+                <div className="text-4xl font-bold mb-2">
+                  {t('marketing.finalCTA.stats.users.number')}
+                </div>
+                <div className="text-blue-100 text-sm">
+                  {t('marketing.finalCTA.stats.users.label')}
+                </div>
               </div>
               <div>
-                <div className="text-4xl font-bold mb-2">100K+</div>
-                <div className="text-blue-100 text-sm">요약 생성</div>
+                <div className="text-4xl font-bold mb-2">
+                  {t('marketing.finalCTA.stats.summaries.number')}
+                </div>
+                <div className="text-blue-100 text-sm">
+                  {t('marketing.finalCTA.stats.summaries.label')}
+                </div>
               </div>
               <div>
-                <div className="text-4xl font-bold mb-2">4.9/5</div>
-                <div className="text-blue-100 text-sm">사용자 평점</div>
+                <div className="text-4xl font-bold mb-2">
+                  {t('marketing.finalCTA.stats.rating.number')}
+                </div>
+                <div className="text-blue-100 text-sm">
+                  {t('marketing.finalCTA.stats.rating.label')}
+                </div>
               </div>
             </div>
 
@@ -43,7 +58,7 @@ export default function FinalCTA() {
                   className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-6 gap-2"
                 >
                   <Chrome className="w-5 h-5" />
-                  무료로 시작하기
+                  {t('marketing.finalCTA.buttons.primary')}
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
@@ -53,7 +68,7 @@ export default function FinalCTA() {
                   variant="outline"
                   className="bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
                 >
-                  요금제 보기
+                  {t('marketing.finalCTA.buttons.secondary')}
                 </Button>
               </Link>
             </div>
@@ -68,7 +83,7 @@ export default function FinalCTA() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>신용카드 불필요</span>
+                <span>{t('marketing.finalCTA.badges.noCard')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -78,7 +93,7 @@ export default function FinalCTA() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>언제든 취소 가능</span>
+                <span>{t('marketing.finalCTA.badges.cancelAnytime')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -88,7 +103,7 @@ export default function FinalCTA() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>7일 무료 체험</span>
+                <span>{t('marketing.finalCTA.badges.freeTrial')}</span>
               </div>
             </div>
           </div>

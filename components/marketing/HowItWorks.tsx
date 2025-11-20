@@ -1,26 +1,31 @@
 // components/marketing/HowItWorks.tsx
+'use client';
+
 import { Download, MousePointerClick, Sparkles } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function HowItWorks() {
+  const { t } = useTranslation();
+
   const steps = [
     {
       number: '01',
       icon: Download,
-      title: 'Chrome 확장 설치',
-      description: 'Chrome 웹 스토어에서 SummaryGenie를 설치하세요. 무료이며 몇 초면 완료됩니다.',
+      title: t('marketing.howItWorks.step1.title'),
+      description: t('marketing.howItWorks.step1.description'),
     },
     {
       number: '02',
       icon: MousePointerClick,
-      title: '웹페이지에서 실행',
-      description: '읽고 싶은 페이지에서 확장 아이콘을 클릭하거나 단축키를 누르세요.',
+      title: t('marketing.howItWorks.step2.title'),
+      description: t('marketing.howItWorks.step2.description'),
     },
     {
       number: '03',
       icon: Sparkles,
-      title: '즉시 요약 확인',
-      description: 'AI가 3초 안에 핵심 내용을 요약해드립니다. 질문도 자유롭게 하세요.',
+      title: t('marketing.howItWorks.step3.title'),
+      description: t('marketing.howItWorks.step3.description'),
     },
   ];
 
@@ -30,10 +35,10 @@ export default function HowItWorks() {
         <ScrollReveal>
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl md:text-5xl font-bold">
-              사용법은 간단합니다
+              {t('marketing.howItWorks.title')}
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              3단계로 시작하는 스마트한 웹 서핑
+              {t('marketing.howItWorks.subtitle')}
             </p>
           </div>
         </ScrollReveal>
@@ -92,7 +97,7 @@ export default function HowItWorks() {
         <ScrollReveal delay={400}>
           <div className="mt-16 text-center">
             <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
-              지금 바로 시작해보세요. 설치부터 사용까지 3분이면 충분합니다.
+              {t('marketing.howItWorks.footer.text')}
             </p>
             <a
               href="https://chrome.google.com/webstore"
@@ -101,7 +106,7 @@ export default function HowItWorks() {
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all hover:-translate-y-1"
             >
               <Download className="w-5 h-5" />
-              무료로 시작하기
+              {t('marketing.howItWorks.footer.cta')}
             </a>
           </div>
         </ScrollReveal>

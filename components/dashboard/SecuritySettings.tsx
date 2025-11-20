@@ -6,6 +6,7 @@ import { User } from 'firebase/auth';
 import { Lock, Mail, Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
 import { updateUserEmail, changePassword } from '@/lib/auth';
 import { showSuccess, showError } from '@/lib/toast-helpers';
+import { translateAuthError } from '@/lib/auth-errors';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface SecuritySettingsProps {
@@ -66,7 +67,10 @@ export default function SecuritySettings({ user, onUpdate }: SecuritySettingsPro
       setEmailPassword('');
       onUpdate();
     } catch (error: any) {
-      showError(error.message || t('common.error'));
+      console.error('Email change error:', error);
+      // ✅ 에러 메시지 번역 적용
+      const errorMessage = translateAuthError(error, t);
+      showError(errorMessage || t('common.error'));
     } finally {
       setEmailLoading(false);
     }
@@ -114,7 +118,10 @@ export default function SecuritySettings({ user, onUpdate }: SecuritySettingsPro
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      showError(error.message || t('common.error'));
+      console.error('Password change error:', error);
+      // ✅ 에러 메시지 번역 적용
+      const errorMessage = translateAuthError(error, t);
+      showError(errorMessage || t('common.error'));
     } finally {
       setPasswordLoading(false);
     }
