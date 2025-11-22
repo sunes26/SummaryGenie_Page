@@ -33,6 +33,7 @@
       "passwordPlaceholder": "••••••••",
       "loginButton": "Sign In",
       "loggingIn": "Signing in...",
+      "or":"In another way",
       "googleLogin": "Sign in with Google",
       "googleLoggingIn": "Signing in with Google...",
       "noAccount": "Don't have an account?",
@@ -50,7 +51,7 @@
       "passwordHint": "Please enter at least 8 characters.",
       "passwordConfirmLabel": "Confirm Password",
       "passwordConfirmPlaceholder": "Re-enter your password",
-      "agreeTerms": "I agree to the Terms of Service and Privacy Policy.",
+      "agreeTerms": ".",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "signupButton": "Sign Up",
@@ -298,6 +299,35 @@
       "email": "support@summarygenie.com"
     }
   },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "subtitle": "Our policy regarding the collection and processing of personal information",
+      "lastUpdated": "Last Updated",
+      "effectiveDate": "Effective from November 21, 2025",
+      "tableOfContents": "Table of Contents",
+      "backToTop": "Back to Top",
+      "contact": {
+        "title": "Privacy Officer",
+        "name": "Name: Haesung Jeon",
+        "position": "Position: CEO",
+        "phone": "Phone: 010-2143-0850",
+        "email": "Email: oceancode0321@gmail.com"
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Terms and conditions for using SummaryGenie service",
+      "lastUpdated": "Last Updated",
+      "effectiveDate": "Effective from November 21, 2025",
+      "tableOfContents": "Table of Contents",
+      "backToTop": "Back to Top",
+      "contact": {
+        "title": "Service Inquiries",
+        "email": "Email: oceancode0321@gmail.com"
+      }
+    }
+  },
   "marketing": {
     "header": {
       "features": "Features",
@@ -443,10 +473,8 @@
         "period": "Forever Free",
         "description": "Try the basic features",
         "features": {
-          "dailyLimit": "10 summaries per day",
-          "basicAI": "Basic AI model",
+          "dailyLimit": "3 summaries per day",
           "korean": "Korean support",
-          "history7": "7-day history",
           "dashboard": "Web dashboard access"
         },
         "cta": "Get Started Free"
@@ -459,21 +487,13 @@
         "popular": "Most Popular",
         "features": {
           "unlimited": "Unlimited summaries",
-          "gpt4": "High-performance AI (GPT-4)",
           "priority": "Priority processing",
           "unlimitedHistory": "Unlimited history",
           "advancedQA": "Advanced Q&A",
           "templates": "Custom summary templates",
-          "pdf": "PDF summary support",
-          "support": "Email support"
+          "pdf": "PDF summary support"
         },
         "cta": "Start Pro"
-      },
-      "footer": {
-        "trial": "7-day free trial for all plans • No credit card required",
-        "cancel": "Cancel anytime",
-        "refund": "Refund guarantee",
-        "secure": "Secure payment"
       }
     },
     "faq": {
@@ -489,7 +509,7 @@
       },
       "q3": {
         "question": "What's the difference between Free and Pro?",
-        "answer": "The Free plan allows up to 10 summaries per day using the basic AI model. Pro offers unlimited summaries, high-performance GPT-4 model, priority processing, PDF support, and advanced features."
+        "answer": "The Free plan allows you to generate up to 3 summaries per day, and history is not saved. The Pro plan offers advanced features such as unlimited summaries, priority processing, PDF summary support, and history saving."
       },
       "needHelp": "Still have questions?",
       "contactEmail": "support@summarygenie.app"
@@ -514,11 +534,6 @@
       "buttons": {
         "primary": "Get Started Free",
         "secondary": "View Pricing"
-      },
-      "badges": {
-        "noCard": "No Credit Card Required",
-        "cancelAnytime": "Cancel Anytime",
-        "freeTrial": "7-Day Free Trial"
       }
     },
     "footer": {

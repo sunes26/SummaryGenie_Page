@@ -86,7 +86,6 @@ export default function SignupPage() {
       router.push('/verify-email?email=' + encodeURIComponent(email));
     } catch (error: any) {
       console.error('Signup error:', error);
-      // translateAuthError 사용 - 에러 코드를 번역 키로 변환 후 번역
       const errorMessage = error.code
         ? translateAuthError(error, t)
         : error.message || t('auth.errors.signupFailed');
@@ -132,7 +131,6 @@ export default function SignupPage() {
       router.refresh();
     } catch (error: any) {
       console.error('Google signup error:', error);
-      // translateAuthError 사용
       const errorMessage = error.code
         ? translateAuthError(error, t)
         : t('auth.errors.signupFailed');
@@ -233,14 +231,14 @@ export default function SignupPage() {
               className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label htmlFor="agreeTerms" className="ml-2 text-sm text-gray-700">
-              <Link href="#" className="text-blue-600 hover:underline">
+              <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">
                 {t('auth.signup.terms')}
               </Link>
               {' '}{t('common.and')}{' '}
-              <Link href="#" className="text-blue-600 hover:underline">
+              <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">
                 {t('auth.signup.privacy')}
               </Link>
-              {t('auth.signup.agreeTerms').replace(t('auth.signup.terms'), '').replace(t('auth.signup.privacy'), '').replace(t('common.and'), '')}
+              {t('auth.signup.agreeTerms')}
               {' '}<span className="text-red-500">*</span>
             </label>
           </div>

@@ -31,6 +31,7 @@
       "emailPlaceholder": "your@email.com",
       "passwordLabel": "비밀번호",
       "passwordPlaceholder": "••••••••",
+      "or":"다른방법으로 로그인",
       "loginButton": "로그인",
       "loggingIn": "로그인 중...",
       "googleLogin": "Google로 로그인",
@@ -50,7 +51,7 @@
       "passwordHint": "최소 8자 이상의 비밀번호를 입력해주세요.",
       "passwordConfirmLabel": "비밀번호 확인",
       "passwordConfirmPlaceholder": "비밀번호를 다시 입력해주세요",
-      "agreeTerms": "이용약관 및 개인정보처리방침에 동의합니다.",
+      "agreeTerms": "에 동의합니다.",
       "terms": "이용약관",
       "privacy": "개인정보처리방침",
       "signupButton": "회원가입",
@@ -298,6 +299,35 @@
       "email": "support@summarygenie.com"
     }
   },
+  "legal": {
+    "privacy": {
+      "title": "개인정보처리방침",
+      "subtitle": "OCEANCODE가 수집하고 처리하는 개인정보에 대한 방침입니다",
+      "lastUpdated": "최종 수정일",
+      "effectiveDate": "2025년 11월 21일부터 시행",
+      "tableOfContents": "목차",
+      "backToTop": "맨 위로",
+      "contact": {
+        "title": "개인정보 보호 책임자",
+        "name": "성명: 전해성",
+        "position": "직책: CEO",
+        "phone": "전화번호: 010-2143-0850",
+        "email": "이메일: oceancode0321@gmail.com"
+      }
+    },
+    "terms": {
+      "title": "이용약관",
+      "subtitle": "SummaryGenie 서비스 이용에 관한 약관입니다",
+      "lastUpdated": "최종 수정일",
+      "effectiveDate": "2025년 11월 21일부터 시행",
+      "tableOfContents": "목차",
+      "backToTop": "맨 위로",
+      "contact": {
+        "title": "서비스 문의",
+        "email": "이메일: oceancode0321@gmail.com"
+      }
+    }
+  },
   "marketing": {
     "header": {
       "features": "기능",
@@ -443,10 +473,8 @@
         "period": "영구 무료",
         "description": "기본 기능을 체험해보세요",
         "features": {
-          "dailyLimit": "하루 10회 요약",
-          "basicAI": "기본 AI 모델",
+          "dailyLimit": "하루 3회 요약",
           "korean": "한국어 지원",
-          "history7": "요약 히스토리 7일",
           "dashboard": "웹 대시보드 접근"
         },
         "cta": "무료로 시작하기"
@@ -459,21 +487,13 @@
         "popular": "가장 인기",
         "features": {
           "unlimited": "무제한 요약",
-          "gpt4": "고성능 AI 모델 (GPT-4)",
           "priority": "우선 처리",
           "unlimitedHistory": "요약 히스토리 무제한",
           "advancedQA": "고급 Q&A 기능",
           "templates": "맞춤형 요약 템플릿",
-          "pdf": "PDF 요약 지원",
-          "support": "이메일 지원"
+          "pdf": "PDF 요약 지원"
         },
         "cta": "Pro 시작하기"
-      },
-      "footer": {
-        "trial": "모든 플랜은 7일 무료 체험이 가능합니다 • 신용카드 등록 불필요",
-        "cancel": "언제든 취소 가능",
-        "refund": "환불 보장",
-        "secure": "안전한 결제"
       }
     },
     "faq": {
@@ -489,10 +509,10 @@
       },
       "q3": {
         "question": "무료 플랜과 Pro 플랜의 차이는 무엇인가요?",
-        "answer": "무료 플랜은 하루 10회까지 요약을 생성할 수 있으며, 기본 AI 모델을 사용합니다. Pro 플랜은 무제한 요약, 고성능 GPT-4 모델, 우선 처리, PDF 요약 지원 등 고급 기능을 제공합니다."
+        "answer": "무료 플랜은 하루 3회까지 요약을 생성할 수 있으며, 기록이 저장되지 않습니다. Pro 플랜은 무제한 요약, 우선 처리, PDF 요약 지원, 기록 저장등 고급 기능을 제공합니다."
       },
       "needHelp": "더 궁금하신 점이 있으신가요?",
-      "contactEmail": "support@summarygenie.app"
+      "contactEmail": "oceancode0321@gmail.com"
     },
     "finalCTA": {
       "title": "지금 바로 시작하세요",
@@ -514,11 +534,6 @@
       "buttons": {
         "primary": "무료로 시작하기",
         "secondary": "요금제 보기"
-      },
-      "badges": {
-        "noCard": "신용카드 불필요",
-        "cancelAnytime": "언제든 취소 가능",
-        "freeTrial": "7일 무료 체험"
       }
     },
     "footer": {

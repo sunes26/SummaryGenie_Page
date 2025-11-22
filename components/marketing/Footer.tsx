@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, Twitter, Github, Mail } from 'lucide-react';
+import { Sparkles, Mail } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Footer() {
@@ -29,9 +29,7 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { icon: Twitter, href: 'https://twitter.com/summarygenie', label: 'Twitter' },
-    { icon: Github, href: 'https://github.com/summarygenie', label: 'GitHub' },
-    { icon: Mail, href: 'mailto:support@summarygenie.app', label: 'Email' },
+    { icon: Mail, href: 'oceancode0321@gmail.com', label: 'Email' },
   ];
 
   return (

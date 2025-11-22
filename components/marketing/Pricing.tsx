@@ -18,9 +18,7 @@ export default function Pricing() {
       description: t('marketing.pricing.free.description'),
       features: [
         t('marketing.pricing.free.features.dailyLimit'),
-        t('marketing.pricing.free.features.basicAI'),
         t('marketing.pricing.free.features.korean'),
-        t('marketing.pricing.free.features.history7'),
         t('marketing.pricing.free.features.dashboard'),
       ],
       cta: t('marketing.pricing.free.cta'),
@@ -34,13 +32,11 @@ export default function Pricing() {
       description: t('marketing.pricing.pro.description'),
       features: [
         t('marketing.pricing.pro.features.unlimited'),
-        t('marketing.pricing.pro.features.gpt4'),
         t('marketing.pricing.pro.features.priority'),
         t('marketing.pricing.pro.features.unlimitedHistory'),
         t('marketing.pricing.pro.features.advancedQA'),
         t('marketing.pricing.pro.features.templates'),
         t('marketing.pricing.pro.features.pdf'),
-        t('marketing.pricing.pro.features.support'),
       ],
       cta: t('marketing.pricing.pro.cta'),
       href: '/signup?plan=pro',
@@ -120,28 +116,6 @@ export default function Pricing() {
             </ScrollReveal>
           ))}
         </div>
-
-        <ScrollReveal delay={200}>
-          <div className="mt-16 text-center">
-            <p className="text-slate-600 dark:text-slate-400 mb-4">
-              {t('marketing.pricing.footer.trial')}
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <span>{t('marketing.pricing.footer.cancel')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <span>{t('marketing.pricing.footer.refund')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <span>{t('marketing.pricing.footer.secure')}</span>
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
       </div>
     </section>
   );

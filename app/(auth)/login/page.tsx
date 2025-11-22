@@ -134,7 +134,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         {/* ✅ SEO: h1 태그로 페이지 제목 명시 */}
         <h1 className="text-2xl font-bold text-center mb-6">
-          {t('auth.login.heading')}
+          {t('auth.login.title')}
         </h1>
 
         {/* ✅ SEO: 설명 추가 (선택사항) */}
@@ -158,7 +158,7 @@ export default function LoginPage() {
               htmlFor="email" 
               className="block text-sm font-medium mb-1"
             >
-              {t('auth.login.email')}
+              {t('auth.login.emailLabel')}
             </label>
             <input
               id="email"
@@ -178,7 +178,7 @@ export default function LoginPage() {
               htmlFor="password" 
               className="block text-sm font-medium mb-1"
             >
-              {t('auth.login.password')}
+              {t('auth.login.passwordLabel')}
             </label>
             <input
               id="password"
@@ -246,7 +246,7 @@ export default function LoginPage() {
               href="/signup" 
               className="text-blue-600 hover:underline font-medium"
             >
-              {t('auth.login.signupLink')}
+              {t('auth.login.signup')}
             </Link>
           </p>
 
