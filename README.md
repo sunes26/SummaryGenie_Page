@@ -48,6 +48,7 @@
 - ✅ Paddle API 직접 조회를 통한 구독 정보 자동/수동 동기화
 - ✅ **완벽한 SEO 최적화** (검색 엔진 노출 극대화)
 - ✅ **다국어 지원** (한국어/영어)
+- ✅ **프리미엄 전용 기능** (요약 기록 접근 제어) ⭐ NEW
 
 ### 프로젝트 현황
 
@@ -58,7 +59,8 @@
 | Phase 3 | ✅ 완료 | 2주 | Paddle 결제 시스템 연동 |
 | Phase 4 | ✅ 완료 | 1주 | 실시간 구독 동기화, 웹훅 처리 |
 | Phase 5 | ✅ 완료 | 1주 | SEO 최적화, 프로필 설정, 성능 개선 |
-| Phase 6 | 📅 예정 | - | 고급 기능 (팀 공유, 태그 관리) |
+| Phase 6 | ✅ 완료 | 1주 | **프리미엄 전용 기능, 접근 제어** ⭐ |
+| Phase 7 | 📅 예정 | - | 고급 기능 (팀 공유, 태그 관리) |
 
 ---
 
@@ -81,7 +83,8 @@
 - ✅ 도메인별 통계
 - ✅ Pro/Free 플랜 상태 표시
 
-### 📝 요약 기록 관리
+### 📝 요약 기록 관리 ⭐ 프리미엄 전용
+- ✅ **프리미엄 전용 접근 제어** ⭐ NEW
 - ✅ 무한 스크롤 페이지네이션
 - ✅ **제목 + 내용 기반 실시간 검색** (디바운스 500ms)
 - ✅ 도메인별 필터링
@@ -90,6 +93,8 @@
 - ✅ 요약문 복사 기능
 - ✅ 반응형 디자인 (데스크톱/모바일)
 - ✅ 중복 제거 및 최적화된 데이터 로딩
+- ✅ **무료 사용자 업그레이드 안내 UI** ⭐ NEW
+- ✅ **사이드바 PRO 배지 표시** ⭐ NEW
 
 ### 💳 구독 관리 (Paddle Billing)
 - ✅ Free/Pro 플랜 제공 (₩9,900/월)
@@ -113,7 +118,7 @@
 - ✅ 사용 통계 확인
 - ✅ 계정 보안 설정
 
-### 🌐 다국어 지원 ⭐ NEW
+### 🌐 다국어 지원 ⭐
 - ✅ **한국어/영어 완벽 지원**
 - ✅ 실시간 언어 전환
 - ✅ URL 기반 언어 감지
@@ -121,6 +126,7 @@
 - ✅ 모든 UI 텍스트 번역
 - ✅ 에러 메시지 번역
 - ✅ SEO 메타데이터 번역
+- ✅ **프리미엄 기능 안내 메시지 번역** ⭐ NEW
 
 ### 🔍 SEO 최적화 ⭐
 - ✅ **동적 사이트맵 생성** (sitemap.xml)
@@ -138,6 +144,21 @@
   - Canonical URLs
 - ✅ **완전한 요금제 페이지** (Pricing)
 - ✅ **시맨틱 HTML** (접근성 개선)
+
+### 🔐 프리미엄 전용 기능 ⭐ NEW
+- ✅ **요약 기록 접근 제어**
+  - 프리미엄 사용자만 요약 기록 조회 가능
+  - 무료 사용자에게 업그레이드 안내 UI 표시
+  - 아름다운 그라데이션 디자인
+  - Pro 플랜 혜택 강조
+- ✅ **사이드바 PRO 배지**
+  - 프리미엄 전용 메뉴 표시
+  - 무료 사용자에게 업그레이드 유도
+  - 프로필에 Pro 상태 표시
+- ✅ **실시간 구독 상태 반영**
+  - AuthContext 기반 자동 체크
+  - 구독 변경 시 즉시 반영
+  - Firestore 실시간 리스너
 
 ---
 
@@ -221,7 +242,7 @@ summarygenie_page/
 │  │  ├─ dashboard/
 │  │  │  └─ page.tsx                       # 대시보드 홈 (통계, 최근 요약)
 │  │  ├─ history/
-│  │  │  └─ page.tsx                       # 요약 기록 조회 (검색, 필터)
+│  │  │  └─ page.tsx                       # 요약 기록 조회 (프리미엄 전용) ⭐⭐
 │  │  ├─ settings/
 │  │  │  └─ page.tsx                       # 설정 (프로필, 보안, 알림, 통계)
 │  │  └─ subscription/
@@ -291,7 +312,7 @@ summarygenie_page/
 │  │  ├─ RecentHistory.tsx                 # 최근 요약 5개 표시 ⭐
 │  │  ├─ SearchBar.tsx                     # 검색 바 (디바운스)
 │  │  ├─ SecuritySettings.tsx              # 보안 설정 (이메일/비밀번호 변경) ⭐
-│  │  ├─ Sidebar.tsx                       # 사이드바 네비게이션
+│  │  ├─ Sidebar.tsx                       # 사이드바 네비게이션 (PRO 배지) ⭐⭐
 │  │  ├─ StatsCard.tsx                     # 통계 카드 컴포넌트
 │  │  ├─ StatsOverview.tsx                 # 통계 개요 ⭐
 │  │  └─ UsageChart.tsx                    # 사용량 차트 (Recharts)
@@ -338,7 +359,7 @@ summarygenie_page/
 │  └─ UserProfile.tsx                      # 사용자 프로필 표시
 │
 ├─ 📂 contexts/                            # React Context
-│  ├─ AuthContext.tsx                      # 인증 컨텍스트
+│  ├─ AuthContext.tsx                      # 인증 컨텍스트 (isPremium 제공) ⭐⭐
 │  └─ LanguageContext.tsx                  # 다국어 컨텍스트 ⭐
 │
 ├─ 📂 hooks/                               # Custom React Hooks
@@ -373,8 +394,8 @@ summarygenie_page/
 │  └─ utils.ts                             # 공통 유틸리티
 │
 ├─ 📂 messages/                            # 다국어 번역 파일 ⭐
-│  ├─ en.json                              # 영어 번역
-│  └─ ko.json                              # 한국어 번역
+│  ├─ en.json                              # 영어 번역 (프리미엄 메시지 포함) ⭐⭐
+│  └─ ko.json                              # 한국어 번역 (프리미엄 메시지 포함) ⭐⭐
 │
 ├─ 📂 public/                              # 정적 파일
 │  ├─ images/
@@ -882,7 +903,7 @@ Firestore
 │  └─ {userId} (Document)
 │     ├─ email: "user@example.com"
 │     ├─ name: "홍길동"
-│     ├─ isPremium: true
+│     ├─ isPremium: true              ⭐ 프리미엄 상태
 │     ├─ photoURL: "https://..."
 │     │
 │     ├─ history (Subcollection) ⭐
@@ -1237,6 +1258,12 @@ messages/
     "home": {
       "title": "대시보드",
       "greeting": "안녕하세요, {name}님! 👋"
+    },
+    "history": {
+      "premiumOnly": {
+        "title": "프리미엄 전용 기능",
+        "subtitle": "Pro 플랜으로 업그레이드하여..."
+      }
     }
   }
 }
@@ -1365,6 +1392,18 @@ https://your-domain.com/api/webhooks/paddle
 
 ---
 
+### 7. 프리미엄 기능 접근 오류 ⭐ NEW
+
+**증상:** Pro 구독했는데 요약 기록이 차단됨
+
+**해결:**
+1. Firestore `users` 컬렉션에서 `isPremium: true` 확인
+2. `subscription` 컬렉션에서 `status: 'active'` 확인
+3. 구독 정보 동기화 버튼 클릭
+4. 브라우저 새로고침
+
+---
+
 ## ✅ 개발 체크리스트
 
 ### Phase 1: 기반 구축 (완료 ✅)
@@ -1399,7 +1438,15 @@ https://your-domain.com/api/webhooks/paddle
 - [x] **다국어 지원 (한국어/영어)** ⭐
 - [x] PWA 지원
 
-### Phase 6: 고급 기능 (예정 📅)
+### Phase 6: 프리미엄 전용 기능 (완료 ✅) ⭐⭐ NEW
+- [x] **요약 기록 접근 제어**
+- [x] **업그레이드 안내 UI**
+- [x] **사이드바 PRO 배지**
+- [x] **실시간 구독 상태 반영**
+- [x] **다국어 프리미엄 메시지**
+- [x] **프로필 Pro 상태 표시**
+
+### Phase 7: 고급 기능 (예정 📅)
 - [ ] 팀 공유 기능
 - [ ] 태그 관리 시스템
 - [ ] PDF 내보내기
@@ -1462,4 +1509,4 @@ in the Software without restriction...
 
 **Made with ❤️ by SummaryGenie Team**
 
-*마지막 업데이트: 2025년 11월 20일*
+*마지막 업데이트: 2025년 11월 22일*

@@ -10,13 +10,14 @@ import HistoryModal from '@/components/dashboard/HistoryModal';
 import SearchBar from '@/components/dashboard/SearchBar';
 import DomainFilter from '@/components/dashboard/DomainFilter';
 import { useTranslation } from '@/hooks/useTranslation';
-import { History, ArrowUpDown, Loader2 } from 'lucide-react';
+import { History, ArrowUpDown, Loader2, Lock, Crown, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 type SortOrder = 'desc' | 'asc';
 
 export default function HistoryPage() {
   const { t } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isPremium, loading: authLoading } = useAuth();
   const userId = user?.uid || null;
 
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -81,6 +82,149 @@ export default function HistoryPage() {
     );
   }
 
+  // ✅ 프리미엄이 아닌 경우 업그레이드 안내 UI
+  if (!isPremium) {
+    return (
+      <div className="space-y-6">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <History className="w-8 h-8 text-blue-600" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {t('dashboard.history.title')}
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        {/* 프리미엄 전용 안내 카드 */}
+        <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-2xl p-8 md:p-12 border-2 border-blue-200 shadow-lg">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
+            {/* 아이콘 */}
+            <div className="flex items-center justify-center space-x-2">
+              <div className="relative">
+                <Crown className="w-16 h-16 text-yellow-500" />
+                <Sparkles className="w-6 h-6 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
+              </div>
+            </div>
+
+            {/* 제목 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-center space-x-2">
+                <Lock className="w-5 h-5 text-blue-600" />
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {t('dashboard.history.premiumOnly.title')}
+                </h2>
+              </div>
+              <p className="text-lg text-gray-600">
+                {t('dashboard.history.premiumOnly.subtitle')}
+              </p>
+            </div>
+
+            {/* 혜택 */}
+            <div className="bg-white/80 backdrop-blur rounded-xl p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('dashboard.history.premiumOnly.benefitsTitle')}
+              </h3>
+              <ul className="space-y-3 text-left">
+                <li className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">
+                    {t('dashboard.history.premiumOnly.benefit1')}
+                  </span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">
+                    {t('dashboard.history.premiumOnly.benefit2')}
+                  </span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">
+                    {t('dashboard.history.premiumOnly.benefit3')}
+                  </span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">
+                    {t('dashboard.history.premiumOnly.benefit4')}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* CTA 버튼 */}
+            <div className="space-y-4">
+              <Link
+                href="/subscription"
+                className="inline-flex items-center justify-center space-x-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+              >
+                <Crown className="w-5 h-5" />
+                <span>{t('dashboard.history.premiumOnly.upgradeButton')}</span>
+              </Link>
+              
+              <p className="text-sm text-gray-500">
+                {t('dashboard.history.premiumOnly.footer')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 추가 정보 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
+            <div className="text-3xl mb-2">🚀</div>
+            <h3 className="font-semibold text-gray-900 mb-1">
+              {t('dashboard.history.premiumOnly.feature1Title')}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {t('dashboard.history.premiumOnly.feature1Desc')}
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
+            <div className="text-3xl mb-2">🔍</div>
+            <h3 className="font-semibold text-gray-900 mb-1">
+              {t('dashboard.history.premiumOnly.feature2Title')}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {t('dashboard.history.premiumOnly.feature2Desc')}
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
+            <div className="text-3xl mb-2">📊</div>
+            <h3 className="font-semibold text-gray-900 mb-1">
+              {t('dashboard.history.premiumOnly.feature3Title')}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {t('dashboard.history.premiumOnly.feature3Desc')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ 프리미엄 사용자는 기존 로직 그대로
   return (
     <div className="space-y-6">
       {/* 헤더 */}
@@ -88,9 +232,15 @@ export default function HistoryPage() {
         <div className="flex items-center space-x-3">
           <History className="w-8 h-8 text-blue-600" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('dashboard.history.title')}
-            </h1>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-3xl font-bold text-gray-900">
+                {t('dashboard.history.title')}
+              </h1>
+              {/* Pro 배지 */}
+              <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-bold rounded-full">
+                PRO
+              </span>
+            </div>
             {!loading && (
               <p className="text-gray-600 mt-1">
                 {t('dashboard.history.totalCount', { count: history.length })}

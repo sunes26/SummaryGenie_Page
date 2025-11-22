@@ -157,6 +157,23 @@
         "date": "Created",
         "actions": "Actions",
         "view": "View Details"
+      },
+      "premiumOnly": {
+        "title": "Premium Feature",
+        "subtitle": "Upgrade to Pro to access all your summary history",
+        "benefitsTitle": "Pro Plan Benefits",
+        "benefit1": "Unlimited summary history storage and access",
+        "benefit2": "Powerful search and filtering capabilities",
+        "benefit3": "Domain-based statistics and analytics",
+        "benefit4": "Export summaries (PDF, CSV)",
+        "upgradeButton": "Upgrade to Pro - $9.99/mo",
+        "footer": "Cancel anytime • Tax included",
+        "feature1Title": "Unlimited Storage",
+        "feature1Desc": "Keep all your summaries forever",
+        "feature2Title": "Advanced Search",
+        "feature2Desc": "Quick search by title, content, or domain",
+        "feature3Title": "Analytics",
+        "feature3Desc": "Analyze your usage patterns and trends"
       }
     },
     "modal": {
