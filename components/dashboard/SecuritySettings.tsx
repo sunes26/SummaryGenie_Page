@@ -3,8 +3,8 @@
 
 import { useState } from 'react';
 import { User } from 'firebase/auth';
-import { Lock, Mail, Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
-import { updateUserEmail, changePassword } from '@/lib/auth';
+import { Lock, Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
+import { changePassword } from '@/lib/auth';
 import { showSuccess, showError } from '@/lib/toast-helpers';
 import { translateAuthError } from '@/lib/auth-errors';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -16,11 +16,6 @@ interface SecuritySettingsProps {
 
 export default function SecuritySettings({ user, onUpdate }: SecuritySettingsProps) {
   const { t, locale } = useTranslation();
-  
-  // 이메일 변경
-  const [newEmail, setNewEmail] = useState('');
-  const [emailPassword, setEmailPassword] = useState('');
-  const [emailLoading, setEmailLoading] = useState(false);
 
   // 비밀번호 변경
   const [currentPassword, setCurrentPassword] = useState('');
@@ -32,49 +27,6 @@ export default function SecuritySettings({ user, onUpdate }: SecuritySettingsPro
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // 이메일 변경 핸들러
-  const handleEmailChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newEmail.trim()) {
-      showError(locale === 'ko' ? '새 이메일을 입력해주세요.' : 'Please enter a new email.');
-      return;
-    }
-
-    if (!emailPassword) {
-      showError(locale === 'ko' ? '현재 비밀번호를 입력해주세요.' : 'Please enter your current password.');
-      return;
-    }
-
-    // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newEmail)) {
-      showError(t('auth.errors.invalidEmail'));
-      return;
-    }
-
-    setEmailLoading(true);
-
-    try {
-      await updateUserEmail(newEmail.trim(), emailPassword);
-      showSuccess(locale === 'ko' 
-        ? '이메일이 변경되었습니다. 새 이메일로 인증 메일이 발송되었습니다.' 
-        : 'Email changed successfully. Verification email sent to your new email.');
-      
-      // 폼 리셋
-      setNewEmail('');
-      setEmailPassword('');
-      onUpdate();
-    } catch (error: any) {
-      console.error('Email change error:', error);
-      // ✅ 에러 메시지 번역 적용
-      const errorMessage = translateAuthError(error, t);
-      showError(errorMessage || t('common.error'));
-    } finally {
-      setEmailLoading(false);
-    }
-  };
 
   // 비밀번호 변경 핸들러
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -129,86 +81,6 @@ export default function SecuritySettings({ user, onUpdate }: SecuritySettingsPro
 
   return (
     <div className="space-y-8">
-      {/* 이메일 변경 */}
-      <div className="pb-8 border-b border-gray-200">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Mail className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {locale === 'ko' ? '이메일 변경' : 'Change Email'}
-            </h3>
-            <p className="text-sm text-gray-500">
-              {locale === 'ko' ? '로그인에 사용하는 이메일을 변경합니다.' : 'Update your login email address.'}
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleEmailChange} className="space-y-4 mt-6">
-          {/* 현재 이메일 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {locale === 'ko' ? '현재 이메일' : 'Current Email'}
-            </label>
-            <input
-              type="email"
-              value={user.email || ''}
-              readOnly
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-
-          {/* 새 이메일 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {locale === 'ko' ? '새 이메일' : 'New Email'}
-            </label>
-            <input
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder={locale === 'ko' ? '새 이메일 주소' : 'New email address'}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={emailLoading}
-            />
-          </div>
-
-          {/* 현재 비밀번호 확인 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('settings.security.currentPassword')}
-            </label>
-            <input
-              type="password"
-              value={emailPassword}
-              onChange={(e) => setEmailPassword(e.target.value)}
-              placeholder={t('settings.security.currentPassword')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={emailLoading}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={emailLoading || !newEmail || !emailPassword}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {emailLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {locale === 'ko' ? '변경 중...' : 'Updating...'}
-              </>
-            ) : (
-              <>
-                <Mail className="w-4 h-4 mr-2" />
-                {locale === 'ko' ? '이메일 변경' : 'Change Email'}
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-
       {/* 비밀번호 변경 */}
       <div>
         <div className="flex items-center space-x-3 mb-4">
@@ -298,24 +170,51 @@ export default function SecuritySettings({ user, onUpdate }: SecuritySettingsPro
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {passwordLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('settings.security.updating')}
-              </>
-            ) : (
-              <>
-                <Shield className="w-4 h-4 mr-2" />
-                {t('settings.security.updateButton')}
-              </>
-            )}
-          </button>
+          {/* 저장 버튼 */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {passwordLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('settings.security.updating')}
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  {t('settings.security.updateButton')}
+                </>
+              )}
+            </button>
+          </div>
         </form>
+      </div>
+
+      {/* 안내 메시지 */}
+      <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+        <h4 className="text-sm font-semibold text-blue-900 mb-2">
+          {locale === 'ko' ? '💡 보안 팁' : '💡 Security Tips'}
+        </h4>
+        <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+          <li>
+            {locale === 'ko' 
+              ? '비밀번호는 최소 6자 이상으로 설정하세요' 
+              : 'Use at least 6 characters for your password'}
+          </li>
+          <li>
+            {locale === 'ko' 
+              ? '영문, 숫자, 특수문자를 조합하면 더 안전합니다' 
+              : 'Combine letters, numbers, and special characters for better security'}
+          </li>
+          <li>
+            {locale === 'ko' 
+              ? '정기적으로 비밀번호를 변경하세요' 
+              : 'Change your password regularly'}
+          </li>
+        </ul>
       </div>
     </div>
   );

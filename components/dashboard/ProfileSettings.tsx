@@ -1,14 +1,13 @@
 // components/dashboard/ProfileSettings.tsx
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { User } from 'firebase/auth';
-import { User as UserIcon, Upload, Loader2, Camera, X } from 'lucide-react';
-import { updateUserProfile, uploadAndUpdateProfilePhoto } from '@/lib/auth';
+import { User as UserIcon, Loader2, Globe } from 'lucide-react';
+import { updateUserProfile } from '@/lib/auth';
 import { showSuccess, showError } from '@/lib/toast-helpers';
 import { translateAuthError } from '@/lib/auth-errors';
 import { useTranslation } from '@/hooks/useTranslation';
-import Image from 'next/image';
 
 interface ProfileSettingsProps {
   user: User;
@@ -16,93 +15,22 @@ interface ProfileSettingsProps {
 }
 
 export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps) {
-  const { t, locale } = useTranslation();
+  const { t, locale, setLocale } = useTranslation();
   
   // 프로필 정보 상태
   const [displayName, setDisplayName] = useState(user.displayName || '');
-  const [photoURL, setPhotoURL] = useState(user.photoURL || '');
-  
-  // 이미지 업로드 상태
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewURL, setPreviewURL] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   
   // 프로필 업데이트 로딩
   const [profileLoading, setProfileLoading] = useState(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 파일 선택 핸들러
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 파일 크기 검증 (2MB)
-    const maxSize = 2 * 1024 * 1024;
-    if (file.size > maxSize) {
-      showError(locale === 'ko' ? '파일 크기는 2MB 이하여야 합니다.' : 'File size must be under 2MB.');
-      return;
-    }
-
-    // 파일 형식 검증
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      showError(locale === 'ko' 
-        ? 'JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드 가능합니다.' 
-        : 'Only JPEG, PNG, GIF, WEBP images are allowed.');
-      return;
-    }
-
-    setSelectedFile(file);
-
-    // 미리보기 생성
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewURL(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // 이미지 업로드 및 프로필 업데이트
-  const handleImageUpload = async () => {
-    if (!selectedFile) return;
-
-    setUploading(true);
-    setUploadProgress(0);
-
-    try {
-      const downloadURL = await uploadAndUpdateProfilePhoto(
-        selectedFile,
-        (progress: number) => {
-          setUploadProgress(progress);
-        }
-      );
-
-      setPhotoURL(downloadURL);
-      setSelectedFile(null);
-      setPreviewURL(null);
-      
-      showSuccess(t('settings.profile.photoSuccess'));
-      onUpdate();
-    } catch (error: any) {
-      console.error('Image upload error:', error);
-      // ✅ 에러 메시지 번역 적용
-      const errorMessage = translateAuthError(error, t);
-      showError(errorMessage || t('common.error'));
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
-    }
-  };
-
-  // 이미지 선택 취소
-  const handleCancelImage = () => {
-    setSelectedFile(null);
-    setPreviewURL(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  // 언어 변경 핸들러
+  const handleLanguageChange = (newLocale: 'ko' | 'en') => {
+    setLocale(newLocale);
+    showSuccess(
+      newLocale === 'ko' 
+        ? '언어가 한국어로 변경되었습니다.' 
+        : 'Language changed to English.'
+    );
   };
 
   // 프로필 정보 업데이트
@@ -137,148 +65,8 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
 
   return (
     <div className="space-y-8">
-      {/* 프로필 사진 */}
-      <div className="pb-8 border-b border-gray-200">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Camera className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{t('settings.profile.photo')}</h3>
-            <p className="text-sm text-gray-500">
-              {locale === 'ko' 
-                ? '프로필 사진을 변경하세요 (최대 2MB)' 
-                : 'Update your profile photo (max 2MB)'}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 flex items-start space-x-6">
-          {/* 현재 프로필 사진 */}
-          <div className="flex-shrink-0">
-            {previewURL ? (
-              <div className="relative">
-                <Image
-                  src={previewURL}
-                  alt={t('settings.profile.photo')}
-                  width={128}
-                  height={128}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
-                />
-                <button
-                  type="button"
-                  onClick={handleCancelImage}
-                  className="absolute top-0 right-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition shadow-lg"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : photoURL ? (
-              <Image
-                src={photoURL}
-                alt={displayName || 'Profile'}
-                width={128}
-                height={128}
-                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
-              />
-            ) : (
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center border-4 border-gray-200">
-                <UserIcon className="w-16 h-16 text-white" />
-              </div>
-            )}
-          </div>
-
-          {/* 업로드 버튼 */}
-          <div className="flex-1">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
-            {selectedFile ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center space-x-3">
-                    <Upload className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {uploading && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">{t('settings.profile.uploading')}</span>
-                      <span className="font-semibold text-blue-600">{uploadProgress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={handleImageUpload}
-                    disabled={uploading}
-                    className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    {uploading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t('settings.profile.uploading')}
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        {locale === 'ko' ? '업로드' : 'Upload'}
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelImage}
-                    disabled={uploading}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {t('settings.profile.uploadPhoto')}
-                </button>
-                <p className="text-xs text-gray-500 mt-2">
-                  {locale === 'ko' 
-                    ? 'JPEG, PNG, GIF, WEBP 형식 (최대 2MB)' 
-                    : 'JPEG, PNG, GIF, WEBP formats (max 2MB)'}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* 프로필 정보 */}
-      <div>
+      <div className="pb-8 border-b border-gray-200">
         <div className="flex items-center space-x-3 mb-4">
           <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
             <UserIcon className="w-5 h-5 text-green-600" />
@@ -287,8 +75,8 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
             <h3 className="text-lg font-semibold text-gray-900">{t('settings.profile.title')}</h3>
             <p className="text-sm text-gray-500">
               {locale === 'ko' 
-                ? '이름과 이메일을 관리하세요' 
-                : 'Manage your name and email'}
+                ? '사용자 이름을 관리하세요' 
+                : 'Manage your display name'}
             </p>
           </div>
         </div>
@@ -306,7 +94,13 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
               placeholder={t('settings.profile.namePlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={profileLoading}
+              maxLength={50}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {locale === 'ko' 
+                ? '다른 사용자에게 표시될 이름입니다 (최대 50자)' 
+                : 'This name will be shown to others (max 50 characters)'}
+            </p>
           </div>
 
           {/* 이메일 (읽기 전용) */}
@@ -321,7 +115,9 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
             />
             <p className="text-xs text-gray-500 mt-1">
-              {t('settings.profile.emailNote')}
+              {locale === 'ko' 
+                ? '이메일은 변경할 수 없습니다' 
+                : 'Email address cannot be changed'}
             </p>
           </div>
 
@@ -343,24 +139,103 @@ export default function ProfileSettings({ user, onUpdate }: ProfileSettingsProps
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={profileLoading || displayName.trim() === user.displayName}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {profileLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('settings.profile.saving')}
-              </>
-            ) : (
-              <>
-                <UserIcon className="w-4 h-4 mr-2" />
-                {t('settings.profile.saveButton')}
-              </>
-            )}
-          </button>
+          {/* 저장 버튼 */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={profileLoading || displayName.trim() === user.displayName}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {profileLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('settings.profile.saving')}
+                </>
+              ) : (
+                <>
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  {t('settings.profile.saveButton')}
+                </>
+              )}
+            </button>
+          </div>
         </form>
+      </div>
+
+      {/* 언어 설정 */}
+      <div>
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <Globe className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {locale === 'ko' ? '언어 설정' : 'Language Settings'}
+            </h3>
+            <p className="text-sm text-gray-500">
+              {locale === 'ko' 
+                ? '사용할 언어를 선택하세요' 
+                : 'Choose your preferred language'}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4 mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              {locale === 'ko' ? '언어' : 'Language'}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {/* 한국어 */}
+              <button
+                type="button"
+                onClick={() => handleLanguageChange('ko')}
+                className={`
+                  relative flex items-center justify-center px-4 py-3 rounded-lg border-2 
+                  transition-all duration-200 font-medium
+                  ${locale === 'ko'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                  }
+                `}
+              >
+                <span className="text-2xl mr-2">🇰🇷</span>
+                <span>한국어</span>
+                {locale === 'ko' && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full"></span>
+                )}
+              </button>
+
+              {/* English */}
+              <button
+                type="button"
+                onClick={() => handleLanguageChange('en')}
+                className={`
+                  relative flex items-center justify-center px-4 py-3 rounded-lg border-2 
+                  transition-all duration-200 font-medium
+                  ${locale === 'en'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                  }
+                `}
+              >
+                <span className="text-2xl mr-2">🇺🇸</span>
+                <span>English</span>
+                {locale === 'en' && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full"></span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-sm text-gray-600">
+              {locale === 'ko' 
+                ? '💡 언어 변경은 즉시 적용되며, 모든 페이지에 반영됩니다.' 
+                : '💡 Language changes are applied immediately across all pages.'}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

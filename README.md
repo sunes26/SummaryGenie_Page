@@ -20,6 +20,7 @@
 - [Paddle 결제 설정](#-paddle-결제-설정)
 - [인증 에러 처리](#-인증-에러-처리)
 - [구현된 기능](#-구현된-기능)
+- [설정 페이지 변경사항](#-설정-페이지-변경사항)
 - [해결된 주요 이슈](#-해결된-주요-이슈)
 - [개발 가이드](#-개발-가이드)
 - [배포](#-배포)
@@ -125,7 +126,7 @@ C:.
 │  │  │      page.tsx                # 요약 기록 (Pro 전용) ✅
 │  │  │
 │  │  ├─settings
-│  │  │      page.tsx                # 설정 페이지
+│  │  │      page.tsx                # 설정 페이지 ✅ (알림 탭 제거)
 │  │  │
 │  │  └─subscription
 │  │          page.tsx               # 구독 관리 ✅
@@ -201,13 +202,11 @@ C:.
 │  │      HistoryModal.tsx           # 요약 상세 모달
 │  │      HistoryTable.tsx           # 요약 기록 테이블
 │  │      MobileHeader.tsx           # 모바일 헤더
-│  │      NotificationSettings.tsx   # 알림 설정
 │  │      OnboardingGuide.tsx        # 온보딩 가이드 ✅
-│  │      page.tsx                   # (임시 파일)
-│  │      ProfileSettings.tsx        # 프로필 설정
+│  │      ProfileSettings.tsx        # 프로필 설정 ✅ (사진 제거, 언어 추가)
 │  │      RecentHistory.tsx          # 최근 기록 (Pro 전용) ✅
 │  │      SearchBar.tsx              # 검색 바
-│  │      SecuritySettings.tsx       # 보안 설정
+│  │      SecuritySettings.tsx       # 보안 설정 ✅ (이메일 변경 제거)
 │  │      Sidebar.tsx                # 사이드바
 │  │      StatsCard.tsx              # 통계 카드
 │  │      StatsOverview.tsx          # 통계 개요
@@ -727,6 +726,101 @@ app/(auth)/login/
 - ✅ 영어
 - ✅ useTranslation 훅
 - ✅ **인증 에러 메시지 다국어 지원**
+- ✅ **설정 페이지 언어 전환 UI** ⭐
+
+---
+
+## ⚙️ 설정 페이지 변경사항
+
+### 개요
+
+대시보드 설정 페이지를 단순화하고 핵심 기능에 집중하도록 개선했습니다.
+
+### ❌ 제거된 기능
+
+| 기능 | 위치 | 제거 이유 |
+|------|------|----------|
+| **프로필 사진 업로드** | ProfileSettings.tsx | 복잡도 감소, 유지보수 부담 경감 |
+| **이메일 변경** | ProfileSettings.tsx<br>SecuritySettings.tsx | 보안 이슈, Firebase 제한사항 |
+| **알림 설정 탭** | settings/page.tsx | 미사용 기능 |
+
+### ✅ 유지된 기능
+
+| 기능 | 위치 | 설명 |
+|------|------|------|
+| **이름 변경** | ProfileSettings.tsx | displayName 업데이트 |
+| **이메일 표시** | ProfileSettings.tsx | 읽기 전용 표시 |
+| **이메일 인증 상태** | ProfileSettings.tsx | ✓ 인증됨 / ⚠ 미인증 |
+| **비밀번호 변경** | SecuritySettings.tsx | 현재/새/확인 비밀번호 |
+| **통계** | StatsOverview.tsx | 사용량 통계 |
+
+### ✨ 새로 추가된 기능
+
+#### 언어 설정 (ProfileSettings.tsx)
+
+```
+🌐 언어 설정
+   사용할 언어를 선택하세요
+
+   ┌──────────────┐  ┌──────────────┐
+   │  🇰🇷 한국어   │  │  🇺🇸 English  │
+   │     ●        │  │              │ ← 선택된 언어는 파란색
+   └──────────────┘  └──────────────┘
+
+   💡 언어 변경은 즉시 적용되며, 모든 페이지에 반영됩니다.
+```
+
+**특징:**
+- 한국어/English 2개 언어 지원
+- 클릭 시 즉시 언어 전환 (페이지 새로고침 불필요)
+- localStorage에 저장되어 재접속 시에도 유지
+- 전체 애플리케이션에 자동 반영
+- 시각적 피드백 (선택된 언어는 파란색 배경 + 점 표시)
+
+### 최종 설정 페이지 구조
+
+```
+┌───────────────────────────────────────┐
+│          ⚙️ 설정                       │
+│   프로필, 보안 및 통계를 관리하세요      │
+├───────────────────────────────────────┤
+│                                       │
+│  [👤 프로필]  [🛡️ 보안]  [📊 통계]     │
+│                                       │
+└───────────────────────────────────────┘
+
+프로필 탭:
+  - 이름 변경
+  - 이메일 표시 (읽기 전용)
+  - 이메일 인증 상태
+  - 언어 설정 (한국어/English) ⭐
+
+보안 탭:
+  - 비밀번호 변경
+  - 보안 팁
+
+통계 탭:
+  - 사용량 통계
+  - 차트 및 분석
+```
+
+### 코드 통계
+
+| 파일 | 이전 라인 수 | 이후 라인 수 | 차이 |
+|------|-------------|-------------|------|
+| settings/page.tsx | ~130 | ~117 | -13 |
+| ProfileSettings.tsx | ~380 | ~220 | -160 |
+| SecuritySettings.tsx | ~340 | ~190 | -150 |
+| **합계** | **~850** | **~527** | **-323 (-38%)** |
+
+### 적용 방법
+
+수정된 파일들:
+1. `app/(dashboard)/settings/page.tsx` - 알림 탭 제거
+2. `components/dashboard/ProfileSettings.tsx` - 사진 제거, 언어 추가
+3. `components/dashboard/SecuritySettings.tsx` - 이메일 변경 제거
+
+상세한 변경 내용은 프로젝트의 `수정가이드.md` 파일을 참조하세요.
 
 ---
 
@@ -971,6 +1065,33 @@ function LoginForm() {
 }
 ```
 
+### 언어 전환
+
+```typescript
+import { useTranslation } from '@/hooks/useTranslation';
+
+function LanguageSelector() {
+  const { locale, setLocale } = useTranslation();
+
+  const handleLanguageChange = (newLocale: 'ko' | 'en') => {
+    setLocale(newLocale);
+    // localStorage에 자동 저장
+    // 전체 앱에 즉시 반영
+  };
+
+  return (
+    <div>
+      <button onClick={() => handleLanguageChange('ko')}>
+        🇰🇷 한국어
+      </button>
+      <button onClick={() => handleLanguageChange('en')}>
+        🇺🇸 English
+      </button>
+    </div>
+  );
+}
+```
+
 ### 테스트 API 엔드포인트
 
 | 엔드포인트 | 용도 |
@@ -1033,13 +1154,14 @@ function LoginForm() {
 - [x] 빈 상태 UI
 - [x] 온보딩 가이드
 - [x] 다국어 (한/영)
+- [x] **설정 페이지 언어 전환 UI** ⭐
 - [x] Paddle 결제 연동
 - [x] 구독 취소/재개
 - [x] 결제 수단 변경
+- [x] **설정 페이지 단순화** (사진/이메일 변경 제거)
 
 ### 개발 중 (🚧)
-- [ ] 프로필 편집
-- [ ] 이메일 알림 설정
+- [ ] 프로필 편집 (고급 기능)
 - [ ] 통계 상세 페이지
 - [ ] About 페이지
 
@@ -1048,6 +1170,7 @@ function LoginForm() {
 - [ ] API 제공
 - [ ] Chrome 확장 개선
 - [ ] 모바일 앱
+- [ ] 추가 언어 지원 (일본어, 중국어 등)
 
 ---
 
@@ -1088,13 +1211,27 @@ function LoginForm() {
 
 ---
 
-**Last Updated:** 2025년 12월 1일  
-**Version:** 1.2.0  
+**Last Updated:** 2025년 12월 2일  
+**Version:** 2.0.0  
 **Status:** 🚀 Active Development
 
 ---
 
 ## 📜 변경 이력
+
+### v2.0.0 (2025-12-02) ⭐
+- ✨ **설정 페이지 대폭 개선**
+  - 프로필 사진 업로드 기능 제거 (복잡도 감소)
+  - 이메일 변경 기능 제거 (보안 및 유지보수)
+  - 알림 탭 제거 (미사용 기능)
+  - 고객 지원 안내 문구 제거
+- ✨ **언어 설정 기능 추가**
+  - 한국어/English 전환 UI
+  - 실시간 언어 전환 (새로고침 불필요)
+  - localStorage 영구 저장
+  - 전체 애플리케이션 자동 반영
+- 📉 코드 323줄 감소 (38% 감소)
+- 🎨 UI/UX 단순화 및 개선
 
 ### v1.2.0 (2025-12-01)
 - ✨ **로그인 에러 처리 대폭 개선**
