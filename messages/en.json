@@ -51,7 +51,7 @@
       "passwordPlaceholder": "••••••••",
       "loginButton": "Sign In",
       "loggingIn": "Signing in...",
-      "or":"In another way",
+      "or": "In another way",
       "googleLogin": "Sign in with Google",
       "googleLoggingIn": "Signing in with Google...",
       "noAccount": "Don't have an account?",
@@ -100,17 +100,37 @@
       "loginFailed": "Login failed.",
       "signupFailed": "Sign up failed.",
       "resetFailed": "Failed to send password reset email.",
-      "wrongPassword": "Current password is incorrect.",
-      "emailInUse": "Email is already in use.",
-      "invalidEmailFormat": "Invalid email format.",
-      "recentLoginRequired": "Please sign in again for security.",
+      
+      "invalidCredential": "Invalid email or password. Please check and try again.",
+      "wrongPassword": "Incorrect password. Please try again.",
+      "emailInUse": "This email is already registered.",
+      "invalidEmailFormat": "Please enter a valid email address.",
+      "recentLoginRequired": "Please sign in again for security verification.",
       "weakPassword": "Password must be at least 6 characters.",
-      "userNotFound": "User not found.",
-      "tooManyRequests": "Too many attempts. Please try again later.",
-      "networkError": "Network error occurred.",
-      "popupClosed": "Login popup was closed.",
-      "popupCancelled": "Previous popup request was cancelled.",
-      "unknownError": "An unknown error occurred."
+      "userNotFound": "No account found with this email. Please check your email.",
+      "userDisabled": "This account has been disabled. Please contact support.",
+      "tooManyRequests": "Too many login attempts. Please try again later.",
+      "networkError": "Network error. Please check your connection.",
+      "timeout": "Server response timed out. Please try again.",
+      
+      "popupClosed": "Login popup was closed. Please try again.",
+      "popupCancelled": "Previous login request was cancelled.",
+      "popupBlocked": "Popup was blocked. Please allow popups for this site.",
+      "redirectPending": "Login is in progress. Please wait.",
+      
+      "accountExistsWithDifferentCredential": "An account already exists with this email using a different sign-in method.",
+      "operationNotAllowed": "This sign-in method is not available.",
+      "unauthorizedDomain": "This domain is not authorized.",
+      
+      "invalidApiKey": "Service configuration error. Please contact support.",
+      "appDeleted": "Service is temporarily unavailable.",
+      "argumentError": "Please check your input.",
+      "invalidUserToken": "Your session is invalid. Please sign in again.",
+      "userTokenExpired": "Your session has expired. Please sign in again.",
+      "webStorageUnsupported": "Browser storage is not supported. Please try a different browser.",
+      "alreadyInitialized": "Already initialized.",
+      
+      "unknownError": "An unexpected error occurred. Please try again."
     }
   },
   "dashboard": {

@@ -18,6 +18,7 @@
 - [시작하기](#-시작하기)
 - [Firebase 설정](#-firebase-설정)
 - [Paddle 결제 설정](#-paddle-결제-설정)
+- [인증 에러 처리](#-인증-에러-처리)
 - [구현된 기능](#-구현된-기능)
 - [해결된 주요 이슈](#-해결된-주요-이슈)
 - [개발 가이드](#-개발-가이드)
@@ -106,7 +107,7 @@ C:.
 │  │  │
 │  │  ├─login
 │  │  │      layout.tsx
-│  │  │      page.tsx                # 로그인 ✅
+│  │  │      page.tsx                # 로그인 ✅ (에러 처리 개선)
 │  │  │
 │  │  ├─signup
 │  │  │      page.tsx                # 회원가입 ✅
@@ -261,7 +262,7 @@ C:.
 │
 ├─lib                                # 유틸리티 라이브러리
 │  │  api-client.ts                  # API 클라이언트
-│  │  auth-errors.ts                 # 인증 에러 처리
+│  │  auth-errors.ts                 # 인증 에러 처리 ✅ (20+ 에러 코드)
 │  │  auth.ts                        # 인증 유틸리티
 │  │  image-loader.ts                # 이미지 로더
 │  │  language.ts                    # 언어 유틸리티
@@ -283,8 +284,8 @@ C:.
 │          utils.ts                  # Firebase 유틸리티
 │
 ├─messages                           # 다국어 파일
-│      en.json                       # 영어 ✅
-│      ko.json                       # 한국어 ✅
+│      en.json                       # 영어 ✅ (에러 메시지 추가)
+│      ko.json                       # 한국어 ✅ (에러 메시지 추가)
 │
 ├─public                             # 정적 파일
 │  │  file.svg
@@ -580,6 +581,109 @@ curl http://localhost:3000/api/test-paddle
 
 ---
 
+## 🔐 인증 에러 처리
+
+### 개요
+
+Firebase Authentication v10+에서는 보안상의 이유로 일부 에러 코드가 통합되었습니다. 이 프로젝트에서는 20개 이상의 Firebase Auth 에러 코드를 사용자 친화적인 메시지로 변환합니다.
+
+### 지원하는 에러 코드
+
+#### 로그인 관련 에러
+
+| 에러 코드 | 한국어 메시지 | 영어 메시지 |
+|-----------|---------------|-------------|
+| `auth/invalid-credential` | 이메일 또는 비밀번호가 올바르지 않습니다. | Invalid email or password. Please check and try again. |
+| `auth/wrong-password` | 비밀번호가 올바르지 않습니다. | Incorrect password. Please try again. |
+| `auth/user-not-found` | 존재하지 않는 계정입니다. | No account found with this email. |
+| `auth/user-disabled` | 비활성화된 계정입니다. | This account has been disabled. |
+| `auth/too-many-requests` | 로그인 시도가 너무 많습니다. | Too many login attempts. Please try again later. |
+
+#### 이메일 관련 에러
+
+| 에러 코드 | 한국어 메시지 | 영어 메시지 |
+|-----------|---------------|-------------|
+| `auth/invalid-email` | 유효하지 않은 이메일 형식입니다. | Please enter a valid email address. |
+| `auth/email-already-in-use` | 이미 사용 중인 이메일입니다. | This email is already registered. |
+| `auth/account-exists-with-different-credential` | 이 이메일은 다른 로그인 방법으로 가입되어 있습니다. | An account already exists with this email using a different sign-in method. |
+
+#### 비밀번호 관련 에러
+
+| 에러 코드 | 한국어 메시지 | 영어 메시지 |
+|-----------|---------------|-------------|
+| `auth/weak-password` | 비밀번호는 최소 6자 이상이어야 합니다. | Password must be at least 6 characters. |
+| `auth/requires-recent-login` | 보안을 위해 다시 로그인해주세요. | Please sign in again for security verification. |
+
+#### 소셜 로그인 관련 에러
+
+| 에러 코드 | 한국어 메시지 | 영어 메시지 |
+|-----------|---------------|-------------|
+| `auth/popup-closed-by-user` | 로그인 창이 닫혔습니다. | Login popup was closed. |
+| `auth/popup-blocked` | 팝업이 차단되었습니다. | Popup was blocked. Please allow popups. |
+| `auth/cancelled-popup-request` | 이전 로그인 요청이 취소되었습니다. | Previous login request was cancelled. |
+
+#### 네트워크 에러
+
+| 에러 코드 | 한국어 메시지 | 영어 메시지 |
+|-----------|---------------|-------------|
+| `auth/network-request-failed` | 네트워크 연결을 확인해주세요. | Network error. Please check your connection. |
+| `auth/timeout` | 서버 응답 시간이 초과되었습니다. | Server response timed out. |
+
+### 사용 방법
+
+```typescript
+// lib/auth-errors.ts
+import { getAuthErrorKey, getAuthErrorType, translateAuthError } from '@/lib/auth-errors';
+import { useTranslation } from '@/hooks/useTranslation';
+
+const { t } = useTranslation();
+
+try {
+  await signInWithEmail(email, password);
+} catch (error: any) {
+  // 방법 1: 에러 키를 가져와서 번역
+  const errorKey = getAuthErrorKey(error);
+  const message = t(errorKey);
+  
+  // 방법 2: 한 번에 번역
+  const message = translateAuthError(error, t);
+  
+  // 방법 3: 에러 타입으로 UI 분기
+  const errorType = getAuthErrorType(error);
+  // errorType: 'credential' | 'email' | 'password' | 'network' | 'popup' | 'permission' | 'unknown'
+  
+  setError(message);
+}
+```
+
+### 에러 UI 컴포넌트
+
+로그인 페이지에서는 에러 타입에 따라 다른 스타일과 아이콘을 표시합니다:
+
+| 에러 타입 | 색상 | 아이콘 |
+|-----------|------|--------|
+| `credential` | 빨간색 | 🔒 자물쇠 |
+| `email` | 주황색 | ✉️ 이메일 |
+| `network` | 노란색 | 📶 와이파이 |
+| `popup` | 파란색 | 🔗 팝업 |
+| `unknown` | 빨간색 | ⚠️ 경고 |
+
+### 파일 구조
+
+```
+lib/
+└── auth-errors.ts        # 에러 코드 매핑 및 헬퍼 함수
+
+messages/
+├── ko.json               # 한국어 에러 메시지 (auth.errors.*)
+└── en.json               # 영어 에러 메시지 (auth.errors.*)
+
+app/(auth)/login/
+└── page.tsx              # 에러 UI 적용된 로그인 페이지
+```
+
+---
+
 ## ✅ 구현된 기능
 
 ### 인증 (Authentication)
@@ -589,6 +693,9 @@ curl http://localhost:3000/api/test-paddle
 - ✅ 이메일 인증
 - ✅ 자동 로그인 (세션 유지)
 - ✅ 사용자 프로필 자동 생성
+- ✅ **로그인 에러 처리 개선** (20+ 에러 코드 지원)
+- ✅ **에러 타입별 UI 차별화** (색상, 아이콘)
+- ✅ **다국어 에러 메시지** (한국어/영어)
 
 ### 대시보드
 - ✅ 실시간 사용량 통계
@@ -619,6 +726,7 @@ curl http://localhost:3000/api/test-paddle
 - ✅ 한국어 (기본)
 - ✅ 영어
 - ✅ useTranslation 훅
+- ✅ **인증 에러 메시지 다국어 지원**
 
 ---
 
@@ -741,6 +849,46 @@ const paddle = (window as any).Paddle as Paddle | undefined;
 
 ---
 
+### 7. Firebase Auth v10+ 로그인 에러 처리 ✅
+
+**문제:**
+```
+Firebase v10+에서 auth/wrong-password, auth/user-not-found 에러가 
+auth/invalid-credential로 통합되어 기존 에러 처리 로직이 작동하지 않음
+```
+
+**원인:**
+- Firebase v10부터 보안상의 이유로 이메일/비밀번호 관련 에러를 구분하지 않음
+- 기존 에러 코드 매핑에 새로운 코드가 누락됨
+
+**해결:**
+```typescript
+// lib/auth-errors.ts에 새로운 에러 코드 추가
+const errorKeyMap: Record<string, string> = {
+  // ✅ Firebase v10+ 통합 에러
+  'auth/invalid-credential': 'auth.errors.invalidCredential',
+  'auth/invalid-login-credentials': 'auth.errors.invalidCredential',
+  
+  // 기존 에러 (하위 호환성)
+  'auth/wrong-password': 'auth.errors.wrongPassword',
+  'auth/user-not-found': 'auth.errors.userNotFound',
+  
+  // 추가 에러 코드 20개+
+  'auth/user-disabled': 'auth.errors.userDisabled',
+  'auth/popup-blocked': 'auth.errors.popupBlocked',
+  // ...
+};
+```
+
+**개선된 UI:**
+- 에러 타입별 색상 구분 (credential=빨강, email=주황, network=노랑)
+- 에러 타입별 아이콘 표시
+- 에러 닫기 버튼 추가
+- 입력 필드 하이라이트 (에러 시 테두리 색상 변경)
+- 비밀번호 에러 시 "비밀번호 찾기" 링크 자동 표시
+
+---
+
 ## 📚 개발 가이드
 
 ### Paddle API 사용법
@@ -788,6 +936,38 @@ function Component() {
   if (isPro && isActive) {
     // Pro 기능 표시
   }
+}
+```
+
+### 인증 에러 처리
+
+```typescript
+import { getAuthErrorKey, getAuthErrorType } from '@/lib/auth-errors';
+import { useTranslation } from '@/hooks/useTranslation';
+
+function LoginForm() {
+  const { t } = useTranslation();
+  const [error, setError] = useState('');
+  const [errorType, setErrorType] = useState<AuthErrorType>('unknown');
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmail(email, password);
+    } catch (err: any) {
+      const errorKey = getAuthErrorKey(err);
+      const type = getAuthErrorType(err);
+      
+      setError(t(errorKey));      // 번역된 에러 메시지
+      setErrorType(type);          // UI 스타일링용 타입
+    }
+  };
+
+  return (
+    <div className={getErrorStyles(errorType)}>
+      <ErrorIcon type={errorType} />
+      <p>{error}</p>
+    </div>
+  );
 }
 ```
 
@@ -843,6 +1023,8 @@ function Component() {
 ### 완료된 기능 (✅)
 - [x] Firebase 연동
 - [x] 사용자 인증 (Email, Google)
+- [x] **로그인 에러 처리 개선** (20+ 에러 코드)
+- [x] **에러 타입별 UI 차별화**
 - [x] 대시보드 홈
 - [x] 사용량 통계
 - [x] 요약 기록 조회 (Pro 전용)
@@ -907,5 +1089,29 @@ function Component() {
 ---
 
 **Last Updated:** 2025년 12월 1일  
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Status:** 🚀 Active Development
+
+---
+
+## 📜 변경 이력
+
+### v1.2.0 (2025-12-01)
+- ✨ **로그인 에러 처리 대폭 개선**
+  - Firebase Auth v10+ `auth/invalid-credential` 에러 지원
+  - 20개 이상의 에러 코드 매핑 추가
+  - 에러 타입별 UI 차별화 (색상, 아이콘)
+  - 에러 닫기 버튼 및 입력 필드 하이라이트 추가
+- 🌐 다국어 에러 메시지 추가 (한국어/영어)
+- 📝 README.md 인증 에러 처리 가이드 추가
+
+### v1.1.0 (2025-11-21)
+- ✨ Paddle 결제 연동 완료
+- 🔧 구독 취소/재개/결제수단 변경 기능
+- 🐛 Paddle 환경 설정 버그 수정
+
+### v1.0.0 (2025-11-01)
+- 🎉 프로젝트 초기 릴리즈
+- ✅ Firebase 인증 및 Firestore 연동
+- ✅ 대시보드 및 요약 기록 관리
+- ✅ 다국어 지원 (한/영)
