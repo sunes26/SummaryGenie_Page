@@ -22,12 +22,14 @@ export interface UserProfile {
 
 /**
  * Auth Context 타입
+ * ✅ emailVerified 추가
  */
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   isPremium: boolean;
   subscriptionPlan: 'free' | 'pro';
+  emailVerified: boolean; // ⭐ 추가
   loading: boolean;
   error: Error | null;
 }
@@ -40,6 +42,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /**
  * Auth Provider 컴포넌트
  * ✅ Firebase Auth + Firestore users 컬렉션 통합
+ * ✅ emailVerified 상태 제공
  * 
  * @example
  * // app/layout.tsx
@@ -137,12 +140,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ✅ 계산된 값들
   const isPremium = userProfile?.isPremium || false;
   const subscriptionPlan = userProfile?.subscriptionPlan || 'free';
+  const emailVerified = user?.emailVerified || false; // ⭐ 추가
 
   const value: AuthContextType = {
     user,
     userProfile,
     isPremium,
     subscriptionPlan,
+    emailVerified, // ⭐ 추가
     loading,
     error,
   };
@@ -158,13 +163,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
  * useAuthContext 훅
  * AuthProvider 내부에서만 사용 가능
  * 
- * @returns AuthContextType - { user, userProfile, isPremium, subscriptionPlan, loading, error }
+ * @returns AuthContextType - { user, userProfile, isPremium, subscriptionPlan, emailVerified, loading, error }
  * 
  * @example
- * const { user, isPremium, loading } = useAuthContext();
+ * const { user, isPremium, emailVerified, loading } = useAuthContext();
  * 
  * if (loading) return <div>Loading...</div>;
  * if (!user) return <div>Please login</div>;
+ * if (!emailVerified) return <EmailVerificationModal />;
  * if (isPremium) return <div>Pro features</div>;
  */
 export function useAuthContext(): AuthContextType {
@@ -182,7 +188,7 @@ export function useAuthContext(): AuthContextType {
  * useAuthContext와 동일하지만 이름이 더 짧음
  * 
  * @example
- * const { user, isPremium } = useAuth();
+ * const { user, isPremium, emailVerified } = useAuth();
  */
 export function useAuth(): AuthContextType {
   return useAuthContext();

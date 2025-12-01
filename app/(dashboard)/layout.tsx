@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import MobileHeader from '@/components/dashboard/MobileHeader';
+import EmailVerificationModal from '@/components/dashboard/EmailVerificationModal';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, emailVerified, loading } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -42,6 +43,14 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-gray-50">
+      {/* ✅ 이메일 미인증 모달 */}
+      {!emailVerified && (
+        <EmailVerificationModal 
+          isOpen={true} 
+          userEmail={user.email || ''} 
+        />
+      )}
+
       {/* 데스크톱 사이드바 */}
       <Sidebar user={user} />
 

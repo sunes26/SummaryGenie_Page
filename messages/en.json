@@ -23,6 +23,23 @@
     "required": "Required",
     "optional": "Optional"
   },
+  "emailVerification": {
+    "title": "Email Verification Required",
+    "subtitle": "Please verify your email to continue using our service",
+    "reason": "Email verification is required for security and account recovery. You'll have access to all features after verification.",
+    "yourEmail": "Your Email Address",
+    "sendButton": "Send Verification Email",
+    "sending": "Sending...",
+    "emailSent": "Verification email has been sent!",
+    "emailSentSuccess": "✓ Verification email sent successfully",
+    "sendError": "Failed to send email. Please try again.",
+    "resendButton": "Resend Verification Email",
+    "nextStepsTitle": "📧 Next Steps",
+    "step1": "Check your email inbox",
+    "step2": "Click the verification link",
+    "step3": "Refresh this page",
+    "helpText": "Didn't receive the email? Check your spam folder or click resend."
+  },
   "auth": {
     "login": {
       "title": "Sign in to SummaryGenie",
