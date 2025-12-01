@@ -14,7 +14,7 @@ import {
 
 // ✅ 페이지 메타데이터 (SEO 최적화)
 export const metadata: Metadata = genMeta({
-  title: 'SummaryGenie - AI 웹페이지 요약',
+  title: 'Gena - AI 웹페이지 요약',
   description: '웹 서핑 시간은 절반으로, 정보의 깊이는 두 배로. Chrome 확장 프로그램으로 한 번의 클릭으로 웹페이지를 AI가 요약합니다. 무료로 시작하세요.',
   keywords: [
     'AI 요약',
@@ -64,8 +64,8 @@ function SectionSkeleton() {
 // ✅ FAQ 데이터 (JSON-LD용)
 const faqData = [
   {
-    question: 'SummaryGenie는 무료인가요?',
-    answer: '네, 기본 플랜은 완전 무료입니다. 월 30회까지 무료로 요약할 수 있으며, 무제한 사용을 원하시면 Pro 플랜(월 9,900원)을 이용하실 수 있습니다.',
+    question: 'Gena는 무료인가요?',
+    answer: '네, 기본 플랜은 완전 무료입니다. 일 3회까지 무료로 요약할 수 있으며, 무제한 사용을 원하시면 Pro 플랜(월 9,900원)을 이용하실 수 있습니다.',
   },
   {
     question: '어떤 웹페이지를 요약할 수 있나요?',
@@ -73,7 +73,7 @@ const faqData = [
   },
   {
     question: 'Chrome 확장 프로그램은 어떻게 설치하나요?',
-    answer: 'Chrome 웹 스토어에서 "SummaryGenie"를 검색하여 설치하거나, 웹사이트의 다운로드 버튼을 클릭하면 자동으로 Chrome 웹 스토어로 이동합니다.',
+    answer: 'Chrome 웹 스토어에서 "Gena"를 검색하여 설치하거나, 웹사이트의 다운로드 버튼을 클릭하면 자동으로 Chrome 웹 스토어로 이동합니다.',
   },
   {
     question: '요약 품질은 어떤가요?',

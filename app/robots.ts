@@ -7,7 +7,7 @@ import { MetadataRoute } from 'next';
  * URL: https://your-domain.com/robots.txt
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.day';
 
   return {
     rules: [

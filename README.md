@@ -1,4 +1,4 @@
-# SummaryGenie Page 프로젝트
+# Gena Page 프로젝트
 
 > AI 기반 웹페이지 요약 Chrome 확장 프로그램과 웹 대시보드를 제공하는 SaaS 플랫폼
 
@@ -37,7 +37,7 @@ AI 기반 웹페이지 요약 Chrome 확장 프로그램과 웹 대시보드를 
 - ✅ 사용 통계 및 분석 대시보드 제공
 
 ### 프로젝트명
-**summarygenie_page**
+**Gena_page**
 
 ---
 
@@ -311,8 +311,8 @@ C:.
 ### 1. 저장소 클론
 
 ```bash
-git clone https://github.com/your-username/summarygenie_page.git
-cd summarygenie_page
+git clone https://github.com/your-username/Gena_page.git
+cd Gena_page
 ```
 
 ### 2. 의존성 설치
@@ -889,9 +889,9 @@ function Component() {
 
 ## 📞 문의
 
-- Email: support@summarygenie.com
-- Website: https://summarygenie.com
-- GitHub: https://github.com/your-username/summarygenie_page
+- Email: oceancode0321@gmail.com
+- Website: https://Gena.day
+- GitHub: https://github.com/sunes/Gena_page
 
 ---
 

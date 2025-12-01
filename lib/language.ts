@@ -8,7 +8,7 @@
 
 export type Locale = 'ko' | 'en';
 
-const STORAGE_KEY = 'summarygenie_locale';
+const STORAGE_KEY = 'gena_locale';
 const DEFAULT_LOCALE: Locale = 'en'; // 기본 언어: 영어
 
 /**

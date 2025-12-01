@@ -16,8 +16,8 @@ export default function OnboardingGuide({ isPremium = false }: OnboardingGuidePr
       icon: Chrome,
       title: locale === 'ko' ? 'Chrome 확장 설치' : 'Install Chrome Extension',
       description: locale === 'ko' 
-        ? 'Chrome 웹스토어에서 SummaryGenie를 설치하세요'
-        : 'Install SummaryGenie from Chrome Web Store',
+        ? 'Chrome 웹스토어에서 Gena를 설치하세요'
+        : 'Install Gena from Chrome Web Store',
       action: {
         label: locale === 'ko' ? '확장 프로그램 설치' : 'Install Extension',
         href: 'https://chrome.google.com/webstore',
@@ -76,8 +76,8 @@ export default function OnboardingGuide({ isPremium = false }: OnboardingGuidePr
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           {locale === 'ko'
-            ? 'SummaryGenie를 시작하려면 아래 단계를 따라주세요'
-            : 'Follow these steps to get started with SummaryGenie'}
+            ? 'Gena를 시작하려면 아래 단계를 따라주세요'
+            : 'Follow these steps to get started with Gena'}
         </p>
       </div>
 
@@ -146,8 +146,8 @@ export default function OnboardingGuide({ isPremium = false }: OnboardingGuidePr
                 도움말 센터
               </a>
               를 방문하거나{' '}
-              <a href="mailto:support@summarygenie.app" className="text-blue-600 hover:text-blue-700 font-medium">
-                support@summarygenie.app
+              <a href="mailto:oceancode0321@gmail.com" className="text-blue-600 hover:text-blue-700 font-medium">
+                oceancode0321@gmail.com
               </a>
               로 문의하세요.
             </>
@@ -158,8 +158,8 @@ export default function OnboardingGuide({ isPremium = false }: OnboardingGuidePr
                 Visit our Help Center
               </a>
               {' '}or contact{' '}
-              <a href="mailto:support@summarygenie.app" className="text-blue-600 hover:text-blue-700 font-medium">
-                support@summarygenie.app
+              <a href="mailto:oceancode0321@gmail.com" className="text-blue-600 hover:text-blue-700 font-medium">
+                oceancode0321@gmail.com
               </a>
             </>
           )}

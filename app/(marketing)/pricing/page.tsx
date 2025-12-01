@@ -14,7 +14,7 @@ import {
 // ✅ 페이지 메타데이터 (SEO 최적화)
 export const metadata: Metadata = generateProductMetadata({
   title: '요금제 - 무료로 시작하기',
-  description: 'SummaryGenie의 Free 플랜(무료)과 Pro 플랜(월 9,900원)을 비교하세요. 무제한 AI 요약, 고성능 엔진, 우선 지원을 제공합니다.',
+  description: 'Gena의 Free 플랜(무료)과 Pro 플랜(월 9,900원)을 비교하세요. 무제한 AI 요약, 고성능 엔진, 우선 지원을 제공합니다.',
   price: '9900',
   currency: 'KRW',
   availability: 'in stock',

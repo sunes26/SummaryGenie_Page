@@ -127,7 +127,7 @@ export default function LoginPage() {
       <DynamicMeta
         title={t('auth.login.title')}
         description={t('auth.login.description')}
-        keywords="로그인, 로그인 페이지, SummaryGenie 로그인"
+        keywords="로그인, 로그인 페이지, Gena 로그인"
       />
 
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">

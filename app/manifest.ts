@@ -8,8 +8,8 @@ import { MetadataRoute } from 'next';
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'SummaryGenie - AI 웹페이지 요약',
-    short_name: 'SummaryGenie',
+    name: 'Gena - AI 웹페이지 요약',
+    short_name: 'Gena',
     description: '웹 서핑 시간은 절반으로, 정보의 깊이는 두 배로. AI 기반 웹페이지 요약 서비스',
     start_url: '/',
     display: 'standalone',
@@ -59,14 +59,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1280x720',
         type: 'image/png',
         form_factor: 'wide',
-        label: 'SummaryGenie Dashboard',
+        label: 'Gena Dashboard',
       },
       {
         src: '/screenshots/mobile-1.png',
         sizes: '750x1334',
         type: 'image/png',
         form_factor: 'narrow',
-        label: 'SummaryGenie Mobile',
+        label: 'Gena Mobile',
       },
     ],
     

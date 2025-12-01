@@ -5,8 +5,8 @@ import { Metadata } from 'next';
  * 기본 메타데이터 설정
  */
 const defaultMetadata = {
-  siteName: 'SummaryGenie',
-  title: 'SummaryGenie - AI 웹페이지 요약',
+  siteName: 'Gena',
+  title: 'Gena - AI 웹페이지 요약',
   description: '웹 서핑 시간은 절반으로, 정보의 깊이는 두 배로. AI 기반 웹페이지 요약 서비스로 효율적인 정보 습득을 경험하세요.',
   keywords: [
     'AI 요약',
@@ -21,7 +21,7 @@ const defaultMetadata = {
     '문서 요약',
   ],
   ogImage: '/og-image.png',
-  twitterHandle: '@summarygenie',
+  twitterHandle: '@gena',
   locale: 'ko_KR',
   type: 'website' as const,
 };
@@ -46,12 +46,12 @@ interface MetadataOptions {
  * // app/pricing/page.tsx
  * export const metadata = generateMetadata({
  *   title: '요금제',
- *   description: 'SummaryGenie의 요금제를 확인하세요',
+ *   description: 'Gena의 요금제를 확인하세요',
  *   canonical: '/pricing',
  * });
  */
 export function generateMetadata(options: MetadataOptions = {}): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.app';
   
   const {
     title = defaultMetadata.title,
@@ -193,7 +193,7 @@ export function generateProductMetadata(options: {
 export function generatePrivateMetadata(title: string): Metadata {
   return generateMetadata({
     title,
-    description: 'SummaryGenie 대시보드',
+    description: 'Gena 대시보드',
     noIndex: true, // 검색 엔진에 노출하지 않음
   });
 }
@@ -209,26 +209,26 @@ export function generateJsonLd(data: Record<string, any>): string {
  * Organization Schema (회사 정보)
  */
 export function getOrganizationSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.day';
   
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'SummaryGenie',
+    name: 'gena',
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description: defaultMetadata.description,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      email: 'support@summarygenie.com',
+      email: 'oceancode0321@gmail.com',
       availableLanguage: ['Korean', 'English'],
     },
     sameAs: [
       // 소셜 미디어 링크 (있다면 추가)
-      // 'https://twitter.com/summarygenie',
-      // 'https://www.facebook.com/summarygenie',
-      // 'https://www.linkedin.com/company/summarygenie',
+      // 'https://twitter.com/Gena',
+      // 'https://www.facebook.com/Gena',
+      // 'https://www.linkedin.com/company/Gena',
     ],
   };
 }
@@ -237,12 +237,12 @@ export function getOrganizationSchema() {
  * WebApplication Schema (웹 애플리케이션)
  */
 export function getWebApplicationSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.day';
   
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'SummaryGenie',
+    name: 'Gena',
     url: baseUrl,
     applicationCategory: 'ProductivityApplication',
     operatingSystem: 'Any',
@@ -266,17 +266,17 @@ export function getWebApplicationSchema() {
  * Product Schema (Pro 구독)
  */
 export function getProductSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.day';
   
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: 'SummaryGenie Pro',
+    name: 'Gena Pro',
     description: '무제한 AI 요약, 고성능 요약 엔진, 우선 지원',
     image: `${baseUrl}/og-image.png`,
     brand: {
       '@type': 'Brand',
-      name: 'SummaryGenie',
+      name: 'Gena',
     },
     offers: {
       '@type': 'Offer',
@@ -300,7 +300,7 @@ export function getProductSchema() {
  * BreadcrumbList Schema (빵 부스러기)
  */
 export function getBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://Gena.day';
   
   return {
     '@context': 'https://schema.org',

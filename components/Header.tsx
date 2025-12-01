@@ -29,7 +29,7 @@ export function Header() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* 로고 */}
         <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition">
-          SummaryGenie
+          Gena
         </Link>
 
         {/* 네비게이션 */}

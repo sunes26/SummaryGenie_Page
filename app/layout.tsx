@@ -17,7 +17,7 @@ const notoSansKr = Noto_Sans_KR({
 
 // ✅ 기본 메타데이터
 export const metadata: Metadata = genMeta({
-  title: 'SummaryGenie - AI 웹페이지 요약',
+  title: 'Gena - AI 웹페이지 요약',
   description: '웹 서핑 시간은 절반으로, 정보의 깊이는 두 배로. Chrome 확장 프로그램으로 한 번의 클릭으로 웹페이지를 AI가 요약합니다.',
   keywords: ['AI 요약', '웹페이지 요약', '크롬 확장프로그램', 'Chrome extension'],
   canonical: '/',

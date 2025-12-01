@@ -194,7 +194,7 @@ export default function TestLanguagePage() {
             <li>□ URL에 ?lang=en 추가 → 영어로 표시</li>
             <li>□ 버튼으로 언어 전환 → 즉시 변경</li>
             <li>□ 페이지 새로고침 → 언어 유지</li>
-            <li>□ localStorage에 'summarygenie_locale' 저장 확인</li>
+            <li>□ localStorage에 'Gena_locale' 저장 확인</li>
           </ul>
         </div>
       </div>

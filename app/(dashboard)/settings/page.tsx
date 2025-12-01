@@ -143,10 +143,10 @@ export default function SettingsPage() {
           설정에 대해 궁금한 점이 있으시면 문의해주세요.
         </p>
         <a
-          href="mailto:support@summarygenie.com"
+          href="mailto:oceancode0321@gmail.com"
           className="text-sm font-medium text-blue-600 hover:text-blue-700 underline"
         >
-          support@summarygenie.com
+          oceancode0321@gmail.com
         </a>
       </div>
     </div>

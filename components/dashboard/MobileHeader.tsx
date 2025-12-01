@@ -25,12 +25,12 @@ export default function MobileHeader({ onMenuClick, user }: MobileHeaderProps) {
       <div className="flex items-center space-x-2">
         <Image
           src="/images/logo.png"
-          alt="SummaryGenie"
+          alt="Gena"
           width={28}
           height={28}
           className="w-7 h-7"
         />
-        <span className="text-lg font-bold text-gray-900">SummaryGenie</span>
+        <span className="text-lg font-bold text-gray-900">Gena</span>
       </div>
 
       {/* 프로필 아이콘 */}

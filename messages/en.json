@@ -42,8 +42,8 @@
   },
   "auth": {
     "login": {
-      "title": "Sign in to SummaryGenie",
-      "description": "Log in to SummaryGenie",
+      "title": "Sign in to Gena",
+      "description": "Log in to Gena",
       "subtitle": "Sign in to access AI-powered web summarization",
       "emailLabel": "Email",
       "emailPlaceholder": "your@email.com",
@@ -115,7 +115,7 @@
   },
   "dashboard": {
     "sidebar": {
-      "logo": "SummaryGenie",
+      "logo": "Gena",
       "dashboard": "Dashboard",
       "history": "Summary History",
       "subscription": "Subscription",
@@ -148,7 +148,7 @@
       "gettingStarted": {
         "title": "💡 Getting Started",
         "step1Title": "1. Install Extension",
-        "step1Desc": "Download SummaryGenie from Chrome Web Store",
+        "step1Desc": "Download Gena from Chrome Web Store",
         "step2Title": "2. Summarize Pages",
         "step2Desc": "Click the extension icon on any page you want to summarize",
         "step3Title": "3. Manage History",
@@ -331,7 +331,7 @@
     "help": {
       "title": "Need Help?",
       "message": "Contact us if you have any questions.",
-      "email": "support@summarygenie.com"
+      "email": "oceancode0321@gmail.com"
     }
   },
   "legal": {
@@ -352,7 +352,7 @@
     },
     "terms": {
       "title": "Terms of Service",
-      "subtitle": "Terms and conditions for using SummaryGenie service",
+      "subtitle": "Terms and conditions for using Gena service",
       "lastUpdated": "Last Updated",
       "effectiveDate": "Effective from November 21, 2025",
       "tableOfContents": "Table of Contents",
@@ -435,7 +435,7 @@
       },
       "quote": {
         "question": "How do you digest the daily information flood?",
-        "answer": "SummaryGenie protects your valuable time."
+        "answer": "Gena protects your valuable time."
       }
     },
     "howItWorks": {
@@ -443,7 +443,7 @@
       "subtitle": "Start smart web browsing in 3 easy steps",
       "step1": {
         "title": "Install Chrome Extension",
-        "description": "Download SummaryGenie from Chrome Web Store. It's free and takes just seconds."
+        "description": "Download Gena from Chrome Web Store. It's free and takes just seconds."
       },
       "step2": {
         "title": "Run on Web Pages",
@@ -484,7 +484,7 @@
       },
       "cta": {
         "title": "Make Your Time More Valuable",
-        "subtitle": "If you need to read dozens of articles daily, save 2 hours per day with SummaryGenie.",
+        "subtitle": "If you need to read dozens of articles daily, save 2 hours per day with Gena.",
         "stat1": {
           "number": "2 Hours",
           "label": "Average Time Saved"
@@ -535,8 +535,8 @@
       "title": "Frequently Asked Questions",
       "subtitle": "Have questions?",
       "q1": {
-        "question": "How does SummaryGenie work?",
-        "answer": "SummaryGenie uses the latest GPT technology to analyze web page text and extract only the key points for concise summaries. Install the Chrome extension and use it instantly on any page."
+        "question": "How does Gena work?",
+        "answer": "Gena uses the latest GPT technology to analyze web page text and extract only the key points for concise summaries. Install the Chrome extension and use it instantly on any page."
       },
       "q2": {
         "question": "Which websites can I use it on?",
@@ -547,11 +547,11 @@
         "answer": "The Free plan allows you to generate up to 3 summaries per day, and history is not saved. The Pro plan offers advanced features such as unlimited summaries, priority processing, PDF summary support, and history saving."
       },
       "needHelp": "Still have questions?",
-      "contactEmail": "support@summarygenie.app"
+      "contactEmail": "oceancode0321@gmail.com"
     },
     "finalCTA": {
       "title": "Get Started Today",
-      "subtitle": "Thousands of users are already saving 2 hours every day with SummaryGenie",
+      "subtitle": "Thousands of users are already saving 2 hours every day with Gena",
       "stats": {
         "users": {
           "number": "10K+",
@@ -576,9 +576,9 @@
       "product": "Product",
       "company": "Company",
       "legal": "Legal",
-      "copyright": "© 2025 SummaryGenie. All rights reserved.",
+      "copyright": "© 2025 Gena. All rights reserved.",
       "language": "🇺🇸 English",
-      "madeIn": "Made with ❤️ in Seoul"
+      "madeIn": "Made with in Seoul"
     }
   }
 }

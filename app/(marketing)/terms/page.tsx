@@ -83,7 +83,7 @@ export default function TermsOfServicePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold text-blue-600">
-              SummaryGenie
+              Gena
             </Link>
             <Link
               href="/"
@@ -145,7 +145,7 @@ export default function TermsOfServicePage() {
                   <section id="article-1" className="mb-8">
                     <h2 className="text-2xl font-bold mb-4">제1조(목적)</h2>
                     <p>
-                      본 약관은 OCEANCODE(이하 "회사"라 합니다)가 제공하는 SummaryGenie 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                      본 약관은 OCEANCODE(이하 "회사"라 합니다)가 제공하는 Gena 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
                     </p>
                   </section>
 
@@ -364,7 +364,7 @@ export default function TermsOfServicePage() {
                   <section id="article-1" className="mb-8">
                     <h2 className="text-2xl font-bold mb-4">Article 1 (Purpose)</h2>
                     <p>
-                      These Terms of Service (hereinafter referred to as "Terms") establish the rights, obligations, responsibilities, and other necessary matters between OCEANCODE (hereinafter referred to as "the Company") and users regarding the use of the SummaryGenie service (hereinafter referred to as "Service") provided by the Company.
+                      These Terms of Service (hereinafter referred to as "Terms") establish the rights, obligations, responsibilities, and other necessary matters between OCEANCODE (hereinafter referred to as "the Company") and users regarding the use of the Gena service (hereinafter referred to as "Service") provided by the Company.
                     </p>
                   </section>
 

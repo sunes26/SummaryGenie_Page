@@ -7,7 +7,7 @@ import { MetadataRoute } from 'next';
  * URL: https://your-domain.com/sitemap.xml
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://summarygenie.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gena.app';
   const currentDate = new Date();
 
   // 정적 페이지들

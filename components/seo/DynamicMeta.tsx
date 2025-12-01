@@ -15,8 +15,8 @@ import { useEffect } from 'react';
  * 
  * @example
  * <DynamicMeta
- *   title="로그인 | SummaryGenie"
- *   description="SummaryGenie에 로그인하세요"
+ *   title="로그인 | Gena"
+ *   description="Gena 로그인하세요"
  * />
  */
 
