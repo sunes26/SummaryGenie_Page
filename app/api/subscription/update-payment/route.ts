@@ -11,11 +11,13 @@ import { getUpdatePaymentMethodUrl } from '@/lib/paddle-server';
  * 플로우:
  * 1. Firebase ID 토큰 인증
  * 2. Firestore에서 구독 정보 조회
- * 3. Paddle API로 결제 수단 변경 URL 생성
+ * 3. Paddle API로 결제 수단 변경 URL 생성 (GET 요청)
  * 4. URL 반환 (클라이언트에서 리다이렉트)
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('📝 Update payment method request received');
+
     // 1. Firebase ID 토큰 인증
     const authHeader = request.headers.get('authorization');
     
@@ -40,18 +42,9 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = decodedToken.uid;
+    console.log(`👤 User authenticated: ${userId}`);
 
-    // 2. 요청 본문 파싱 (선택사항)
-    let body;
-    try {
-      body = await request.json();
-    } catch (error) {
-      body = {};
-    }
-
-    const { returnUrl } = body;
-
-    // 3. Firestore에서 구독 정보 조회
+    // 2. Firestore에서 구독 정보 조회
     const db = getAdminFirestore();
     const subscriptionRef = db.collection('subscription');
     
@@ -62,6 +55,7 @@ export async function POST(request: NextRequest) {
       .get();
 
     if (subscriptionsSnapshot.empty) {
+      console.log('❌ No active subscription found');
       return NextResponse.json(
         {
           error: 'No active subscription',
@@ -74,6 +68,8 @@ export async function POST(request: NextRequest) {
     const subscriptionData = subscriptionsSnapshot.docs[0].data();
     const paddleSubscriptionId = subscriptionData.paddleSubscriptionId;
 
+    console.log(`📋 Subscription found: ${paddleSubscriptionId}`);
+
     if (!paddleSubscriptionId) {
       console.error('Missing paddleSubscriptionId:', subscriptionData);
       return NextResponse.json(
@@ -85,16 +81,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Paddle API로 결제 수단 변경 URL 생성
+    // 3. Paddle API로 결제 수단 변경 URL 생성
     let updateUrl;
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const finalReturnUrl = returnUrl || `${baseUrl}/subscription?payment_updated=true`;
-
+      console.log(`🔄 Requesting update payment URL from Paddle...`);
+      
       updateUrl = await getUpdatePaymentMethodUrl({
         subscriptionId: paddleSubscriptionId,
-        returnUrl: finalReturnUrl,
       });
+      
+      console.log(`✅ Update payment URL generated: ${updateUrl.substring(0, 50)}...`);
     } catch (error) {
       console.error('Failed to get update URL:', error);
       return NextResponse.json(
@@ -107,7 +103,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. URL 반환
+    // 4. URL 반환
     return NextResponse.json({
       success: true,
       updateUrl,
@@ -183,8 +179,6 @@ export async function GET(request: NextRequest) {
       subscription: {
         id: subscription.paddleSubscriptionId,
         status: subscription.status,
-        // 실제 결제 수단 정보는 Paddle API에서 가져와야 함
-        // 여기서는 기본 정보만 반환
         hasPaymentMethod: true,
       },
     });

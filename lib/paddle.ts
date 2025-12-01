@@ -1,19 +1,19 @@
 // lib/paddle.ts
-import type { Paddle, CheckoutOpenOptions, InitializePaddleOptions } from '@paddle/paddle-js';
+import type { Paddle, CheckoutOpenOptions } from '@paddle/paddle-js';
 
 /**
  * Paddle 가격 설정
  * Paddle Dashboard에서 생성한 Price ID를 여기에 입력하세요
  */
 export const PADDLE_PRICES = {
-  pro_monthly: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY || 'pri_01234567890',
-  // pro_yearly: 'pri_01234567891', // 연간 플랜 (나중에 추가)
+  pro_monthly: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY || '',
+  // pro_yearly: process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO_YEARLY || '',
 } as const;
 
 /**
  * Paddle 환경 설정
  */
-const PADDLE_ENVIRONMENT = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+export const PADDLE_ENVIRONMENT = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
 
 /**
@@ -24,67 +24,49 @@ const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
  */
 export function getPaddleInstance(): Paddle | undefined {
   if (typeof window === 'undefined') {
-    console.warn('⚠️ getPaddleInstance called on server side');
+    console.warn('⚠️ getPaddleInstance: 서버 사이드에서 호출됨');
     return undefined;
   }
 
-  if (!window.Paddle) {
-    console.warn('⚠️ Paddle not initialized. Make sure PaddleProvider is added to your app.');
+  const paddle = (window as any).Paddle as Paddle | undefined;
+  if (!paddle) {
+    console.warn('⚠️ getPaddleInstance: Paddle이 초기화되지 않음');
     return undefined;
   }
 
-  return window.Paddle;
+  return paddle;
 }
 
 /**
- * ✅ Paddle 초기화 (클라이언트 사이드 전용)
- * PaddleProvider에서 자동으로 호출되므로 직접 호출할 필요 없음
- * 
- * @deprecated Use PaddleProvider instead
+ * ✅ Paddle 초기화 상태 확인
  */
-export async function initializePaddleClient(): Promise<Paddle | undefined> {
-  if (typeof window === 'undefined') {
-    return undefined;
-  }
+export function isPaddleReady(): boolean {
+  return typeof window !== 'undefined' && !!(window as any).Paddle;
+}
 
-  // 환경 변수 검증
+/**
+ * ✅ Paddle 설정 검증
+ */
+export function validatePaddleConfig(): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
   if (!PADDLE_CLIENT_TOKEN) {
-    throw new Error(
-      'Missing Paddle Client Token.\n' +
-      'Please set NEXT_PUBLIC_PADDLE_CLIENT_TOKEN in your .env.local file.\n' +
-      'You can get this from: Paddle Dashboard → Developer Tools → Authentication'
-    );
+    errors.push('NEXT_PUBLIC_PADDLE_CLIENT_TOKEN이 설정되지 않았습니다.');
   }
 
-  try {
-    if (!window.Paddle) {
-      console.error('❌ Paddle.js not loaded yet');
-      return undefined;
-    }
-
-    // ✅ Paddle.js v2 Setup
-    const options: InitializePaddleOptions = {
-      token: PADDLE_CLIENT_TOKEN,
-      eventCallback: (event) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Paddle Event:', event);
-        }
-      },
-    };
-
-    window.Paddle.Setup(options);
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ Paddle initialized successfully (${PADDLE_ENVIRONMENT} mode)`);
-    }
-    
-    return window.Paddle;
-  } catch (error) {
-    console.error('❌ Failed to initialize Paddle:', error);
-    throw new Error(
-      `Failed to initialize Paddle: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  if (!PADDLE_PRICES.pro_monthly) {
+    errors.push('NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY가 설정되지 않았습니다.');
   }
+
+  // 기본값인지 확인
+  if (PADDLE_PRICES.pro_monthly === 'pri_01234567890') {
+    errors.push('NEXT_PUBLIC_PADDLE_PRICE_PRO_MONTHLY가 기본값입니다. 실제 Price ID를 설정하세요.');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }
 
 /**
@@ -120,11 +102,27 @@ export async function openCheckout(options: OpenCheckoutOptions): Promise<void> 
     customData = {},
   } = options;
 
+  // 설정 검증
+  const configValidation = validatePaddleConfig();
+  if (!configValidation.valid) {
+    console.error('❌ Paddle 설정 오류:', configValidation.errors);
+    throw new Error(configValidation.errors.join('\n'));
+  }
+
   try {
     const paddle = getPaddleInstance();
 
     if (!paddle) {
-      throw new Error('Paddle not initialized. Please wait for PaddleProvider to load.');
+      throw new Error('Paddle이 초기화되지 않았습니다. PaddleProvider가 올바르게 설정되었는지 확인하세요.');
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🛒 체크아웃 열기:', {
+        priceId,
+        userId,
+        userEmail,
+        environment: PADDLE_ENVIRONMENT,
+      });
     }
 
     // 체크아웃 설정
@@ -148,7 +146,7 @@ export async function openCheckout(options: OpenCheckoutOptions): Promise<void> 
       },
       settings: {
         displayMode: 'overlay', // 오버레이 모드
-        theme: 'dark', // 다크 테마
+        theme: 'light', // 라이트 테마
         locale: 'ko', // 한국어
         showAddDiscounts: true, // 할인 코드 입력 허용
         allowLogout: false, // 로그아웃 버튼 숨김
@@ -160,12 +158,12 @@ export async function openCheckout(options: OpenCheckoutOptions): Promise<void> 
     paddle.Checkout.open(checkoutOptions);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Paddle checkout opened');
+      console.log('✅ Paddle 체크아웃 열림');
     }
   } catch (error) {
-    console.error('❌ Failed to open checkout:', error);
+    console.error('❌ 체크아웃 열기 실패:', error);
     throw new Error(
-      `Failed to open checkout: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `체크아웃을 열 수 없습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
     );
   }
 }
@@ -204,7 +202,7 @@ export async function cancelSubscription(subscriptionId: string): Promise<boolea
     const token = await getIdToken();
 
     if (!token) {
-      throw new Error('User is not authenticated');
+      throw new Error('사용자가 인증되지 않았습니다.');
     }
 
     // 서버 API 호출
@@ -219,18 +217,18 @@ export async function cancelSubscription(subscriptionId: string): Promise<boolea
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to cancel subscription');
+      throw new Error(error.error || '구독 취소에 실패했습니다.');
     }
 
     const data = await response.json();
     
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Subscription canceled:', data);
+      console.log('✅ 구독 취소됨:', data);
     }
     
     return true;
   } catch (error) {
-    console.error('❌ Failed to cancel subscription:', error);
+    console.error('❌ 구독 취소 실패:', error);
     throw error;
   }
 }
@@ -245,7 +243,7 @@ export async function updatePaymentMethod(subscriptionId: string): Promise<void>
     const token = await getIdToken();
 
     if (!token) {
-      throw new Error('User is not authenticated');
+      throw new Error('사용자가 인증되지 않았습니다.');
     }
 
     const response = await fetch('/api/subscription/update-payment', {
@@ -259,7 +257,7 @@ export async function updatePaymentMethod(subscriptionId: string): Promise<void>
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to get update URL');
+      throw new Error(error.error || '결제 수단 변경 URL을 가져올 수 없습니다.');
     }
 
     const { updateUrl } = await response.json();
@@ -267,7 +265,7 @@ export async function updatePaymentMethod(subscriptionId: string): Promise<void>
     // Paddle 관리 페이지로 리다이렉트
     window.location.href = updateUrl;
   } catch (error) {
-    console.error('❌ Failed to update payment method:', error);
+    console.error('❌ 결제 수단 변경 실패:', error);
     throw error;
   }
 }
@@ -281,7 +279,7 @@ export async function resumeSubscription(subscriptionId: string): Promise<boolea
     const token = await getIdToken();
 
     if (!token) {
-      throw new Error('User is not authenticated');
+      throw new Error('사용자가 인증되지 않았습니다.');
     }
 
     const response = await fetch('/api/subscription/resume', {
@@ -295,16 +293,16 @@ export async function resumeSubscription(subscriptionId: string): Promise<boolea
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to resume subscription');
+      throw new Error(error.error || '구독 재개에 실패했습니다.');
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Subscription resumed');
+      console.log('✅ 구독 재개됨');
     }
     
     return true;
   } catch (error) {
-    console.error('❌ Failed to resume subscription:', error);
+    console.error('❌ 구독 재개 실패:', error);
     throw error;
   }
 }
@@ -323,19 +321,31 @@ export function isSandboxMode(): boolean {
   return PADDLE_ENVIRONMENT === 'sandbox';
 }
 
-// ============================================
-// Window 타입 확장
-// ============================================
-declare global {
-  interface Window {
-    Paddle?: Paddle;
+/**
+ * 디버그 정보 출력
+ */
+export function logPaddleDebugInfo(): void {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  console.group('🔍 Paddle Debug Info');
+  console.log('Environment:', PADDLE_ENVIRONMENT);
+  console.log('Client Token:', PADDLE_CLIENT_TOKEN ? `${PADDLE_CLIENT_TOKEN.substring(0, 20)}...` : 'NOT SET');
+  console.log('Price ID (Pro Monthly):', PADDLE_PRICES.pro_monthly || 'NOT SET');
+  console.log('Paddle Ready:', isPaddleReady());
+  
+  const validation = validatePaddleConfig();
+  console.log('Config Valid:', validation.valid);
+  if (!validation.valid) {
+    console.log('Config Errors:', validation.errors);
   }
+  console.groupEnd();
 }
 
 // 기본 export
 export default {
   getInstance: getPaddleInstance,
-  initialize: initializePaddleClient,
+  isReady: isPaddleReady,
+  validateConfig: validatePaddleConfig,
   openCheckout,
   startProSubscription,
   cancelSubscription,
@@ -343,4 +353,5 @@ export default {
   resumeSubscription,
   prices: PADDLE_PRICES,
   environment: PADDLE_ENVIRONMENT,
+  logDebugInfo: logPaddleDebugInfo,
 };

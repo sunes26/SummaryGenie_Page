@@ -2,7 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyIdToken } from '@/lib/firebase/admin-utils';
 import { getAdminFirestore } from '@/lib/firebase/admin';
-import { resumePaddleSubscription } from '@/lib/paddle-server';
+import { 
+  resumePaddleSubscription, 
+  cancelScheduledChange,
+  getPaddleSubscription 
+} from '@/lib/paddle-server';
 import { Timestamp } from 'firebase-admin/firestore';
 
 /**
@@ -12,7 +16,9 @@ import { Timestamp } from 'firebase-admin/firestore';
  * 플로우:
  * 1. Firebase ID 토큰 인증
  * 2. Firestore에서 구독 정보 조회
- * 3. Paddle API로 구독 재개 요청
+ * 3. 구독 상태에 따라:
+ *    - paused: resumePaddleSubscription 호출
+ *    - cancelAtPeriodEnd: cancelScheduledChange 호출
  * 4. Firestore subscription 업데이트
  */
 export async function POST(request: NextRequest) {
@@ -48,7 +54,7 @@ export async function POST(request: NextRequest) {
     
     const subscriptionsSnapshot = await subscriptionRef
       .where('userId', '==', userId)
-      .where('status', 'in', ['active', 'trialing'])
+      .where('status', 'in', ['active', 'trialing', 'paused'])
       .limit(1)
       .get();
 
@@ -77,8 +83,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. 취소 예정이 아닌 경우
-    if (!subscriptionData.cancelAtPeriodEnd) {
+    console.log(`🔍 Subscription status check:`, {
+      paddleSubscriptionId,
+      status: subscriptionData.status,
+      cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd,
+    });
+
+    // 3. 이미 활성 상태이고 취소 예정이 아닌 경우
+    if (!subscriptionData.cancelAtPeriodEnd && subscriptionData.status !== 'paused') {
       return NextResponse.json({
         success: true,
         alreadyActive: true,
@@ -90,12 +102,24 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 4. Paddle API로 구독 재개
-    let resumedSubscription;
+    let updatedSubscription;
+
+    // 4. 상태에 따라 다른 API 호출
     try {
-      resumedSubscription = await resumePaddleSubscription(paddleSubscriptionId);
+      if (subscriptionData.status === 'paused') {
+        // paused 상태: resume API 호출
+        console.log(`⏯️ Resuming paused subscription: ${paddleSubscriptionId}`);
+        updatedSubscription = await resumePaddleSubscription(paddleSubscriptionId);
+      } else if (subscriptionData.cancelAtPeriodEnd) {
+        // 취소 예정 상태: scheduled_change 취소
+        console.log(`🔄 Canceling scheduled cancellation: ${paddleSubscriptionId}`);
+        updatedSubscription = await cancelScheduledChange(paddleSubscriptionId);
+      } else {
+        // 그 외의 경우: 현재 상태 조회
+        updatedSubscription = await getPaddleSubscription(paddleSubscriptionId);
+      }
     } catch (error) {
-      console.error('Paddle resume error:', error);
+      console.error('Paddle API error:', error);
       return NextResponse.json(
         {
           error: 'Failed to resume subscription',
@@ -108,22 +132,24 @@ export async function POST(request: NextRequest) {
 
     // 5. Firestore 업데이트
     await subscriptionDoc.ref.update({
-      status: resumedSubscription.status,
-      cancelAtPeriodEnd: false,
+      status: updatedSubscription.status,
+      cancelAtPeriodEnd: updatedSubscription.scheduled_change?.action === 'cancel' || false,
       canceledAt: null,
       updatedAt: Timestamp.now(),
     });
+
+    console.log(`✅ Subscription resumed successfully: ${paddleSubscriptionId}`);
 
     // 6. 성공 응답
     return NextResponse.json({
       success: true,
       message: '구독이 재개되었습니다. 다음 결제일에 정상적으로 갱신됩니다.',
       subscription: {
-        id: resumedSubscription.id,
-        status: resumedSubscription.status,
-        cancelAtPeriodEnd: false,
-        currentPeriodEnd: resumedSubscription.current_billing_period.ends_at,
-        nextBilledAt: resumedSubscription.next_billed_at,
+        id: updatedSubscription.id,
+        status: updatedSubscription.status,
+        cancelAtPeriodEnd: updatedSubscription.scheduled_change?.action === 'cancel' || false,
+        currentPeriodEnd: updatedSubscription.current_billing_period.ends_at,
+        nextBilledAt: updatedSubscription.next_billed_at,
       },
     });
 

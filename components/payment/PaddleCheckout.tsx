@@ -4,9 +4,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { usePaddleStatus } from '@/components/providers/PaddleProvider';
 import { getPaddleInstance, PADDLE_PRICES } from '@/lib/paddle';
 import type { CheckoutOpenOptions } from '@paddle/paddle-js';
 import { showSuccess, showError, showLoading, dismissToast } from '@/lib/toast-helpers';
+import { Loader2 } from 'lucide-react';
 
 /**
  * PaddleCheckout 컴포넌트 Props
@@ -31,7 +33,10 @@ interface PaddleCheckoutProps {
 }
 
 /**
- * ✅ Paddle Checkout 버튼 (TypeScript 에러 수정)
+ * ✅ 수정된 Paddle Checkout 버튼
+ * - Paddle 초기화 상태 확인
+ * - 상세한 에러 메시지
+ * - 로딩 상태 개선
  */
 export function PaddleCheckout({
   buttonText = 'Pro로 업그레이드',
@@ -45,6 +50,7 @@ export function PaddleCheckout({
 }: PaddleCheckoutProps) {
   const { user } = useAuth();
   const { isPro, isActive, loading: subscriptionLoading } = useSubscription();
+  const { isReady: paddleReady, isLoading: paddleLoading, error: paddleError } = usePaddleStatus();
   const [opening, setOpening] = useState(false);
 
   // 버튼 크기 스타일
@@ -56,7 +62,7 @@ export function PaddleCheckout({
 
   // 버튼 variant 스타일
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    primary: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white',
     secondary: 'bg-gray-600 hover:bg-gray-700 text-white',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50',
   };
@@ -65,7 +71,7 @@ export function PaddleCheckout({
   const isAlreadyPro = isPro && isActive;
 
   /**
-   * ✅ Paddle Checkout 열기 (수정됨)
+   * ✅ Paddle Checkout 열기
    */
   const handleOpenCheckout = async () => {
     // 사용자 인증 확인
@@ -80,6 +86,25 @@ export function PaddleCheckout({
       return;
     }
 
+    // Paddle 초기화 에러 확인
+    if (paddleError) {
+      showError(`결제 시스템 오류: ${paddleError}`);
+      console.error('Paddle error:', paddleError);
+      return;
+    }
+
+    // Paddle 로딩 중
+    if (paddleLoading) {
+      showError('결제 시스템을 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    // Paddle 준비 안됨
+    if (!paddleReady) {
+      showError('결제 시스템이 준비되지 않았습니다. 페이지를 새로고침 해주세요.');
+      return;
+    }
+
     setOpening(true);
     const toastId = showLoading('결제 페이지를 준비 중...');
 
@@ -88,10 +113,23 @@ export function PaddleCheckout({
       const paddle = getPaddleInstance();
 
       if (!paddle) {
-        throw new Error('Paddle이 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        throw new Error('Paddle이 초기화되지 않았습니다. 페이지를 새로고침 해주세요.');
       }
 
-      // 체크아웃 옵션 설정
+      // Price ID 검증
+      if (!priceId || priceId === 'pri_01234567890') {
+        throw new Error('유효한 Price ID가 설정되지 않았습니다. 관리자에게 문의하세요.');
+      }
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🛒 Opening checkout with:', {
+          priceId,
+          userId: user.uid,
+          email: user.email,
+        });
+      }
+
+      // ✅ 체크아웃 옵션 설정
       const checkoutOptions: CheckoutOpenOptions = {
         items: [
           {
@@ -107,7 +145,7 @@ export function PaddleCheckout({
         },
         settings: {
           displayMode: 'overlay',
-          theme: 'dark',
+          theme: 'light', // 라이트 테마로 변경 (가독성 향상)
           locale: 'ko',
           showAddDiscounts: true,
           allowLogout: false,
@@ -122,13 +160,13 @@ export function PaddleCheckout({
         };
       }
 
-      // 체크아웃 열기
+      // ✅ 체크아웃 열기
       paddle.Checkout.open(checkoutOptions);
 
       dismissToast(toastId);
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Paddle checkout opened');
+        console.log('✅ Paddle checkout opened successfully');
       }
 
       // 성공 콜백
@@ -142,7 +180,7 @@ export function PaddleCheckout({
       
       const errorMessage = error instanceof Error 
         ? error.message 
-        : '결제 페이지를 열 수 없습니다.';
+        : '결제 페이지를 열 수 없습니다. 잠시 후 다시 시도해주세요.';
       
       showError(errorMessage);
 
@@ -155,7 +193,7 @@ export function PaddleCheckout({
     }
   };
 
-  // 로딩 중
+  // 구독 로딩 중
   if (subscriptionLoading) {
     return (
       <button
@@ -165,9 +203,11 @@ export function PaddleCheckout({
           ${variantClasses[variant]}
           rounded-lg font-medium
           opacity-50 cursor-not-allowed
+          flex items-center justify-center gap-2
           ${className}
         `}
       >
+        <Loader2 className="w-4 h-4 animate-spin" />
         로딩 중...
       </button>
     );
@@ -191,21 +231,52 @@ export function PaddleCheckout({
     );
   }
 
+  // Paddle 에러 상태
+  if (paddleError) {
+    return (
+      <button
+        onClick={() => window.location.reload()}
+        className={`
+          ${sizeClasses[size]}
+          bg-red-100 text-red-700 border border-red-300
+          rounded-lg font-medium
+          hover:bg-red-200 transition-colors
+          ${className}
+        `}
+      >
+        오류 발생 - 새로고침
+      </button>
+    );
+  }
+
   // 일반 버튼
   return (
     <button
       onClick={handleOpenCheckout}
-      disabled={opening}
+      disabled={opening || paddleLoading || !paddleReady}
       className={`
         ${sizeClasses[size]}
         ${variantClasses[variant]}
         rounded-lg font-medium
-        transition-colors duration-200
+        transition-all duration-200
         disabled:opacity-50 disabled:cursor-not-allowed
+        flex items-center justify-center gap-2
         ${className}
       `}
     >
-      {opening ? '준비 중...' : buttonText}
+      {opening ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          준비 중...
+        </>
+      ) : paddleLoading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          로딩 중...
+        </>
+      ) : (
+        buttonText
+      )}
     </button>
   );
 }

@@ -26,14 +26,24 @@ async function paddleRequest<T>(
 
   const url = `${PADDLE_API_BASE_URL}${endpoint}`;
 
-  const response = await fetch(url, {
+  // GET 요청에서는 body를 제거
+  const requestOptions: RequestInit = {
     ...options,
     headers: {
       'Authorization': `Bearer ${PADDLE_API_KEY}`,
       'Content-Type': 'application/json',
       ...options.headers,
     },
-  });
+  };
+
+  // GET 요청에서 body가 있으면 제거
+  if (options.method === 'GET' && requestOptions.body) {
+    delete requestOptions.body;
+  }
+
+  console.log(`📡 Paddle API Request: ${options.method || 'GET'} ${endpoint}`);
+
+  const response = await fetch(url, requestOptions);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -61,7 +71,11 @@ export interface PaddleSubscription {
   next_billed_at: string | null;
   created_at: string;
   updated_at: string;
-  scheduled_change: any | null;
+  scheduled_change: {
+    action: 'cancel' | 'pause' | 'resume';
+    effective_at: string;
+    resume_at?: string;
+  } | null;
   items: Array<{
     price_id: string;
     quantity: number;
@@ -179,7 +193,10 @@ export async function cancelPaddleSubscription(
 }
 
 /**
- * Paddle 구독 재개
+ * ✅ 구독 재개 (paused 상태에서만 작동)
+ * 
+ * 주의: 이 API는 "paused" 상태의 구독에서만 작동합니다.
+ * "취소 예정" 상태를 취소하려면 cancelScheduledChange()를 사용하세요.
  */
 export async function resumePaddleSubscription(
   subscriptionId: string
@@ -194,6 +211,34 @@ export async function resumePaddleSubscription(
     }
   );
 
+  return response.data;
+}
+
+/**
+ * ✅ 예정된 변경 취소 (취소 예정 취소)
+ * 
+ * 구독이 "취소 예정(scheduled_change.action = cancel)" 상태일 때,
+ * 이 함수를 호출하면 취소를 철회하고 구독을 계속 유지합니다.
+ * 
+ * @param subscriptionId - Paddle 구독 ID
+ * @returns 업데이트된 구독 정보
+ */
+export async function cancelScheduledChange(
+  subscriptionId: string
+): Promise<PaddleSubscription> {
+  console.log(`🔄 Canceling scheduled change for subscription: ${subscriptionId}`);
+  
+  const response = await paddleRequest<{ data: PaddleSubscription }>(
+    `/subscriptions/${subscriptionId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        scheduled_change: null,  // 예정된 변경 취소
+      }),
+    }
+  );
+
+  console.log(`✅ Scheduled change canceled for subscription: ${subscriptionId}`);
   return response.data;
 }
 
@@ -213,32 +258,36 @@ export async function getCustomerSubscriptions(
 }
 
 /**
- * 결제 수단 업데이트 URL 생성
+ * ✅ 결제 수단 업데이트 URL 생성 (수정됨)
+ * 
+ * Paddle Billing API에서는 GET 요청을 사용합니다.
  */
 export interface UpdatePaymentMethodOptions {
   subscriptionId: string;
-  returnUrl?: string;
 }
 
 export async function getUpdatePaymentMethodUrl(
   options: UpdatePaymentMethodOptions
 ): Promise<string> {
-  const { subscriptionId, returnUrl } = options;
+  const { subscriptionId } = options;
 
+  console.log(`🔄 Getting update payment method URL for: ${subscriptionId}`);
+
+  // ✅ GET 요청 사용 (POST 아님!)
   const response = await paddleRequest<{
     data: {
-      url: string;
+      transaction_id: string;
+      subscription_id: string;
+      checkout: {
+        url: string;
+      };
     };
   }>(`/subscriptions/${subscriptionId}/update-payment-method-transaction`, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...(returnUrl && {
-        return_url: returnUrl,
-      }),
-    }),
+    method: 'GET',
   });
 
-  return response.data.url;
+  console.log(`✅ Update payment URL generated`);
+  return response.data.checkout.url;
 }
 
 /**
@@ -273,6 +322,7 @@ export default {
   getSubscription: getPaddleSubscription,
   cancelSubscription: cancelPaddleSubscription,
   resumeSubscription: resumePaddleSubscription,
+  cancelScheduledChange,
   getCustomerSubscriptions,
   getUpdatePaymentMethodUrl,
   verifyWebhook: verifyPaddleWebhook,

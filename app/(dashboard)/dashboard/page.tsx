@@ -168,8 +168,12 @@ export default function DashboardPage() {
         {/* 최근 7일 사용량 차트 */}
         <UsageChart data={dailyStats} loading={statsLoading} />
 
-        {/* 최근 요약 5개 */}
-        <RecentHistory history={history} loading={historyLoading} />
+        {/* ✅ 최근 요약 5개 - isPremium prop 전달 */}
+        <RecentHistory 
+          history={history} 
+          loading={historyLoading} 
+          isPremium={isPremium}
+        />
       </div>
 
       {/* ✅ 도움말 섹션 - 항상 표시 */}
