@@ -41,9 +41,6 @@ const nextConfig: NextConfig = {
   // 프로덕션 소스맵 제거 (번들 크기 감소)
   productionBrowserSourceMaps: false,
 
-  // SWC 컴파일러 최적화
-  swcMinify: true,
-
   // 실험적 기능
   experimental: {
     // React 18 기능 최적화
@@ -96,12 +93,7 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Firebase 최적화
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@firebase/auth': '@firebase/auth/dist/esm/index.node.js',
-      '@firebase/firestore': '@firebase/firestore/dist/esm/index.node.js',
-    };
+    // 🔴 Firebase alias 제거됨 - Vercel 빌드 에러 방지
 
     return config;
   },
