@@ -9,7 +9,10 @@
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(npm audit:*)"
     ]
   }
 }
