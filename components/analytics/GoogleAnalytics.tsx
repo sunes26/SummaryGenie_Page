@@ -1,67 +1,43 @@
+// components/analytics/GoogleAnalytics.tsx
 'use client';
 
-import { useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { GA_MEASUREMENT_ID, isGAEnabled, pageview } from '@/lib/analytics';
 
 /**
- * Google Analytics Component
+ * Google Analytics 4 (GA4) 컴포넌트
  *
- * app/layout.tsx에 추가하여 사용:
- *
- * import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
- *
- * export default function RootLayout({ children }) {
- *   return (
- *     <html>
- *       <body>
- *         <GoogleAnalytics />
- *         {children}
- *       </body>
- *     </html>
- *   );
- * }
+ * 사용법:
+ * 1. Google Analytics 계정에서 측정 ID 발급 (G-XXXXXXXXXX)
+ * 2. .env.local에 NEXT_PUBLIC_GA_MEASUREMENT_ID 추가
+ * 3. app/layout.tsx에서 이 컴포넌트 import
  */
-export function GoogleAnalytics() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Track page views on route change
-  useEffect(() => {
-    if (!isGAEnabled) return;
+export default function GoogleAnalytics() {
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-    pageview(url);
-  }, [pathname, searchParams]);
-
-  // Don't render if GA is not enabled
-  if (!isGAEnabled) {
+  // 측정 ID가 없으면 렌더링하지 않음 (개발 환경에서는 선택사항)
+  if (!measurementId) {
     return null;
   }
 
   return (
     <>
-      {/* Global Site Tag (gtag.js) - Google Analytics */}
+      {/* Google Analytics 스크립트 */}
       <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
-      <Script
-        id="google-analytics"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}', {
-              page_path: window.location.pathname,
-              send_page_view: false
-            });
-          `,
-        }}
-      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', '${measurementId}', {
+            page_path: window.location.pathname,
+          });
+        `}
+      </Script>
     </>
   );
 }

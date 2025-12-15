@@ -7,6 +7,7 @@ import { PaddleProvider } from '@/components/providers/PaddleProvider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Toaster } from 'react-hot-toast';
 import { generateMetadata as genMeta } from '@/lib/metadata';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
@@ -44,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notoSansKr.variable} font-sans antialiased`}>
+        {/* ✅ Google Analytics */}
+        <GoogleAnalytics />
+
         {/* ✅ Language Provider - 최상위에 배치 */}
         <LanguageProvider>
           {/* ✅ Auth Provider */}
