@@ -14,7 +14,8 @@
       "Bash(npm install:*)",
       "Bash(npm audit:*)",
       "Bash(start og-image-generator.html)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }

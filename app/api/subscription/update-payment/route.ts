@@ -4,6 +4,7 @@ import { verifyIdToken } from '@/lib/firebase/admin-utils';
 import { getAdminFirestore } from '@/lib/firebase/admin';
 import { getUpdatePaymentMethodUrl } from '@/lib/paddle-server';
 import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 /**
  * 결제 수단 변경 URL 생성
@@ -125,14 +126,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Update payment method error:', error);
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        message: '결제 수단 변경 중 오류가 발생했습니다.',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '결제 수단 변경 중 오류가 발생했습니다.',
+      error,
+      'Update payment method error'
     );
   }
 }
@@ -213,13 +210,10 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Get payment info error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to get payment info',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '결제 정보 조회 중 오류가 발생했습니다.',
+      error,
+      'Get payment info error'
     );
   }
 }

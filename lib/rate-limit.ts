@@ -1,5 +1,6 @@
 // lib/rate-limit.ts
 import { NextResponse } from 'next/server';
+import { getRedisClient } from '@/lib/redis';
 
 /**
  * Rate Limit 설정
@@ -25,10 +26,148 @@ interface RateLimitEntry {
 }
 
 /**
- * 메모리 기반 Rate Limit 저장소
- * 프로덕션에서는 Redis로 교체 권장
+ * Rate Limit 결과
  */
-class MemoryRateLimitStore {
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetTime: number;
+  blockedUntil?: number;
+}
+
+/**
+ * Rate Limit 저장소 인터페이스
+ */
+interface IRateLimitStore {
+  check(key: string, config: RateLimitConfig): Promise<RateLimitResult>;
+  reset(key: string): Promise<void>;
+  resetAll(): Promise<void>;
+  destroy(): void;
+}
+
+/**
+ * Redis 기반 Rate Limit 저장소
+ */
+class RedisRateLimitStore implements IRateLimitStore {
+  /**
+   * Rate limit 체크 및 업데이트
+   */
+  async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
+    const redis = getRedisClient();
+    if (!redis) {
+      throw new Error('Redis client not available');
+    }
+
+    const now = Date.now();
+    const rateLimitKey = `ratelimit:${key}`;
+    const blockKey = `ratelimit:block:${key}`;
+
+    // 1. 차단 중인지 확인
+    const blockedUntil = await redis.get<number>(blockKey);
+    if (blockedUntil && blockedUntil > now) {
+      const entry = await redis.get<RateLimitEntry>(rateLimitKey);
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: entry?.resetTime || now + config.windowMs,
+        blockedUntil,
+      };
+    }
+
+    // 2. 현재 카운트 조회
+    const entry = await redis.get<RateLimitEntry>(rateLimitKey);
+
+    // 3. 기존 항목이 없거나 윈도우가 만료된 경우
+    if (!entry || entry.resetTime <= now) {
+      const newEntry: RateLimitEntry = {
+        count: 1,
+        resetTime: now + config.windowMs,
+      };
+
+      // TTL을 윈도우 시간으로 설정 (자동 만료)
+      const ttlSeconds = Math.ceil(config.windowMs / 1000);
+      await redis.set(rateLimitKey, newEntry, { ex: ttlSeconds });
+
+      return {
+        allowed: true,
+        remaining: config.max - 1,
+        resetTime: newEntry.resetTime,
+      };
+    }
+
+    // 4. 제한 초과 확인
+    if (entry.count >= config.max) {
+      // 차단 시간 설정
+      if (config.blockDurationMs) {
+        const blockedUntilTime = now + config.blockDurationMs;
+        const blockTtlSeconds = Math.ceil(config.blockDurationMs / 1000);
+        await redis.set(blockKey, blockedUntilTime, { ex: blockTtlSeconds });
+
+        return {
+          allowed: false,
+          remaining: 0,
+          resetTime: entry.resetTime,
+          blockedUntil: blockedUntilTime,
+        };
+      }
+
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: entry.resetTime,
+      };
+    }
+
+    // 5. 카운트 증가
+    entry.count++;
+    const ttlSeconds = Math.ceil((entry.resetTime - now) / 1000);
+    await redis.set(rateLimitKey, entry, { ex: ttlSeconds });
+
+    return {
+      allowed: true,
+      remaining: config.max - entry.count,
+      resetTime: entry.resetTime,
+    };
+  }
+
+  /**
+   * 특정 키 초기화
+   */
+  async reset(key: string): Promise<void> {
+    const redis = getRedisClient();
+    if (!redis) {
+      throw new Error('Redis client not available');
+    }
+
+    await redis.del(`ratelimit:${key}`, `ratelimit:block:${key}`);
+  }
+
+  /**
+   * 전체 초기화 (개발/테스트용)
+   */
+  async resetAll(): Promise<void> {
+    const redis = getRedisClient();
+    if (!redis) {
+      throw new Error('Redis client not available');
+    }
+
+    // Upstash Redis는 KEYS 명령어를 지원하지 않으므로
+    // 개별 키를 추적하거나 패턴 스캔을 사용해야 함
+    console.warn('RedisRateLimitStore.resetAll() is not fully implemented for Upstash Redis');
+  }
+
+  /**
+   * 정리 작업 (Redis는 TTL로 자동 정리되므로 불필요)
+   */
+  destroy(): void {
+    // Redis는 TTL로 자동 만료되므로 별도 정리 불필요
+  }
+}
+
+/**
+ * 메모리 기반 Rate Limit 저장소 (Fallback)
+ */
+class MemoryRateLimitStore implements IRateLimitStore {
   private store: Map<string, RateLimitEntry> = new Map();
   private cleanupInterval: NodeJS.Timeout;
 
@@ -42,12 +181,7 @@ class MemoryRateLimitStore {
   /**
    * Rate limit 체크 및 업데이트
    */
-  async check(key: string, config: RateLimitConfig): Promise<{
-    allowed: boolean;
-    remaining: number;
-    resetTime: number;
-    blockedUntil?: number;
-  }> {
+  async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
     const now = Date.now();
     const entry = this.store.get(key);
 
@@ -118,16 +252,16 @@ class MemoryRateLimitStore {
   }
 
   /**
-   * 특정 키 초기화 (테스트용)
+   * 특정 키 초기화
    */
-  reset(key: string): void {
+  async reset(key: string): Promise<void> {
     this.store.delete(key);
   }
 
   /**
-   * 전체 초기화 (테스트용)
+   * 전체 초기화
    */
-  resetAll(): void {
+  async resetAll(): Promise<void> {
     this.store.clear();
   }
 
@@ -139,8 +273,25 @@ class MemoryRateLimitStore {
   }
 }
 
-// 싱글톤 인스턴스
-const rateLimitStore = new MemoryRateLimitStore();
+/**
+ * Rate Limit 저장소 가져오기 (싱글톤)
+ * Redis가 설정되어 있으면 Redis 사용, 아니면 메모리 사용
+ */
+let rateLimitStore: IRateLimitStore | null = null;
+
+function getRateLimitStore(): IRateLimitStore {
+  if (!rateLimitStore) {
+    const redis = getRedisClient();
+    if (redis) {
+      console.log('Using Redis for rate limiting');
+      rateLimitStore = new RedisRateLimitStore();
+    } else {
+      console.log('Using in-memory store for rate limiting (Redis not configured)');
+      rateLimitStore = new MemoryRateLimitStore();
+    }
+  }
+  return rateLimitStore;
+}
 
 /**
  * Rate Limit 체크
@@ -152,13 +303,9 @@ const rateLimitStore = new MemoryRateLimitStore();
 export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
-): Promise<{
-  allowed: boolean;
-  remaining: number;
-  resetTime: number;
-  blockedUntil?: number;
-}> {
-  return rateLimitStore.check(identifier, config);
+): Promise<RateLimitResult> {
+  const store = getRateLimitStore();
+  return store.check(identifier, config);
 }
 
 /**
@@ -249,7 +396,7 @@ export const RATE_LIMITS = {
 
   /** 구독 조작 (취소, 재개 등) - 보통 */
   SUBSCRIPTION_MUTATE: {
-    max: 10,
+    max: 3, // ✅ 보안 강화: 10 → 3으로 축소 (민감한 작업)
     windowMs: 60 * 1000, // 1분
     blockDurationMs: 5 * 60 * 1000, // 5분 차단
     message: '요청이 너무 많습니다. 5분 후 다시 시도해주세요.',
@@ -267,7 +414,17 @@ export const RATE_LIMITS = {
  * 테스트용 함수 (개발 환경에서만 사용)
  */
 export const __testOnly = {
-  reset: (identifier: string) => rateLimitStore.reset(identifier),
-  resetAll: () => rateLimitStore.resetAll(),
-  destroy: () => rateLimitStore.destroy(),
+  reset: async (identifier: string) => {
+    const store = getRateLimitStore();
+    return store.reset(identifier);
+  },
+  resetAll: async () => {
+    const store = getRateLimitStore();
+    return store.resetAll();
+  },
+  destroy: () => {
+    const store = getRateLimitStore();
+    return store.destroy();
+  },
+  getStore: () => getRateLimitStore(),
 };

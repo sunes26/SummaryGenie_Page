@@ -268,3 +268,50 @@ export function rateLimitErrorResponse(message: string = '요청이 너무 많�
     message
   );
 }
+
+/**
+ * ✅ 안전한 에러 로깅 및 상세 정보 추출
+ *
+ * 개발 환경에서는 전체 에러 스택을 반환하지만,
+ * 프로덕션 환경에서는 민감한 정보를 숨깁니다.
+ *
+ * @param error - 발생한 에러
+ * @param context - 에러 컨텍스트 (로깅용)
+ * @returns 안전한 에러 상세 정보 (개발 환경에서만)
+ */
+export function logAndGetErrorDetails(error: unknown, context: string): string | undefined {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // 콘솔에 에러 로깅 (항상)
+  console.error(`[${context}]`, error);
+
+  // 개발 환경에서만 에러 상세 정보 반환
+  if (isDevelopment) {
+    if (error instanceof Error) {
+      return error.stack || error.message;
+    }
+    return String(error);
+  }
+
+  // 프로덕션 환경에서는 상세 정보 숨김
+  return undefined;
+}
+
+/**
+ * ✅ 안전한 서버 에러 응답 (500)
+ *
+ * 개발 환경: 전체 에러 스택 포함
+ * 프로덕션 환경: 에러 상세 정보 숨김
+ *
+ * @param message - 사용자에게 표시할 메시지
+ * @param error - 실제 발생한 에러
+ * @param context - 에러 발생 컨텍스트
+ */
+export function safeInternalServerErrorResponse(
+  message: string,
+  error: unknown,
+  context: string
+) {
+  const errorDetails = logAndGetErrorDetails(error, context);
+  return internalServerErrorResponse(message, errorDetails);
+}

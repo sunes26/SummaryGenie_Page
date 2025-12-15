@@ -1,6 +1,7 @@
 // lib/validation.ts
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
+import { validationErrorResponse } from '@/lib/api-response';
 
 /**
  * Zod 검증 에러를 사용자 친화적인 에러 메시지로 변환
@@ -120,4 +121,38 @@ export function validateQueryParams<T>(
       ),
     };
   }
+}
+
+/**
+ * userId 파라미터 검증
+ *
+ * 검증 규칙:
+ * - 필수값이어야 함
+ * - 문자열 타입
+ * - 1~128자 사이
+ * - Firebase UID 형식 (영숫자, 하이픈, 언더스코어만 허용)
+ */
+export function validateUserId(userId: unknown): NextResponse | null {
+  // 타입 체크
+  if (typeof userId !== 'string') {
+    return validationErrorResponse('userId는 문자열이어야 합니다.');
+  }
+
+  // 빈 문자열 체크
+  if (!userId || userId.trim().length === 0) {
+    return validationErrorResponse('userId는 필수입니다.');
+  }
+
+  // 길이 체크
+  if (userId.length > 128) {
+    return validationErrorResponse('userId는 128자를 초과할 수 없습니다.');
+  }
+
+  // Firebase UID 형식 검증 (영숫자, 하이픈, 언더스코어만)
+  const uidPattern = /^[a-zA-Z0-9_-]+$/;
+  if (!uidPattern.test(userId)) {
+    return validationErrorResponse('userId 형식이 올바르지 않습니다.');
+  }
+
+  return null; // 검증 통과
 }

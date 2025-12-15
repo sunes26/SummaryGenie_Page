@@ -7,6 +7,7 @@ import { cancelPaddleSubscription } from '@/lib/paddle-server';
 import { Timestamp } from 'firebase-admin/firestore';
 import { cancelSubscriptionSchema } from '@/lib/validation';
 import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { requireCSRFToken } from '@/lib/csrf';
 import {
   successResponse,
   unauthorizedResponse,
@@ -15,6 +16,7 @@ import {
   validationErrorResponse,
   internalServerErrorResponse,
   businessLogicErrorResponse,
+  safeInternalServerErrorResponse,
 } from '@/lib/api-response';
 
 /**
@@ -53,6 +55,12 @@ export async function POST(request: NextRequest) {
     const rateLimitResponse = await applyRateLimit(identifier, RATE_LIMITS.SUBSCRIPTION_MUTATE);
     if (rateLimitResponse) {
       return rateLimitResponse;
+    }
+
+    // CSRF 보호
+    const csrfResponse = await requireCSRFToken(request);
+    if (csrfResponse) {
+      return csrfResponse;
     }
 
     // 2. 요청 본문 검증 (본문이 없으면 기본값 사용)
@@ -235,10 +243,10 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Subscription cancellation error:', error);
-    return internalServerErrorResponse(
+    return safeInternalServerErrorResponse(
       '구독 취소 중 오류가 발생했습니다.',
-      error instanceof Error ? error.message : 'Unknown error'
+      error,
+      'Subscription cancellation error'
     );
   }
 }
@@ -324,10 +332,10 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Check cancellation error:', error);
-    return internalServerErrorResponse(
+    return safeInternalServerErrorResponse(
       '취소 상태 확인 중 오류가 발생했습니다.',
-      error instanceof Error ? error.message : 'Unknown error'
+      error,
+      'Check cancellation error'
     );
   }
 }

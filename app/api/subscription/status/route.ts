@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyIdToken } from '@/lib/firebase/admin-utils';
 import { getAdminFirestore } from '@/lib/firebase/admin';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 /**
  * 구독 상태 조회
@@ -93,13 +94,10 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Subscription status error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to get subscription status',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '구독 상태 조회 중 오류가 발생했습니다.',
+      error,
+      'Subscription status error'
     );
   }
 }

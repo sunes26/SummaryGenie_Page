@@ -5,6 +5,7 @@ import { getPaddleSubscription } from '@/lib/paddle-server';
 import { Timestamp } from 'firebase-admin/firestore';
 import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import { tryClaimIdempotencyKey, getIdempotencyResult, storeIdempotencyResult } from '@/lib/idempotency';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 /**
  * 구독 정보 수동 동기화 API
@@ -50,12 +51,35 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ Security: Idempotency check (prevent duplicate sync requests within 2 minutes)
-    const idempotencyKey = `sync_${userId}_${Math.floor(Date.now() / (2 * 60 * 1000))}`;
-    const canProceed = await tryClaimIdempotencyKey(idempotencyKey, userId, 'subscription.sync', 2);
+    // Fix race condition: check both current and previous time buckets
+    const now = Date.now();
+    const bucketSize = 2 * 60 * 1000; // 2 minutes
+    const currentBucket = Math.floor(now / bucketSize);
+    const currentIdempotencyKey = `sync_${userId}_${currentBucket}`;
+
+    // Also check the previous bucket to prevent race conditions at bucket boundaries
+    const timeSinceCurrentBucketStart = now % bucketSize;
+    const gracePeriod = 30 * 1000; // 30 seconds
+    let previousBucketKey: string | null = null;
+
+    if (timeSinceCurrentBucketStart < gracePeriod) {
+      // We're near the start of a bucket, also check the previous bucket
+      const previousBucket = currentBucket - 1;
+      previousBucketKey = `sync_${userId}_${previousBucket}`;
+
+      // Check if previous bucket was recently used
+      const previousResult = await getIdempotencyResult(previousBucketKey);
+      if (previousResult) {
+        return NextResponse.json(previousResult);
+      }
+    }
+
+    // Try to claim the current bucket
+    const canProceed = await tryClaimIdempotencyKey(currentIdempotencyKey, userId, 'subscription.sync', 2);
 
     if (!canProceed) {
       // Check if we have a cached result
-      const cachedResult = await getIdempotencyResult(idempotencyKey);
+      const cachedResult = await getIdempotencyResult(currentIdempotencyKey);
       if (cachedResult) {
         return NextResponse.json(cachedResult);
       }
@@ -70,6 +94,8 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
+
+    const idempotencyKey = currentIdempotencyKey;
 
     // 2. Firestore에서 사용자의 구독 찾기
     const db = getAdminFirestore();
@@ -223,14 +249,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('Subscription sync error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: '구독 동기화에 실패했습니다.',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '구독 동기화에 실패했습니다.',
+      error,
+      'Subscription sync error'
     );
   }
 }

@@ -196,7 +196,7 @@ export function verifyWebhookSignature(
       return false;
     }
 
-    // ✅ Security: Enhanced timestamp validation
+    // ✅ Security: Strict timestamp validation (5-minute window)
     const now = Math.floor(Date.now() / 1000);
     const timestampNum = parseInt(timestamp, 10);
 
@@ -206,24 +206,12 @@ export function verifyWebhookSignature(
       return false;
     }
 
-    // Validate timestamp is not too far in the past (max 1 hour old)
-    const MAX_AGE_SECONDS = 60 * 60; // 1 hour
-    if (timestampNum < now - MAX_AGE_SECONDS) {
-      console.error(`Timestamp too old: ${now - timestampNum} seconds (max: ${MAX_AGE_SECONDS})`);
-      return false;
-    }
-
-    // Validate timestamp is not in the future (allow 5 min clock skew tolerance)
-    const MAX_FUTURE_TOLERANCE = 5 * 60; // 5 minutes
-    if (timestampNum > now + MAX_FUTURE_TOLERANCE) {
-      console.error(`Timestamp too far in future: ${timestampNum - now} seconds ahead`);
-      return false;
-    }
-
-    // Final check: timestamp within acceptable window (5 minutes for normal operation)
+    // Validate timestamp within 5-minute window (past or future)
+    // This prevents replay attacks and rejects webhooks with clock skew > 5 minutes
+    const TOLERANCE_SECONDS = 5 * 60; // 5 minutes
     const timeDiff = Math.abs(now - timestampNum);
-    if (timeDiff > 300) {
-      console.error(`Timestamp outside acceptable window: ${timeDiff} seconds`);
+    if (timeDiff > TOLERANCE_SECONDS) {
+      console.error(`Timestamp outside acceptable window: ${timeDiff} seconds (max: ${TOLERANCE_SECONDS})`);
       return false;
     }
 

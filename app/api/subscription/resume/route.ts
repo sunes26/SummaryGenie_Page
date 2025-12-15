@@ -18,6 +18,7 @@ import {
   internalServerErrorResponse,
   businessLogicErrorResponse,
   rateLimitErrorResponse,
+  safeInternalServerErrorResponse,
 } from '@/lib/api-response';
 import { logSubscriptionResumed } from '@/lib/audit';
 
@@ -62,12 +63,34 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ Security: Idempotency check (prevent duplicate resume requests within 5 minutes)
-    const idempotencyKey = `resume_${userId}_${Math.floor(Date.now() / (5 * 60 * 1000))}`;
-    const canProceed = await tryClaimIdempotencyKey(idempotencyKey, userId, 'subscription.resume', 5);
+    // Fix race condition: check both current and previous time buckets
+    const now = Date.now();
+    const bucketSize = 5 * 60 * 1000; // 5 minutes
+    const currentBucket = Math.floor(now / bucketSize);
+    const currentIdempotencyKey = `resume_${userId}_${currentBucket}`;
+
+    // Also check the previous bucket to prevent race conditions at bucket boundaries
+    const timeSinceCurrentBucketStart = now % bucketSize;
+    const gracePeriod = 30 * 1000; // 30 seconds
+
+    if (timeSinceCurrentBucketStart < gracePeriod) {
+      // We're near the start of a bucket, also check the previous bucket
+      const previousBucket = currentBucket - 1;
+      const previousBucketKey = `resume_${userId}_${previousBucket}`;
+
+      // Check if previous bucket was recently used
+      const previousResult = await getIdempotencyResult(previousBucketKey);
+      if (previousResult) {
+        return Response.json(previousResult);
+      }
+    }
+
+    // Try to claim the current bucket
+    const canProceed = await tryClaimIdempotencyKey(currentIdempotencyKey, userId, 'subscription.resume', 5);
 
     if (!canProceed) {
       // Check if we have a cached result
-      const cachedResult = await getIdempotencyResult(idempotencyKey);
+      const cachedResult = await getIdempotencyResult(currentIdempotencyKey);
       if (cachedResult) {
         return Response.json(cachedResult);
       }
@@ -75,6 +98,8 @@ export async function POST(request: NextRequest) {
       // No cached result, but this is a duplicate - return appropriate message
       return rateLimitErrorResponse('구독 재개 요청이 이미 처리되었습니다. 잠시 후 다시 시도해주세요.');
     }
+
+    const idempotencyKey = currentIdempotencyKey;
 
     // 2. Firestore에서 구독 정보 조회
     const db = getAdminFirestore();
@@ -138,10 +163,10 @@ export async function POST(request: NextRequest) {
         updatedSubscription = await getPaddleSubscription(paddleSubscriptionId);
       }
     } catch (error) {
-      console.error('Paddle API error:', error);
-      return internalServerErrorResponse(
+      return safeInternalServerErrorResponse(
         'Paddle 구독 재개에 실패했습니다.',
-        error instanceof Error ? error.message : 'Unknown error'
+        error,
+        'Paddle API error'
       );
     }
 
@@ -194,10 +219,10 @@ export async function POST(request: NextRequest) {
     return successResponse(responseData, message);
 
   } catch (error) {
-    console.error('Subscription resume error:', error);
-    return internalServerErrorResponse(
+    return safeInternalServerErrorResponse(
       '구독 재개 중 오류가 발생했습니다.',
-      error instanceof Error ? error.message : 'Unknown error'
+      error,
+      'Subscription resume error'
     );
   }
 }

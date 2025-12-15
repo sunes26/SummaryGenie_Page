@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebase/admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { getPaddleSubscription } from '@/lib/paddle-server';
-import { verifyWebhookSignature, logWebhookFailure } from '@/lib/paddle-webhook';
+import { verifyWebhookSignature, logWebhookFailure, logWebhookEvent } from '@/lib/paddle-webhook';
 import {
   logSubscriptionCreated,
   logSubscriptionUpdated,
@@ -15,6 +15,7 @@ import {
   logPlanUpgraded,
   logPlanDowngraded,
 } from '@/lib/audit';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 type PaddleEventType =
   | 'subscription.created'
@@ -336,7 +337,9 @@ async function handleSubscriptionCreated(data: unknown): Promise<void> {
     throw new Error('Invalid userId: user not found');
   }
 
-  // 1. subscription 컬렉션에 저장
+  // ✅ Transaction: Atomically create subscription and update user profile
+  // This ensures data consistency - either both succeed or both fail
+  const now = Timestamp.now();
   const subscriptionData = {
     userId,
     paddleSubscriptionId: data.id,
@@ -351,16 +354,23 @@ async function handleSubscriptionCreated(data: unknown): Promise<void> {
     price: data.items[0]?.price?.unit_price?.amount || 0,
     currency: data.items[0]?.price?.unit_price?.currency_code || 'KRW',
     priceId: data.items[0]?.price?.id || '',
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: now,
+    updatedAt: now,
   };
 
-  await db.collection('subscription').add(subscriptionData);
+  await db.runTransaction(async (transaction) => {
+    const userRef = db.collection('users').doc(userId);
+    const subscriptionRef = db.collection('subscription').doc(); // Generate ID
 
-  // 2. ✅ users 컬렉션 업데이트
-  await updateUserProfile(userId, {
-    isPremium: true,
-    subscriptionPlan: 'pro',
+    // 1. Create subscription
+    transaction.set(subscriptionRef, subscriptionData);
+
+    // 2. Update user profile atomically
+    transaction.update(userRef, {
+      isPremium: true,
+      subscriptionPlan: 'pro',
+      updatedAt: now,
+    });
   });
 
   // 3. ✅ daily 컬렉션 업데이트 (서브컬렉션)
@@ -529,23 +539,32 @@ async function handleSubscriptionCanceled(data: unknown): Promise<void> {
   const subscriptionDoc = subscriptionsSnapshot.docs[0];
   const subscriptionData = subscriptionDoc.data();
   const userId = subscriptionData.userId;
+  const now = Timestamp.now();
+  const immediatelyCanceled = data.scheduled_change?.action !== 'cancel';
 
-  // 1. subscription 컬렉션 업데이트
-  const updateData: Record<string, unknown> = {
-    status: 'canceled',
-    cancelAtPeriodEnd: true,
-    canceledAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  };
-
-  await subscriptionDoc.ref.update(updateData);
-
-  // 2. ✅ 즉시 취소인 경우 users 업데이트
-  if (data.scheduled_change?.action !== 'cancel') {
-    await updateUserProfile(userId, {
-      isPremium: false,
-      subscriptionPlan: 'free',
+  // ✅ Transaction: Atomically update subscription and user profile
+  await db.runTransaction(async (transaction) => {
+    // 1. Update subscription
+    transaction.update(subscriptionDoc.ref, {
+      status: 'canceled',
+      cancelAtPeriodEnd: true,
+      canceledAt: now,
+      updatedAt: now,
     });
+
+    // 2. Update user profile if immediately canceled
+    if (immediatelyCanceled) {
+      const userRef = db.collection('users').doc(userId);
+      transaction.update(userRef, {
+        isPremium: false,
+        subscriptionPlan: 'free',
+        updatedAt: now,
+      });
+    }
+  });
+
+  // 3. Update daily stats (eventually consistent)
+  if (immediatelyCanceled) {
     await updateDailyPremiumStatus(userId, false);
   }
 
@@ -657,20 +676,28 @@ async function handleSubscriptionResumed(data: unknown): Promise<void> {
 
   const subscriptionDoc = subscriptionsSnapshot.docs[0];
   const userId = subscriptionDoc.data().userId;
+  const now = Timestamp.now();
 
-  await subscriptionDoc.ref.update({
-    status: 'active',
-    cancelAtPeriodEnd: false,
-    canceledAt: null,
-    updatedAt: Timestamp.now(),
+  // ✅ Transaction: Atomically resume subscription and update user profile
+  await db.runTransaction(async (transaction) => {
+    // 1. Update subscription
+    transaction.update(subscriptionDoc.ref, {
+      status: 'active',
+      cancelAtPeriodEnd: false,
+      canceledAt: null,
+      updatedAt: now,
+    });
+
+    // 2. Update user profile
+    const userRef = db.collection('users').doc(userId);
+    transaction.update(userRef, {
+      isPremium: true,
+      subscriptionPlan: 'pro',
+      updatedAt: now,
+    });
   });
 
-  // ✅ users 업데이트
-  await updateUserProfile(userId, {
-    isPremium: true,
-    subscriptionPlan: 'pro',
-  });
-
+  // 3. Update daily stats (eventually consistent)
   await updateDailyPremiumStatus(userId, true);
 
   // ✅ Phase 3-1: Audit logging for subscription resumption
@@ -798,12 +825,12 @@ async function handleTransactionCompleted(data: unknown): Promise<void> {
         paddleSubscriptionId: data.subscription_id,
         verifiedAt: Timestamp.now(),
         verificationResult: 'error',
-        message: `Failed to sync subscription: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Failed to sync subscription: ${error instanceof Error ? error.message : String(error)}`,
         severity: 'high',
         error: error instanceof Error ? {
           message: error.message,
           stack: error.stack,
-        } : { message: 'Unknown error' },
+        } : { message: String(error) },
       };
 
       await db.collection('payment_verifications').add(verificationData);
@@ -1040,7 +1067,10 @@ export async function POST(request: NextRequest) {
           break;
       }
 
-      // ✅ 이미 tryMarkEventAsProcessed에서 저장됨 - markEventAsProcessed 호출 불필요
+      // ✅ 성공 로그 기록
+      await logWebhookEvent(payload, 'success').catch(logErr => {
+        console.error('Failed to log webhook success:', logErr);
+      });
 
       return NextResponse.json({
         success: true,
@@ -1052,14 +1082,44 @@ export async function POST(request: NextRequest) {
     } catch (processingError) {
       console.error('Error processing webhook:', processingError);
 
-      // ✅ 웹훅 실패 영구 로깅
+      // ✅ 웹훅 실패 로깅 (webhook_logs 및 webhook_failures)
       if (processingError instanceof Error) {
+        // 일반 로그에도 기록
+        await logWebhookEvent(payload, 'failed', processingError).catch(logErr => {
+          console.error('Failed to log webhook event:', logErr);
+        });
+
+        // 실패 전용 로그에도 기록
         await logWebhookFailure(payload, processingError, {
           attemptedHandler: event_type,
           timestamp: new Date().toISOString(),
         }).catch(logErr => {
           console.error('Failed to log webhook failure:', logErr);
         });
+      }
+
+      // ✅ 재시도 큐에 추가 (자동 복구를 위해)
+      try {
+        const db = getAdminFirestore();
+        await db.collection('webhook_retry_queue').add({
+          eventId: event_id,
+          eventType: event_type,
+          payload: payload,
+          signature: signatureHeader,
+          error: processingError instanceof Error ? {
+            message: processingError.message,
+            stack: processingError.stack,
+          } : { message: String(processingError) },
+          retryCount: 0,
+          maxRetries: 5,
+          nextRetryAt: Timestamp.fromDate(new Date(Date.now() + 60000)), // 1분 후 재시도
+          status: 'pending',
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          expiresAt: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)), // ✅ TTL: 7일 후 만료
+        });
+      } catch (queueError) {
+        console.error('Failed to add webhook to retry queue:', queueError);
       }
 
       return NextResponse.json(
@@ -1072,13 +1132,10 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Webhook handler error:', error);
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '웹훅 처리 중 오류가 발생했습니다.',
+      error,
+      'Webhook handler error'
     );
   }
 }

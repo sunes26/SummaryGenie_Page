@@ -32,6 +32,12 @@ export type AuditEventType =
   // 관리자 작업
   | 'admin.subscription_modified'
   | 'admin.refund_issued'
+  | 'admin.user_viewed'
+  | 'admin.data_exported'
+  | 'admin.email_sent'
+  | 'admin.settings_changed'
+  | 'admin.login'
+  | 'admin.page_accessed'
   // 시스템 이벤트
   | 'system.webhook_received'
   | 'system.webhook_failed'
@@ -460,6 +466,176 @@ export async function getAuditStats(
     bySeverity,
     recentCritical,
   };
+}
+
+/**
+ * ✅ 관리자 로그인 로그
+ */
+export async function logAdminLogin(
+  adminId: string,
+  adminEmail: string,
+  ip?: string,
+  userAgent?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.login',
+    severity: 'info',
+    userId: adminId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+      userAgent,
+    },
+    action: `Admin logged in: ${adminEmail}`,
+    details: {
+      email: adminEmail,
+      timestamp: new Date().toISOString(),
+    },
+  });
+}
+
+/**
+ * ✅ 관리자 페이지 접근 로그
+ */
+export async function logAdminPageAccess(
+  adminId: string,
+  adminEmail: string,
+  pagePath: string,
+  ip?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.page_accessed',
+    severity: 'info',
+    userId: adminId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+    },
+    action: `Admin accessed page: ${pagePath}`,
+    details: {
+      email: adminEmail,
+      page: pagePath,
+    },
+  });
+}
+
+/**
+ * ✅ 관리자 사용자 조회 로그
+ */
+export async function logAdminUserView(
+  adminId: string,
+  adminEmail: string,
+  targetUserId: string,
+  targetUserEmail: string,
+  ip?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.user_viewed',
+    severity: 'info',
+    userId: targetUserId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+    },
+    action: `Admin viewed user: ${targetUserEmail}`,
+    details: {
+      adminEmail,
+      targetUserId,
+      targetUserEmail,
+    },
+  });
+}
+
+/**
+ * ✅ 관리자 데이터 내보내기 로그
+ */
+export async function logAdminDataExport(
+  adminId: string,
+  adminEmail: string,
+  exportType: 'users' | 'subscriptions' | 'audit_logs',
+  recordCount: number,
+  filters?: Record<string, unknown>,
+  ip?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.data_exported',
+    severity: 'warning',
+    userId: adminId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+    },
+    action: `Admin exported ${exportType} data (${recordCount} records)`,
+    details: {
+      adminEmail,
+      exportType,
+      recordCount,
+      filters,
+      timestamp: new Date().toISOString(),
+    },
+  });
+}
+
+/**
+ * ✅ 관리자 이메일 전송 로그
+ */
+export async function logAdminEmailSent(
+  adminId: string,
+  adminEmail: string,
+  recipientEmail: string,
+  emailType: string,
+  ip?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.email_sent',
+    severity: 'info',
+    userId: adminId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+    },
+    action: `Admin sent ${emailType} email to ${recipientEmail}`,
+    details: {
+      adminEmail,
+      recipientEmail,
+      emailType,
+    },
+  });
+}
+
+/**
+ * ✅ 관리자 설정 변경 로그
+ */
+export async function logAdminSettingsChange(
+  adminId: string,
+  adminEmail: string,
+  settingType: string,
+  before: Record<string, unknown>,
+  after: Record<string, unknown>,
+  ip?: string
+): Promise<void> {
+  await createAuditLog({
+    eventType: 'admin.settings_changed',
+    severity: 'warning',
+    userId: adminId,
+    actor: {
+      type: 'admin',
+      id: adminId,
+      ip,
+    },
+    action: `Admin changed ${settingType} settings`,
+    details: {
+      adminEmail,
+      settingType,
+    },
+    before,
+    after,
+  });
 }
 
 /**

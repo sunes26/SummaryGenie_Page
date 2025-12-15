@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth } from '@/lib/firebase/admin';
 import { validateRequestBody, createSessionSchema } from '@/lib/validation';
 import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { requireCSRFToken, setCSRFToken } from '@/lib/csrf';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 /**
  * 세션 쿠키 생성
@@ -35,7 +37,10 @@ export async function POST(request: NextRequest) {
       expiresIn,
     });
 
-    // 4. NextResponse로 쿠키 설정
+    // 4. CSRF 토큰 생성
+    const csrfToken = await setCSRFToken();
+
+    // 5. NextResponse로 쿠키 설정
     const response = NextResponse.json(
       {
         success: true,
@@ -44,6 +49,7 @@ export async function POST(request: NextRequest) {
           uid: decodedToken.uid,
           email: decodedToken.email,
         },
+        csrfToken, // 클라이언트가 헤더에 사용할 수 있도록 반환
       },
       { status: 200 }
     );
@@ -61,13 +67,10 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Session creation error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to create session',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 401 }
+    return safeInternalServerErrorResponse(
+      '세션 생성 중 오류가 발생했습니다.',
+      error,
+      'Session creation error'
     );
   }
 }
@@ -115,8 +118,14 @@ export async function GET(request: NextRequest) {
  * 세션 쿠키 삭제 (로그아웃)
  * DELETE /api/auth/session
  */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
+    // CSRF 보호
+    const csrfResponse = await requireCSRFToken(request);
+    if (csrfResponse) {
+      return csrfResponse;
+    }
+
     // NextResponse로 쿠키 삭제
     const response = NextResponse.json({
       success: true,
@@ -136,13 +145,10 @@ export async function DELETE() {
 
     return response;
   } catch (error) {
-    console.error('Session deletion error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to delete session',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '세션 삭제 중 오류가 발생했습니다.',
+      error,
+      'Session deletion error'
     );
   }
 }

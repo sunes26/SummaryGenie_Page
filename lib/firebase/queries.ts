@@ -375,15 +375,53 @@ export async function softDeleteHistory(
 ): Promise<void> {
   return handleQuery(async () => {
     const db = getAdminFirestore();
-    
+    const now = Timestamp.now();
+
+    // Update history document
     await db
       .collection('users')
       .doc(userId)
       .collection('history')
       .doc(historyId)
       .update({
-        deletedAt: Timestamp.now(),
+        deletedAt: now,
       });
+
+    // Update user-level stats (denormalized fields)
+    const userRef = db.collection('users').doc(userId);
+
+    // Get current historyCount to check if it becomes 0
+    const userDoc = await userRef.get();
+    const currentCount = userDoc.data()?.historyCount || 0;
+
+    // Decrement count and update timestamp
+    const updateData: Record<string, unknown> = {
+      historyCount: currentCount > 0 ? currentCount - 1 : 0,
+      updatedAt: now,
+    };
+
+    // If count becomes 0, get the new most recent history item for lastActivity
+    if (currentCount <= 1) {
+      const recentHistory = await db
+        .collection('users')
+        .doc(userId)
+        .collection('history')
+        .where('deletedAt', '==', null)
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (recentHistory.empty) {
+        updateData.lastActivity = null;
+      } else {
+        const lastHistoryData = recentHistory.docs[0].data();
+        if (lastHistoryData.createdAt instanceof Timestamp) {
+          updateData.lastActivity = lastHistoryData.createdAt;
+        }
+      }
+    }
+
+    await userRef.update(updateData);
   }, 'Failed to soft delete history');
 }
 
@@ -398,7 +436,7 @@ export async function bulkSoftDeleteHistory(
   return handleQuery(async () => {
     const db = getAdminFirestore();
     const batch = db.batch();
-    const deletedAt = Timestamp.now();
+    const now = Timestamp.now();
 
     historyIds.forEach((id) => {
       const docRef = db
@@ -406,9 +444,46 @@ export async function bulkSoftDeleteHistory(
         .doc(userId)
         .collection('history')
         .doc(id);
-      batch.update(docRef, { deletedAt });
+      batch.update(docRef, { deletedAt: now });
     });
 
     await batch.commit();
+
+    // Update user-level stats (denormalized fields)
+    const userRef = db.collection('users').doc(userId);
+
+    // Get current historyCount
+    const userDoc = await userRef.get();
+    const currentCount = userDoc.data()?.historyCount || 0;
+    const newCount = Math.max(0, currentCount - historyIds.length);
+
+    // Decrement count by the number of deleted items
+    const updateData: Record<string, unknown> = {
+      historyCount: newCount,
+      updatedAt: now,
+    };
+
+    // If count becomes 0, get the new most recent history item for lastActivity
+    if (newCount === 0) {
+      const recentHistory = await db
+        .collection('users')
+        .doc(userId)
+        .collection('history')
+        .where('deletedAt', '==', null)
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (recentHistory.empty) {
+        updateData.lastActivity = null;
+      } else {
+        const lastHistoryData = recentHistory.docs[0].data();
+        if (lastHistoryData.createdAt instanceof Timestamp) {
+          updateData.lastActivity = lastHistoryData.createdAt;
+        }
+      }
+    }
+
+    await userRef.update(updateData);
   }, 'Failed to bulk soft delete history');
 }

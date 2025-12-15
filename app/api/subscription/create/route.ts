@@ -6,6 +6,8 @@ import { createPaddleTransaction } from '@/lib/paddle-server';
 import { PADDLE_PRICES } from '@/lib/paddle';
 import { validateRequestBody, createSubscriptionSchema } from '@/lib/validation';
 import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { requireCSRFToken } from '@/lib/csrf';
+import { safeInternalServerErrorResponse } from '@/lib/api-response';
 
 /**
  * Pro 플랜 구독 생성
@@ -50,6 +52,12 @@ export async function POST(request: NextRequest) {
     const rateLimitResponse = await applyRateLimit(identifier, RATE_LIMITS.SUBSCRIPTION_CREATE);
     if (rateLimitResponse) {
       return rateLimitResponse;
+    }
+
+    // CSRF 보호
+    const csrfResponse = await requireCSRFToken(request);
+    if (csrfResponse) {
+      return csrfResponse;
     }
 
     // 2. 요청 본문 검증
@@ -152,14 +160,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Subscription creation error:', error);
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        message: '구독 생성 중 오류가 발생했습니다.',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+    return safeInternalServerErrorResponse(
+      '구독 생성 중 오류가 발생했습니다.',
+      error,
+      'Subscription creation error'
     );
   }
 }
@@ -184,24 +188,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Firebase 인증 확인 (실제로는 토큰 검증 필요)
+    // ✅ Security: Firebase 인증 필수 (IDOR 취약점 수정)
     const authHeader = request.headers.get('authorization');
-    if (authHeader) {
-      const token = authHeader.split('Bearer ')[1];
-      try {
-        const decodedToken = await verifyIdToken(token);
-        if (decodedToken.uid !== userId) {
-          return NextResponse.json(
-            { error: 'Unauthorized' },
-            { status: 403 }
-          );
-        }
-      } catch {
-        return NextResponse.json(
-          { error: 'Invalid token' },
-          { status: 401 }
-        );
-      }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authorization header required' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+    let decodedToken;
+    try {
+      decodedToken = await verifyIdToken(token);
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // ✅ Security: 소유권 검증 - 본인의 구독 정보만 조회 가능
+    if (decodedToken.uid !== userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized: You can only access your own subscription' },
+        { status: 403 }
+      );
     }
 
     // 구독 상태 조회

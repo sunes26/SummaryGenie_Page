@@ -26,8 +26,20 @@ export default function DashboardPage() {
 
   const { history, loading: historyLoading } = useHistory(userId, { pageSize: 5 });
   const { count: totalCount, loading: countLoading } = useHistoryCount(userId);
-  const { total: monthlyTotal, loading: monthlyLoading } = useMonthlyUsage(userId);
-  const { dailyStats, weeklyTotal, loading: statsLoading } = useRecentUsage(userId, 7);
+  const { total: monthlyTotal, loading: monthlyLoading, error: monthlyError, dailyStats: monthlyStats } = useMonthlyUsage(userId);
+  const { dailyStats, weeklyTotal, loading: statsLoading, error: statsError } = useRecentUsage(userId, 7);
+
+  // ✅ 디버깅: 콘솔에 데이터 출력
+  if (userId) {
+    console.log('🔍 Dashboard Debug Info:');
+    console.log('📧 User ID:', userId);
+    console.log('📅 Monthly Stats:', monthlyStats);
+    console.log('📊 Daily Stats (7 days):', dailyStats);
+    console.log('📈 Monthly Total:', monthlyTotal);
+    console.log('📈 Weekly Total:', weeklyTotal);
+    console.log('❌ Monthly Error:', monthlyError);
+    console.log('❌ Stats Error:', statsError);
+  }
 
   // ✅ 모든 데이터가 로드될 때까지만 로딩 표시
   const isLoading = authLoading || historyLoading || countLoading || monthlyLoading || statsLoading;
@@ -69,6 +81,28 @@ export default function DashboardPage() {
           {t('dashboard.home.greeting', { name: user.displayName || t('common.name') })}
         </p>
       </div>
+
+      {/* ✅ 디버깅 패널 (개발 환경에서만) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+          <h3 className="font-bold text-yellow-900 mb-2">🔧 디버깅 정보</h3>
+          <div className="text-xs font-mono text-yellow-800 space-y-1">
+            <p>User ID: {userId}</p>
+            <p>Monthly Total: {monthlyTotal} (Loading: {monthlyLoading ? 'Yes' : 'No'})</p>
+            <p>Weekly Total: {weeklyTotal} (Loading: {statsLoading ? 'Yes' : 'No'})</p>
+            <p>Monthly Stats Count: {monthlyStats?.length || 0}</p>
+            <p>Daily Stats Count: {dailyStats?.length || 0}</p>
+            {monthlyError && <p className="text-red-600">Monthly Error: {monthlyError.message}</p>}
+            {statsError && <p className="text-red-600">Stats Error: {statsError.message}</p>}
+            <details className="mt-2">
+              <summary className="cursor-pointer font-semibold">Raw Data</summary>
+              <pre className="mt-2 bg-yellow-100 p-2 rounded overflow-x-auto">
+                {JSON.stringify({ monthlyStats, dailyStats }, null, 2)}
+              </pre>
+            </details>
+          </div>
+        </div>
+      )}
 
       {/* ✅ 사용량 경고 배너 (무료 사용자만) */}
       {!isPremium && !isLoading && (
