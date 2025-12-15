@@ -12,7 +12,8 @@
       "Bash(xargs:*)",
       "WebSearch",
       "Bash(npm install:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(start og-image-generator.html)"
     ]
   }
 }
