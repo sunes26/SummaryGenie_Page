@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from '@sentry/nextjs';
 
 // ✅ Validate environment variables at build time
 import './lib/env';
@@ -60,6 +61,9 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+
+    // ✅ Sentry instrumentation 활성화
+    instrumentationHook: true,
   },
 
   /* ========================================
@@ -211,4 +215,17 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 };
 
-export default nextConfig;
+// ✅ Sentry 통합
+export default withSentryConfig(nextConfig, {
+  // Sentry Webpack Plugin 옵션
+  silent: true, // 빌드 로그 억제
+
+  // 소스맵 업로드 설정 (선택사항)
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+
+  // Sentry organization과 project는 환경 변수로 설정 가능
+  // org: process.env.SENTRY_ORG,
+  // project: process.env.SENTRY_PROJECT,
+});

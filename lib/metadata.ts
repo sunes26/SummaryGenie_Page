@@ -238,7 +238,7 @@ export function getOrganizationSchema(locale: Locale = 'ko') {
     '@type': 'Organization',
     name: 'gena',
     url: baseUrl,
-    logo: `${baseUrl}/logo.png`,
+    logo: `${baseUrl}/images/logo.png`,
     description,
     contactPoint: {
       '@type': 'ContactPoint',

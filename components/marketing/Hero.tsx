@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Chrome, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -80,13 +81,15 @@ export default function Hero() {
             <div className="relative max-w-5xl mx-auto">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl" />
               <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-200 dark:border-slate-700">
-                <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 rounded-lg flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <Chrome className="w-16 h-16 mx-auto text-slate-400" />
-                    <p className="text-slate-500 dark:text-slate-400">
-                      Chrome Extension Demo
-                    </p>
-                  </div>
+                <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 rounded-lg overflow-hidden">
+                  <Image
+                    src="/images/sample.png"
+                    alt="Gena Chrome Extension Demo"
+                    width={1920}
+                    height={1080}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
                 </div>
               </div>
             </div>

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebase/admin';
 import { Timestamp } from 'firebase-admin/firestore';
+import { notifyWebhookFailure } from '@/lib/notifications';
 
 /**
  * Webhook 재시도 Cron Job
@@ -104,6 +105,16 @@ export async function GET(request: NextRequest) {
           });
           maxRetriesCount++;
           console.log(`  ⛔ Max retries reached for ${retryData.eventId}`);
+
+          // ✅ Critical: Slack/Discord 알림 전송
+          await notifyWebhookFailure(
+            retryData.eventId,
+            retryData.eventType,
+            newRetryCount,
+            error instanceof Error ? error : new Error(String(error))
+          ).catch(notifyErr => {
+            console.error('Failed to send webhook failure notification:', notifyErr);
+          });
         } else {
           // Exponential backoff: 1분 -> 5분 -> 15분 -> 30분 -> 60분
           const backoffMinutes = [1, 5, 15, 30, 60];
@@ -156,29 +167,27 @@ export async function GET(request: NextRequest) {
 /**
  * 웹훅 재처리 함수
  *
- * NOTE: 이 함수는 실제로 webhook/paddle/route.ts의 processWebhookEvent 로직을
- * 재사용해야 합니다. 여기서는 간단한 예시만 제공합니다.
- *
- * 실제 구현 시:
- * 1. webhook/paddle/route.ts에서 processWebhookEvent를 별도 모듈로 분리
- * 2. 여기서 해당 함수를 import하여 사용
- * 3. 서명 검증은 선택사항 (이미 한 번 검증된 웹훅이므로)
+ * webhook/paddle/route.ts의 processWebhookEvent를 재사용합니다.
+ * 서명 검증은 생략 (이미 한 번 검증된 웹훅이므로)
  */
 async function retryWebhookProcessing(
   eventType: string,
-  _payload: Record<string, unknown>,
+  payload: Record<string, unknown>,
   _signature?: string
 ): Promise<boolean> {
   try {
-    // TODO: 실제 구현에서는 webhook/paddle/route.ts의 processWebhookEvent 사용
-    // 예시:
-    // const { processWebhookEvent } = await import('@/app/api/webhooks/paddle/webhook-processor');
-    // return await processWebhookEvent(eventType, payload);
-
     console.log(`Processing webhook retry: ${eventType}`);
 
-    // 임시 구현: 항상 실패로 처리 (실제 구현 필요)
-    return false;
+    // webhook/paddle/route.ts의 processWebhookEvent를 동적으로 import
+    const { processWebhookEvent } = await import('@/app/api/webhooks/paddle/route');
+
+    // payload에서 data 추출
+    const data = payload.data || payload;
+
+    await processWebhookEvent(eventType as any, data);
+
+    console.log(`✅ Webhook retry successful: ${eventType}`);
+    return true;
 
   } catch (error) {
     console.error('Webhook retry processing error:', error);

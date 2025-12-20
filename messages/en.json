@@ -396,6 +396,14 @@
         "title": "Service Inquiries",
         "email": "Email: oceancode0321@gmail.com"
       }
+    },
+    "refund": {
+      "title": "Refund Policy",
+      "subtitle": "Refund policy for Gena service",
+      "lastUpdated": "Last Updated",
+      "effectiveDate": "Effective from December 19, 2024",
+      "tableOfContents": "Table of Contents",
+      "backToTop": "Back to Top"
     }
   },
   "marketing": {

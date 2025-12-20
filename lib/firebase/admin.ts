@@ -123,27 +123,6 @@ export const getCollection = (collectionName: string) => {
   return db.collection(collectionName);
 };
 
-/**
- * history 컬렉션 참조
- */
-export const getHistoryCollection = () => {
-  return getCollection('history');
-};
-
-/**
- * daily 컬렉션 참조
- */
-export const getDailyCollection = () => {
-  return getCollection('daily');
-};
-
-/**
- * subscription 컬렉션 참조
- */
-export const getSubscriptionCollection = () => {
-  return getCollection('subscription');
-};
-
 // Export instances
 export { adminApp, adminAuth, adminDb };
 

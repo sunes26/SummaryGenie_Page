@@ -1,0 +1,333 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================
+    // 헬퍼 함수
+    // ========================================
+    
+    /**
+     * 인증된 사용자 확인
+     * Firebase Authentication 사용
+     */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /**
+     * 사용자 본인 확인
+     * Firebase Auth UID 사용
+     */
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    /**
+     * 이메일 인증 확인
+     * Firebase Auth의 email_verified 토큰 클레임 사용
+     */
+    function isEmailVerified() {
+      return isAuthenticated() && 
+             request.auth.token.email_verified == true;
+    }
+
+    /**
+     * 관리자 권한 확인
+     * 커스텀 클레임 사용
+     */
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.admin == true;
+    }
+    
+    /**
+     * 특정 역할 확인
+     * ℹ️ 현재 사용되지 않음 - 필요시 주석 해제
+     */
+    // function hasRole(role) {
+    //   return isAuthenticated() &&
+    //          request.auth.token.role == role;
+    // }
+    
+    /**
+     * 문자열 유효성 검증
+     */
+    function isValidString(value, minLen, maxLen) {
+      return value is string && 
+             value.size() >= minLen && 
+             value.size() <= maxLen;
+    }
+    
+    /**
+     * URL 형식 검증
+     */
+    function isValidUrl(url) {
+      return url is string && 
+             (url.matches('https?://.*') || url == '');
+    }
+    
+    /**
+     * 날짜 형식 검증 (YYYY-MM-DD)
+     */
+    function isValidDateFormat(dateStr) {
+      return dateStr is string && 
+             dateStr.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    }
+    
+    /**
+     * 배열 유효성 검증
+     * ℹ️ 현재 사용되지 않음 - 필요시 주석 해제
+     */
+    // function isValidArray(arr, maxLen) {
+    //   return arr is list && arr.size() <= maxLen;
+    // }
+    
+    // ========================================
+    // 1. /users/{userId} - 사용자 프로필 및 데이터
+    // ========================================
+    match /users/{userId} {
+      
+      // ========================================
+      // 프로필 문서 자체
+      // ========================================
+      
+      // 읽기: 본인만 (Firebase Auth UID 사용)
+      allow read: if isOwner(userId);
+      
+      // 생성: 본인만 (회원가입 시)
+      // Firebase Auth로 이미 인증된 상태에서만 가능
+      allow create: if isAuthenticated() && 
+                      isOwner(userId) &&
+                      validateUserCreate(request.resource.data, userId);
+      
+      // 수정: 본인만 또는 관리자
+      allow update: if (isOwner(userId) || isAdmin()) &&
+                      validateUserUpdate(request.resource.data, resource.data);
+      
+      // 삭제: 본인만 (소프트 삭제 권장)
+      allow delete: if isOwner(userId);
+      
+      // ========================================
+      // 1-1. /users/{userId}/history/{historyId}
+      // Chrome 확장 + 웹 대시보드 공용
+      // ========================================
+      match /history/{historyId} {
+        
+        // 읽기: 본인만, 이메일 인증 필수, 삭제되지 않은 문서
+        allow read: if isOwner(userId) && 
+                      isEmailVerified() &&
+                      (resource == null || 
+                       resource.data.deletedAt == null ||
+                       !resource.data.keys().hasAny(['deletedAt']));
+        
+        // 생성: 본인만, 이메일 인증 필수
+        allow create: if isOwner(userId) &&
+                        isEmailVerified() &&
+                        validateHistoryCreate(request.resource.data, userId);
+        
+        // 수정: 본인만, 이메일 인증 필수
+        allow update: if isOwner(userId) &&
+                        isEmailVerified() &&
+                        request.resource.data.userId == userId &&
+                        request.resource.data.createdAt == resource.data.createdAt &&
+                        // deletedAt 필드는 서버(Admin SDK)만 수정 가능
+                        (!request.resource.data.keys().hasAny(['deletedAt']) ||
+                         request.resource.data.deletedAt == resource.data.deletedAt) &&
+                        // updatedAt 필드는 반드시 업데이트되어야 하며, 과거보다 미래여야 함
+                        request.resource.data.keys().hasAny(['updatedAt']) &&
+                        request.resource.data.updatedAt is timestamp &&
+                        (!resource.data.keys().hasAny(['updatedAt']) ||
+                         request.resource.data.updatedAt > resource.data.updatedAt);
+        
+        // 삭제: 허용 안 함 (소프트 삭제만 사용)
+        allow delete: if false;
+      }
+      
+      // ========================================
+      // 1-2. /users/{userId}/daily/{date}
+      // 일일 사용량 추적
+      // ========================================
+      match /daily/{date} {
+        
+        // 읽기: 본인만, 이메일 인증 필수
+        allow read: if isOwner(userId) && isEmailVerified();
+        
+        // 생성: 본인만, 이메일 인증 필수
+        allow create: if isOwner(userId) &&
+                        isEmailVerified() &&
+                        validateDailyCreate(request.resource.data, userId, date);
+        
+        // 수정: 본인만 (프리미엄 상태 업데이트 포함)
+        allow update: if isOwner(userId) &&
+                        isEmailVerified() &&
+                        request.resource.data.userId == userId &&
+                        request.resource.data.date == date;
+        
+        // 삭제: 허용 안 함
+        allow delete: if false;
+      }
+    }
+    
+    // ========================================
+    // 2. /subscription/{subscriptionId}
+    // Paddle 웹훅에서 생성, 웹 대시보드에서 읽기
+    // ========================================
+    match /subscription/{subscriptionId} {
+      
+      // 읽기: 본인의 구독 정보만, 이메일 인증 필수
+      allow read: if isAuthenticated() && 
+                    isEmailVerified() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // 쓰기: 서버(Admin SDK)에서만
+      allow write: if false;
+    }
+    
+    // ========================================
+    // 3. /payments/{paymentId}
+    // Paddle 웹훅에서 생성, 웹 대시보드에서 읽기
+    // ========================================
+    match /payments/{paymentId} {
+      
+      // 읽기: 본인의 결제 내역만, 이메일 인증 필수
+      allow read: if isAuthenticated() && 
+                    isEmailVerified() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // 쓰기: 서버(Admin SDK)에서만
+      allow write: if false;
+    }
+    
+    // ========================================
+    // 4. /pending_transactions/{transactionId}
+    // Paddle 트랜잭션 임시 저장
+    // ========================================
+    match /pending_transactions/{transactionId} {
+      
+      // 읽기: 본인의 트랜잭션만, 이메일 인증 필수
+      allow read: if isAuthenticated() && 
+                    isEmailVerified() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // 쓰기: 서버(Admin SDK)에서만
+      allow write: if false;
+    }
+    
+    // ========================================
+    // 5. 웹훅 관련 컬렉션 (서버 전용)
+    // ========================================
+    
+    // webhook_events: 웹훅 이벤트 기록
+    match /webhook_events/{eventId} {
+      allow read, write: if false;
+    }
+    
+    // processed_webhook_events: 처리된 웹훅 (중복 방지)
+    match /processed_webhook_events/{eventId} {
+      allow read, write: if false;
+    }
+    
+    // webhook_logs: 웹훅 처리 로그
+    match /webhook_logs/{logId} {
+      allow read, write: if false;
+    }
+
+    // ========================================
+    // 6. 기타 시스템 컬렉션
+    // ========================================
+    
+    // 헬스체크 (테스트용)
+    match /_health/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // 테스트용 (_test 컬렉션)
+    // 프로덕션 보안: 클라이언트 접근 완전 차단
+    // Admin SDK는 이 규칙을 우회하므로 서버 연결 테스트는 계속 작동
+    match /_test/{document} {
+      allow read, write: if false;
+    }
+    
+    // 기본: 명시적으로 허용되지 않은 모든 접근 거부
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // ========================================
+    // 검증 함수
+    // ========================================
+    
+    /**
+     * User 프로필 생성 데이터 검증
+     */
+    function validateUserCreate(data, userId) {
+      return data.keys().hasAll(['id', 'email', 'createdAt']) &&
+             data.id == userId &&
+             data.id == request.auth.uid &&
+             data.email is string &&
+             data.email == request.auth.token.email &&
+             data.email.size() > 0 &&
+             data.createdAt is timestamp &&
+             // 선택적 필드 검증
+             (!data.keys().hasAny(['isPremium']) || data.isPremium is bool) &&
+             (!data.keys().hasAny(['subscriptionPlan']) || data.subscriptionPlan is string) &&
+             (!data.keys().hasAny(['name']) || data.name is string) &&
+             (!data.keys().hasAny(['role']) || data.role is string);
+    }
+    
+    /**
+     * User 프로필 수정 데이터 검증
+     */
+    function validateUserUpdate(newData, oldData) {
+      return newData.keys().hasAll(['id', 'email', 'createdAt']) &&
+             // id, createdAt 변경 불가
+             newData.id == oldData.id &&
+             newData.createdAt == oldData.createdAt &&
+             // email 변경 불가 (Firebase Auth에서 관리)
+             newData.email == oldData.email &&
+             // updatedAt 필수 (과거보다 미래여야 함)
+             newData.keys().hasAny(['updatedAt']) &&
+             newData.updatedAt is timestamp &&
+             (!oldData.keys().hasAny(['updatedAt']) ||
+              newData.updatedAt > oldData.updatedAt) &&
+             // role 변경 불가 (관리자만 가능)
+             (newData.role == oldData.role || request.auth.token.admin == true) &&
+             // isPremium 변경 불가 (관리자 또는 서버만 가능)
+             (!newData.keys().hasAny(['isPremium']) ||
+              newData.isPremium == oldData.isPremium ||
+              request.auth.token.admin == true) &&
+             // subscriptionPlan 변경 불가 (관리자 또는 서버만 가능)
+             (!newData.keys().hasAny(['subscriptionPlan']) ||
+              newData.subscriptionPlan == oldData.subscriptionPlan ||
+              request.auth.token.admin == true);
+    }
+    
+    /**
+     * History 생성 데이터 검증
+     */
+    function validateHistoryCreate(data, userId) {
+      return data.keys().hasAll(['userId', 'title', 'createdAt']) &&
+             data.userId == userId &&
+             data.userId == request.auth.uid &&
+             isValidString(data.title, 1, 500) &&
+             (!data.keys().hasAny(['url']) || isValidUrl(data.url)) &&
+             (!data.keys().hasAny(['summary']) || isValidString(data.summary, 1, 10000)) &&
+             data.createdAt is timestamp;
+    }
+    
+    /**
+     * Daily 생성 데이터 검증
+     */
+    function validateDailyCreate(data, userId, date) {
+      return data.keys().hasAll(['userId', 'date', 'createdAt']) &&
+             data.userId == userId &&
+             data.userId == request.auth.uid &&
+             data.date == date &&
+             isValidDateFormat(data.date) &&
+             data.createdAt is timestamp &&
+             (!data.keys().hasAny(['count']) || (data.count is number && data.count >= 0)) &&
+             (!data.keys().hasAny(['isPremium']) || data.isPremium is bool);
+    }
+  }
+}

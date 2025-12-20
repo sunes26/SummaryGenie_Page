@@ -31,8 +31,15 @@ export function Header() {
     <header className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* 로고 */}
-        <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition">
-          Gena
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition">
+          <Image
+            src="/images/logo.png"
+            alt="Gena"
+            width={28}
+            height={28}
+            className="w-7 h-7"
+          />
+          <span>Gena</span>
         </Link>
 
         {/* 네비게이션 */}

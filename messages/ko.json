@@ -396,6 +396,14 @@
         "title": "서비스 문의",
         "email": "이메일: oceancode0321@gmail.com"
       }
+    },
+    "refund": {
+      "title": "환불 정책",
+      "subtitle": "Gena 서비스의 환불 정책입니다",
+      "lastUpdated": "최종 수정일",
+      "effectiveDate": "2024년 12월 19일부터 시행",
+      "tableOfContents": "목차",
+      "backToTop": "맨 위로"
     }
   },
   "marketing": {

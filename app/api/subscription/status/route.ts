@@ -3,15 +3,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyIdToken } from '@/lib/firebase/admin-utils';
 import { getAdminFirestore } from '@/lib/firebase/admin';
 import { safeInternalServerErrorResponse } from '@/lib/api-response';
+import { applyRateLimit, getIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
  * 구독 상태 조회
  * GET /api/subscription/status
- * 
+ *
  * useSubscriptionAPI 훅을 위한 API 엔드포인트
  */
 export async function GET(request: NextRequest) {
   try {
+    // ✅ Rate Limiting (일반 조회)
+    const rateLimitResponse = await applyRateLimit(
+      getIdentifier(request),
+      RATE_LIMITS.GENERAL
+    );
+    if (rateLimitResponse) return rateLimitResponse;
+
     // Firebase ID 토큰 인증
     const authHeader = request.headers.get('authorization');
     

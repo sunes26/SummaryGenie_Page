@@ -961,11 +961,85 @@ async function handleTransactionRefunded(data: unknown): Promise<void> {
 }
 
 /**
+ * Webhook 이벤트 처리 (재사용 가능)
+ *
+ * @param eventType - Paddle 이벤트 타입
+ * @param data - 이벤트 데이터
+ */
+export async function processWebhookEvent(
+  eventType: PaddleEventType,
+  data: unknown
+): Promise<void> {
+  switch (eventType) {
+    case 'subscription.created':
+      await handleSubscriptionCreated(data);
+      break;
+
+    case 'subscription.updated':
+      await handleSubscriptionUpdated(data);
+      break;
+
+    case 'subscription.canceled':
+      await handleSubscriptionCanceled(data);
+      break;
+
+    case 'subscription.past_due':
+      await handleSubscriptionPastDue(data);
+      break;
+
+    case 'subscription.paused':
+      await handleSubscriptionPaused(data);
+      break;
+
+    case 'subscription.resumed':
+      await handleSubscriptionResumed(data);
+      break;
+
+    case 'transaction.completed':
+      await handleTransactionCompleted(data);
+      break;
+
+    case 'transaction.payment_failed':
+      await handleTransactionPaymentFailed(data);
+      break;
+
+    case 'transaction.refunded':
+      await handleTransactionRefunded(data);
+      break;
+
+    default:
+      // Unhandled event type
+      console.log(`Unhandled webhook event type: ${eventType}`);
+      break;
+  }
+}
+
+/**
  * Paddle 웹훅 핸들러
  * POST /api/webhooks/paddle
  */
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Security: Paddle IP whitelist (optional but recommended)
+    // Paddle webhook IPs are documented at: https://developer.paddle.com/webhooks/overview
+    // If PADDLE_ALLOWED_IPS is set, verify the request comes from Paddle
+    const allowedIPs = process.env.PADDLE_ALLOWED_IPS;
+    if (allowedIPs) {
+      const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+                       request.headers.get('x-real-ip') ||
+                       'unknown';
+
+      const allowedIPList = allowedIPs.split(',').map(ip => ip.trim());
+
+      if (!allowedIPList.includes(clientIP)) {
+        console.warn(`⚠️ Webhook request from unauthorized IP: ${clientIP}`);
+        return NextResponse.json(
+          { error: 'Forbidden' },
+          { status: 403 }
+        );
+      }
+    }
+
     const rawBody = await request.text();
 
     const signatureHeader = request.headers.get('paddle-signature');
@@ -1025,47 +1099,7 @@ export async function POST(request: NextRequest) {
 
     // 처음 처리하는 이벤트 - 핸들러 실행
     try {
-      switch (event_type) {
-        case 'subscription.created':
-          await handleSubscriptionCreated(data);
-          break;
-
-        case 'subscription.updated':
-          await handleSubscriptionUpdated(data);
-          break;
-
-        case 'subscription.canceled':
-          await handleSubscriptionCanceled(data);
-          break;
-
-        case 'subscription.past_due':
-          await handleSubscriptionPastDue(data);
-          break;
-
-        case 'subscription.paused':
-          await handleSubscriptionPaused(data);
-          break;
-
-        case 'subscription.resumed':
-          await handleSubscriptionResumed(data);
-          break;
-
-        case 'transaction.completed':
-          await handleTransactionCompleted(data);
-          break;
-
-        case 'transaction.payment_failed':
-          await handleTransactionPaymentFailed(data);
-          break;
-
-        case 'transaction.refunded':
-          await handleTransactionRefunded(data);
-          break;
-
-        default:
-          // Unhandled event type
-          break;
-      }
+      await processWebhookEvent(event_type, data);
 
       // ✅ 성공 로그 기록
       await logWebhookEvent(payload, 'success').catch(logErr => {
